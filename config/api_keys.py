@@ -1,4 +1,9 @@
-TOKEN_API = '6169246048:AAFGyHRhW3OYYt4tB3nqTVY7WEwjWbv8w1g'
-API_ID = 24791011
-API_HASH = 'ae961cb23041367c48e2577f13a66e58'
-NAME = 'Grimm_Python_Test_Bot'
+from dotenv import dotenv_values
+
+
+ENV_DATA = {**dotenv_values('.env')}
+
+TOKEN_API = ENV_DATA['TOKEN_API']
+API_ID = ENV_DATA['API_ID']
+API_HASH = ENV_DATA['API_HASH']
+NAME = ENV_DATA['NAME']
