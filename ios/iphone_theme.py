@@ -9,7 +9,7 @@ from config.api_keys import API_ID, API_HASH, NAME
 api_id = API_ID
 api_hash = API_HASH
 
-async def adjust_color_brightness(hex_color, factor=0.1):
+async def adjust_color_brightness(hex_color, factor=0.2):
     # Перетворюємо рядок у форматі "#RRGGBB" у відповідне ціле число.
     color = int(hex_color[1:], 16)
 
@@ -546,7 +546,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"    negative: ff3b30",
                 f"  disclosureActions:",
                 f"    neutral1:",
-                f"      bg: 4892f2",
+                f"      bg: {not_primary_txt}",
                 f"      fg: ffffff",
                 f"    neutral2:",
                 f"      bg: f09a37",
@@ -648,7 +648,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"      accentControl: {not_primary_txt}",
                 f"      mediaActiveControl: {not_primary_txt}",
                 f"      mediaInactiveControl: cacaca",
-                f"      pendingActivity: 99525252",
+                f"      pendingActivity: 99{bg}",
                 f"      fileTitle: {not_primary_txt}",
                 f"      fileDescription: 999999",
                 f"      fileDuration: 99525252",
@@ -690,7 +690,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"      accentControl: ffffff",
                 f"      mediaActiveControl: ffffff",
                 f"      mediaInactiveControl: a5ffffff",
-                f"      pendingActivity: a5ffffff",
+                f"      pendingActivity: a5{bg}",
                 f"      fileTitle: ffffff",
                 f"      fileDescription: a5ffffff",
                 f"      fileDuration: a5ffffff",
@@ -722,7 +722,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"        highlightedBg: dadade",
                 f"        stroke: e5e5ea",
                 f"    infoPrimaryText: 000000",
-                f"    infoLinkText: 004bad",
+                f"    infoLinkText: {primary_txt}",
                 f"    outgoingCheck: ffffff",
                 f"    mediaDateAndStatusBg: 7f000000",
                 f"    mediaDateAndStatusText: ffffff",
