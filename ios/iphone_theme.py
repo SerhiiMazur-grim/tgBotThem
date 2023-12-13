@@ -4,7 +4,7 @@ from telethon.sync import TelegramClient
 from telethon.tl.functions.account import UploadWallPaperRequest
 from telethon.tl.types import InputFile, WallPaperSettings
 
-from config.api_keys import API_ID, API_HASH
+from config.api_keys import API_ID, API_HASH, NAME
 
 api_id = API_ID
 api_hash = API_HASH
@@ -75,7 +75,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
 
             wallpaper_slug = wallpaper.slug
             name = f'{status_bar}_{bg}'
-            file_name = f'{bg}{primary_txt}{secondary_txt}.tgios-theme'
+            file_name = f'{NAME}_{bg}{primary_txt}{not_primary_txt}.tgios-theme'
 
             path = os.path.join('ios', 'theme', str(chat_id))
             if not os.path.exists(path):
@@ -577,7 +577,10 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"    placeholder: 96979d",
                 f"    primary: {primary_txt}",
                 f"    control: {not_primary_txt}",
-                f"  mediaPlaceholder: e4e4e4",
+                
+                # f"  mediaPlaceholder: e4e4e4",
+                
+                f"  mediaPlaceholder: {bg}",
                 f"  scrollIndicator: 4c000000",
                 f"  pageIndicatorInactive: e3e3e7",
                 f"  inputClearButton: cccccc",
@@ -628,13 +631,13 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"    incoming:",
                 f"      bubble:",
                 f"        withWp:",
-                f"          bg: {bg}",
+                f"          bg: {darker_bg}",
                 f"          highlightedBg: ccdadade",
-                f"          stroke: {bg}",
+                f"          stroke: {darker_bg}",
                 f"        withoutWp:",
-                f"          bg: {bg}",
+                f"          bg: {darker_bg}",
                 f"          highlightedBg: ccdadade",
-                f"          stroke: {bg}",
+                f"          stroke: {darker_bg}",
                 f"      primaryText: {primary_txt}",
                 f"      secondaryText: {secondary_txt}",
                 f"      linkText: {not_primary_txt}",
@@ -691,7 +694,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 f"      fileTitle: ffffff",
                 f"      fileDescription: a5ffffff",
                 f"      fileDuration: a5ffffff",
-                f"      mediaPlaceholder: 0000f2",
+                f"      mediaPlaceholder: {primary_txt}",
                 f"      polls:",
                 f"        radioButton: a5ffffff",
                 f"        radioProgress: ffffff",

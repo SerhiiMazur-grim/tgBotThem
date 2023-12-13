@@ -23,7 +23,7 @@ async def is_user_subscribed(message, bot: Bot):
 
     # Перевірка підписки користувача на кожен канал зі списку channel_ids
     checked_channels = []
-    for channel_id in CHANNEL_IDS.keys():
+    for channel_id in CHANNEL_IDS:
         member = await Bot.get_chat_member(self=bot, chat_id=channel_id, user_id=message.from_user.id)
 
         # Перевірка, чи користувач є учасником каналу та має статус "member" або "creator"

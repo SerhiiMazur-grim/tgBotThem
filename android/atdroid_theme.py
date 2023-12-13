@@ -1,6 +1,7 @@
 import os
 
 from config.alfa_bg import alfa_bg
+from config.api_keys import NAME
 
 
 async def color_to_int32(color):
@@ -67,7 +68,7 @@ async def adjust_color_brightness(hex_color, factor=0.1):
 async def create_android_theme(chat_id, image_path, bg, primary_txt, secondary_txt, alfa):
     alfa = alfa_bg[alfa]
     bg_hex = bg
-    file_name = f'{bg}{primary_txt}{secondary_txt}.attheme'
+    file_name = f'{NAME}_{bg}{primary_txt}{secondary_txt}.attheme'
     binar_imag = await img_to_binar(image_path)
     bg = await color_to_int32(bg)
     primary_txt = await color_to_int32(primary_txt)

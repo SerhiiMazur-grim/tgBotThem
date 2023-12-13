@@ -2,6 +2,7 @@ import os
 import zipfile
 
 from config.alfa_bg import alfa_bg
+from config.api_keys import NAME
 from android.atdroid_theme import adjust_color_brightness
 
 
@@ -24,7 +25,7 @@ async def create_pc_theme(chat_id, image_path, background_color, primary_text_co
     zip_name = os.path.join('desktop',
                             'theme',
                             str(chat_id),
-                            f'{background_color}{primary_text_color}{secondary_text_color}.tdesktop-theme')
+                            f'{NAME}_{background_color}{primary_text_color}{secondary_text_color}.tdesktop-theme')
 
     write_data = [
         "windowShadowFg: #000000bf;",

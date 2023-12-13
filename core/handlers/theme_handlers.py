@@ -12,7 +12,6 @@ from core.keyboards.inline_keybords import choose_device_keyboard, choose_backgr
 from core.theme_creator import create_theme
 
 
-sended_photo = None
 user_data = {}
 
 
@@ -21,7 +20,6 @@ async def handler_abort(callback_query: CallbackQuery, bot: Bot):
 
     chat_id = callback_query.message.chat.id
     await callback_query.message.delete()
-    await sended_photo.delete()
     await dell_data(user_data=user_data, chat_id=chat_id)
     user_data[chat_id] = {}
 
@@ -31,17 +29,19 @@ async def handle_photo(message: Message, bot: Bot):
 
     if await is_user_subscribed(message, bot):
         if message.document:
-            photo = message.document  # Отримати останнє фото зі списку
+            photo = message.document
+            if photo.mime_type != 'image/jpeg':
+                await message.reply(text=messages.NOT_IMAGE)
+                return
+            
         elif message.photo:
             photo = message.photo[-1]
 
-        global sended_photo
-
         wait_message = await message.answer(text=messages.WAIT_MESSAGE)
         
-        sended_photo = message
         chat_id = message.chat.id
         user_data[chat_id] = {}
+        user_data[chat_id]['sended_photo'] = message
 
         photo_id = photo.file_id
         get_photo = await bot.get_file(photo_id)
@@ -51,7 +51,11 @@ async def handle_photo(message: Message, bot: Bot):
         download_file = os.path.join('download_photo', new_filename)
         await bot.download_file(file_path=get_photo.file_path, destination=download_file)  # завантажити фото
 
-        colors = await image_color_picker(download_file)
+        try:
+            colors = await image_color_picker(download_file)
+        except:
+            await wait_message.delete()
+            await message.reply(text=messages.NOT_IMAGE)
         user_data[chat_id]['colors'] = colors
         color_pick_image = f'{photo_id}{message.from_user.id}.jpg'
         user_data[chat_id]['colors_image'] = color_pick_image
@@ -151,7 +155,7 @@ async def handler_secondary_text_color(callback_query: CallbackQuery):
     else:
         theme = await create_theme(user_data[chat_id], chat_id)
         await callback_query.message.delete()
-        await sended_photo.reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
+        await user_data[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
         await dell_data(user_data=user_data, chat_id=chat_id)
         user_data[chat_id] = {}
 
@@ -177,7 +181,7 @@ async def handler_alfa_background_color(callback_query: CallbackQuery):
 
         theme = await create_theme(user_data[chat_id], chat_id)
         await callback_query.message.delete()
-        await sended_photo.reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
+        await user_data[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
         await dell_data(user_data=user_data, chat_id=chat_id)
         user_data[chat_id] = {}
 
@@ -195,7 +199,7 @@ async def handler_auto_theme(callback_query: CallbackQuery):
 
         theme = await create_theme(user_data[chat_id], chat_id)
         await callback_query.message.delete()
-        await sended_photo.reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
+        await user_data[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
         await dell_data(user_data=user_data, chat_id=chat_id)
         user_data[chat_id] = {}
 
@@ -207,7 +211,7 @@ async def handler_auto_theme(callback_query: CallbackQuery):
 
         theme = await create_theme(user_data[chat_id], chat_id)
         await callback_query.message.delete()
-        await sended_photo.reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
+        await user_data[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
         await dell_data(user_data=user_data, chat_id=chat_id)
         user_data[chat_id] = {}
 
@@ -220,6 +224,6 @@ async def handler_auto_theme(callback_query: CallbackQuery):
 
         theme = await create_theme(user_data[chat_id], chat_id)
         await callback_query.message.delete()
-        await sended_photo.reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
+        await user_data[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme), caption=messages.MESSAGE_THEME_DONE)
         await dell_data(user_data=user_data, chat_id=chat_id)
         user_data[chat_id] = {}
