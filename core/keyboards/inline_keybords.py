@@ -105,3 +105,12 @@ def choose_alfa_background_color_keyboard():
     keyboard.adjust(3, 3, 3, 1, 2)
 
     return keyboard.as_markup()
+
+
+def add_bot_to_chat_inl_keyboard():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url='t.me/Grimm_Python_Test_Bot?startgroup&admin=post_messages')
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup()

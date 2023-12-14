@@ -38,7 +38,6 @@ async def handle_photo(message: Message, bot: Bot):
             photo = message.photo[-1]
 
         wait_message = await message.answer(text=messages.WAIT_MESSAGE)
-        
         chat_id = message.chat.id
         user_data[chat_id] = {}
         user_data[chat_id]['sended_photo'] = message

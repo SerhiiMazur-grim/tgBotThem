@@ -7,7 +7,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command
 
 from config.api_keys import TOKEN_API
-from core.handlers.basic import start_bot, command_start, sub_checker
+from config import messages
+from core.handlers.basic import start_bot, command_start, sub_checker, command_create_theme, command_add_to_chat, command_faq
 from core.handlers.theme_handlers import handle_photo, handler_abort, handler_device, handler_background_color, \
     handler_primary_text_color, handler_secondary_text_color, handler_alfa_background_color, handler_auto_theme, \
     handler_back_to_device_choose, handler_back_to_background_color_choose, handler_back_to_primary_text_color_choose, \
@@ -27,6 +28,9 @@ async def main():
     # basic handlers
     dp.startup.register(start_bot)
     dp.message.register(command_start, Command('start'))
+    dp.message.register(command_create_theme, F.text == messages.BUTTON_CREATE_THEME)
+    dp.message.register(command_add_to_chat, F.text == messages.BUTTON_ADD_TO_CHAT)
+    dp.message.register(command_faq, F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
 
     dp.message.register(handle_photo, F.photo)
