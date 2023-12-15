@@ -28,15 +28,28 @@ async def handle_photo(message: Message, bot: Bot):
     """ Отримуємо фото від користувача та оброблємо його """
 
     if await is_user_subscribed(message, bot):
-        if message.document:
-            photo = message.document
-            if photo.mime_type != 'image/jpeg':
-                await message.reply(text=messages.NOT_IMAGE)
-                return
-            
-        elif message.photo:
-            photo = message.photo[-1]
-
+        if message.chat.type == 'private':
+            if message.document:
+                photo = message.document
+                if photo.mime_type != 'image/jpeg':
+                    await message.reply(text=messages.NOT_IMAGE)
+                    return
+                
+            elif message.photo:
+                photo = message.photo[-1]
+                
+        elif message.chat.type != 'private' and message.caption == '/theme':
+            if message.document:
+                photo = message.document
+                if photo.mime_type != 'image/jpeg':
+                    await message.reply(text=messages.NOT_IMAGE)
+                    return
+                
+            elif message.photo:
+                photo = message.photo[-1]
+        else:
+            return
+        
         wait_message = await message.answer(text=messages.WAIT_MESSAGE)
         chat_id = message.chat.id
         user_data[chat_id] = {}

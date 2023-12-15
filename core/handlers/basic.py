@@ -16,32 +16,38 @@ async def start_bot(bot: Bot):
 
 
 async def command_start(message: Message, bot: Bot):
-    await message.delete()
-    if await is_user_subscribed(message=message, bot=bot):
-        user_id = message.from_user.id
-        await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id, ADMINS))
+    if message.chat.type == 'private':
+        await message.delete()
+        if await is_user_subscribed(message=message, bot=bot):
+            user_id = message.from_user.id
+            await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id, ADMINS))
+    # else:
+    #     await message.answer(text=messages.MESSAGE_ON_START_COMMAND_IN_GROUP)
 
 
 async def command_create_theme(message: Message, bot: Bot):
-    await message.delete()
-    if await is_user_subscribed(message=message, bot=bot):
-        await message.answer(text=messages.MESSAGE_ON_CREATE_THEME)
+    if message.chat.type == 'private':
+        await message.delete()
+        if await is_user_subscribed(message=message, bot=bot):
+            await message.answer(text=messages.MESSAGE_ON_CREATE_THEME)
 
 
 async def command_add_to_chat(message: Message, bot: Bot):
-    await message.delete()
-    if await is_user_subscribed(message=message, bot=bot):
-        await message.answer_photo(
-            photo='AgACAgIAAxkBAAIKbWV7EpqPFuHEym4Bs32PSo_9Rit-AALQ0TEbqwAB2EttErDuM8NVEgEAAwIAA3kAAzME',
-            caption=messages.MESSAGE_ON_ADD_TO_CHAT,
-            reply_markup=add_bot_to_chat_inl_keyboard()
-        )
+    if message.chat.type == 'private':
+        await message.delete()
+        if await is_user_subscribed(message=message, bot=bot):
+            await message.answer_photo(
+                photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
+                caption=messages.MESSAGE_ON_ADD_TO_CHAT,
+                reply_markup=add_bot_to_chat_inl_keyboard()
+            )
         
 
 async def command_faq(message: Message, bot: Bot):
-    await message.delete()
-    if await is_user_subscribed(message=message, bot=bot):
-        await message.answer(text=messages.MESSAGE_ON_FAQ, disable_web_page_preview=True)
+    if message.chat.type == 'private':
+        await message.delete()
+        if await is_user_subscribed(message=message, bot=bot):
+            await message.answer(text=messages.MESSAGE_ON_FAQ, disable_web_page_preview=True)
 
 
 async def is_user_subscribed(message, bot: Bot):

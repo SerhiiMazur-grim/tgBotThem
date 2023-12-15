@@ -9,7 +9,7 @@ from config.api_keys import API_ID, API_HASH, NAME
 api_id = API_ID
 api_hash = API_HASH
 
-async def adjust_color_brightness(hex_color, factor=0.2):
+async def adjust_color_brightness(hex_color, factor=0.1):
     # Перетворюємо рядок у форматі "#RRGGBB" у відповідне ціле число.
     color = int(hex_color[1:], 16)
 

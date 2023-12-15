@@ -18,4 +18,3 @@ def user_keyboard(user_id, admin_list):
     keyboard.adjust(2, 2, 1, 2)
     
     return keyboard.as_markup()
-    
