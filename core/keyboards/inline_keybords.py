@@ -1,6 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
+from config.categories import CATEGORIES, DRVICES
 
 
 def subscribe_keyboard(checked_channels):
@@ -113,4 +114,21 @@ def add_bot_to_chat_inl_keyboard():
     keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url='t.me/Grimm_Python_Test_Bot?startgroup&admin=post_messages')
     keyboard.adjust(1)
     
+    return keyboard.as_markup()
+
+
+def choice_category_ikb_keyboard():
+    keyboard = InlineKeyboardBuilder()
+
+    for category, index in CATEGORIES.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+def choice_device_db_ikb_keyboard():
+    keyboard = InlineKeyboardBuilder()
+
+    for device, value in DRVICES.items():
+        keyboard.button(text=device, callback_data=value)
+    keyboard.adjust(3)
     return keyboard.as_markup()

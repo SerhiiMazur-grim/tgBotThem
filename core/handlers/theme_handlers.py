@@ -8,11 +8,35 @@ from core.handlers.basic import is_user_subscribed, dell_data
 from core.image.gener_image import create_image
 from core.image.image_analiz import image_color_picker
 from core.keyboards.inline_keybords import choose_device_keyboard, choose_background_color_keyboard, \
-    choose_primary_text_color_keyboard, choose_secondary_text_color_keyboard, choose_alfa_background_color_keyboard
+    choose_primary_text_color_keyboard, choose_secondary_text_color_keyboard, choose_alfa_background_color_keyboard, \
+    choice_category_ikb_keyboard, choice_device_db_ikb_keyboard
 from core.theme_creator import create_theme
+from config.api_keys import ADMINS
+from core.database import add_theme_to_catalog
 
 
 user_data = {}
+ADMIN_ADD_DATA = {}
+
+
+async def is_admin(user_id):
+    return str(user_id) in ADMINS
+
+
+async def start_add_theme(message: Message, bot: Bot):
+    admin = message.from_user.id
+    if await is_admin(admin):
+        ADMIN_ADD_DATA[admin] = {'theme': {}}
+        ADMIN_ADD_DATA[admin]['init'] = True
+        await message.answer(text=messages.MESSAGE_CHOICE_DEVICE, reply_markup=choice_device_db_ikb_keyboard())
+
+
+async def add_theme_device(callback_query: CallbackQuery):
+    admin = callback_query.from_user.id
+    if await is_admin(admin) and ADMIN_ADD_DATA.get(admin):
+        if ADMIN_ADD_DATA[admin]['init']:
+            ADMIN_ADD_DATA[admin]['theme']['device'] = callback_query.data.split('_')[-1]
+            await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
 
 
 async def handler_abort(callback_query: CallbackQuery, bot: Bot):
@@ -26,8 +50,27 @@ async def handler_abort(callback_query: CallbackQuery, bot: Bot):
 
 async def handle_photo(message: Message, bot: Bot):
     """ Отримуємо фото від користувача та оброблємо його """
+    
+    admin = message.from_user.id
+    if await is_admin(admin) and ADMIN_ADD_DATA.get(admin):
+        if ADMIN_ADD_DATA[admin]['init'] and message.photo:
+            preview = message.photo[-1]
+            
+            ADMIN_ADD_DATA[admin]['theme']['preview'] = preview.file_id
+            await message.answer(text=messages.MESSAGE_SEND_THEME_FILE)
+            return
+            
+        elif ADMIN_ADD_DATA[admin]['init'] and message.document:
+            theme_file = message.document
+            if theme_file.file_name.split('.')[-1] in ('attheme', 'tdesktop-theme', 'tgios-theme'):
+                ADMIN_ADD_DATA[admin]['theme']['file'] = theme_file.file_id
+                await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY, reply_markup=choice_category_ikb_keyboard())
+                return
+            else:
+                await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
+                return
 
-    if await is_user_subscribed(message, bot):
+    elif await is_user_subscribed(message, bot):
         if message.chat.type == 'private':
             if message.document:
                 photo = message.document
@@ -80,6 +123,22 @@ async def handle_photo(message: Message, bot: Bot):
             caption=messages.CHOOSE_DEVICE_TEXT,
             reply_markup=choose_device_keyboard()
         )
+
+
+async def add_theme_category(callback_query: CallbackQuery):
+    if ADMIN_ADD_DATA:
+        admin = callback_query.from_user.id
+        if await is_admin(admin) and ADMIN_ADD_DATA[admin]['init']:
+            category = callback_query.data.split('_')[-1]
+            preview = ADMIN_ADD_DATA[admin]['theme']['preview']
+            theme = ADMIN_ADD_DATA[admin]['theme']['file']
+            device = ADMIN_ADD_DATA[admin]['theme']['device']
+            
+            await add_theme_to_catalog(category, preview, theme, device)
+            
+            ADMIN_ADD_DATA[admin] = {}
+            
+            await callback_query.message.answer(text=messages.MESSAGE_ADDED_TO_DB)
 
 
 async def handler_device(callback_query: CallbackQuery):

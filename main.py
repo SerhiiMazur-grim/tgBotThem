@@ -12,7 +12,7 @@ from core.handlers.basic import start_bot, command_start, sub_checker, command_c
 from core.handlers.theme_handlers import handle_photo, handler_abort, handler_device, handler_background_color, \
     handler_primary_text_color, handler_secondary_text_color, handler_alfa_background_color, handler_auto_theme, \
     handler_back_to_device_choose, handler_back_to_background_color_choose, handler_back_to_primary_text_color_choose, \
-    handler_back_to_secondary_text_color_choose
+    handler_back_to_secondary_text_color_choose, start_add_theme, add_theme_category, add_theme_device
 from core.middleware import CleanupMiddleware, check_and_delete_files
 
 
@@ -33,10 +33,14 @@ async def main():
     dp.message.register(command_faq, F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
 
+
+    dp.message.register(start_add_theme, F.text == messages.BUTTON_ADD_THEME)
     dp.message.register(handle_photo, F.photo)
     dp.message.register(handle_photo, F.document)
+    dp.callback_query.register(add_theme_category, F.data.startswith('cat_'))
     dp.callback_query.register(handler_abort, F.data == 'abort')
     dp.callback_query.register(handler_device, F.data.startswith('device_'))
+    dp.callback_query.register(add_theme_device, F.data.startswith('db-dev_'))
     dp.callback_query.register(handler_background_color, F.data.startswith('background_color_'))
     dp.callback_query.register(handler_primary_text_color, F.data.startswith('primary_text_color_'))
     dp.callback_query.register(handler_secondary_text_color, F.data.startswith('secondary_text_color_'))
@@ -47,7 +51,7 @@ async def main():
     dp.callback_query.register(handler_back_to_background_color_choose, F.data == 'back_to_background_choose')
     dp.callback_query.register(handler_back_to_primary_text_color_choose, F.data == 'back_to_primary_text_choose')
     dp.callback_query.register(handler_back_to_secondary_text_color_choose, F.data == 'back_to_secondary_text_choose')
-
+    
     try:
         await dp.start_polling(bot)
     finally:

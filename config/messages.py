@@ -59,3 +59,13 @@ BUTTON_ALFA_90 = '90%'
 BUTTON_ALFA_0 = 'Без прозорості'
 
 MESSAGE_THEME_DONE = 'Тема зроблена в @Grimm_Python_Test_Bot\n⚠️⚠️⚠️\nПерезавантажте Телеграм для того, щоб тема встановилась повністю.\n⚠️⚠️⚠️'
+
+MESSAGE_ADDED_TO_DB = 'Тему додано до каталогу'
+
+
+MESSAGE_SEND_PREVIEW_THEME = 'Скиньте мені прев`ю для теми'
+MESSAGE_SEND_THEME_FILE = 'Скиньте мені файл теми'
+MESSAGE_CHOICE_CATEGORY = 'Оберіть категорію'
+MESSAGE_CHOICE_DEVICE = 'Для якого девайса тема?'
+MESSAGE_IS_NOT_THEME = 'Це не файл теми!'
+MESSAGE_NO_PREVIEW_IN_THEME = 'У теми немає превю! Скиньте превю для теми!'

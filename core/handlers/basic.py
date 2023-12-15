@@ -9,10 +9,12 @@ from config.telegram_chats import CHANNEL_IDS
 from core.commands import set_commands
 from core.keyboards.inline_keybords import subscribe_keyboard, add_bot_to_chat_inl_keyboard
 from core.keyboards.reply_keybords import user_keyboard
+from core.database import start_db
 
 
 async def start_bot(bot: Bot):
     await set_commands(bot)
+    await start_db()
 
 
 async def command_start(message: Message, bot: Bot):
@@ -21,8 +23,6 @@ async def command_start(message: Message, bot: Bot):
         if await is_user_subscribed(message=message, bot=bot):
             user_id = message.from_user.id
             await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id, ADMINS))
-    # else:
-    #     await message.answer(text=messages.MESSAGE_ON_START_COMMAND_IN_GROUP)
 
 
 async def command_create_theme(message: Message, bot: Bot):
