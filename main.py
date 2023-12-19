@@ -4,11 +4,11 @@ import sys
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.enums import ParseMode
-from aiogram.filters import Command
+from aiogram.filters import Command, and_f, invert_f
 
 from config.api_keys import TOKEN_API
 from config import messages
-from core.handlers import basic, theme_handlers, theme_catalog_handlers
+from core.handlers import basic, theme_handlers, theme_catalog_handlers, mailing_handlers
 from core.middleware import CleanupMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 
@@ -31,6 +31,12 @@ async def main():
     dp.message.register(basic.command_faq, F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
 
+    dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
+    dp.message.register(mailing_handlers.save_post_media, F.media_group_id | F.caption.startswith('POST\n'))
+    dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
+    dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
+    
+    
     # theme handlers
     dp.message.register(theme_handlers.command_user_kb, F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(theme_handlers.start_add_theme, F.text == messages.BUTTON_ADD_THEME)

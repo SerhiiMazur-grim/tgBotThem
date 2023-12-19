@@ -1,0 +1,84 @@
+from aiogram import Bot
+from aiogram.types import Message, CallbackQuery
+from aiogram.types.input_media_animation import InputMediaAnimation
+from aiogram.types.input_media_document import InputMediaDocument
+from aiogram.types.input_media_audio import InputMediaAudio
+from aiogram.types.input_media_photo import InputMediaPhoto
+from aiogram.types.input_media_video import InputMediaVideo
+
+from config import messages
+from core.utils import is_admin
+from core.keyboards.inline_keybords import send_post_ikb
+from core.database import get_chats_id_from_db
+
+
+SEND_DATA = {}
+
+
+async def create_mailing(message: Message, bot: Bot):
+    user_id = message.from_user.id
+    if is_admin(user_id):
+        await message.delete()
+        SEND_DATA[user_id] = []
+        await message.answer(text=messages.MESSAGE_GIVE_ME_POST)
+
+
+async def save_post_media(message: Message, bot: Bot):
+    user_id = message.from_user.id
+    if is_admin(user_id):
+        if message.animation:
+            media = message.animation.file_id
+            caption = message.caption
+            animation = InputMediaAnimation(media=media, caption=caption)
+            SEND_DATA[user_id].append(animation)
+            return
+
+        elif message.document:
+            media = message.document.file_id
+            caption = message.caption
+            document = InputMediaDocument(media=media, caption=caption)
+            SEND_DATA[user_id].append(document)
+            return
+
+        elif message.audio:
+            media = message.audio.file_id
+            caption = message.caption
+            audio = InputMediaAudio(media=media, caption=caption)
+            SEND_DATA[user_id].append(audio)
+            return
+
+        elif message.photo:
+            media = message.photo[-1].file_id
+            caption = message.caption
+            photo = InputMediaPhoto(media=media, caption=caption)
+            SEND_DATA[user_id].append(photo)
+            return
+
+        elif message.video:
+            media = message.video.file_id
+            caption = message.caption
+            video = InputMediaVideo(media=media, caption=caption)
+            SEND_DATA[user_id].append(video)
+            return
+
+
+async def view_post_media(message: Message, bot: Bot):
+    user_id = message.from_user.id
+    if is_admin(user_id):
+        await message.delete()
+        if SEND_DATA[user_id]:
+            await message.answer_media_group(media=SEND_DATA[user_id])
+            await message.answer(text=messages.MESSAGE_IS_YOUR_POST, reply_markup=send_post_ikb())
+        else:
+            await message.answer(text=messages.MESSAGE_NO_POST)
+
+
+async def send_post_to_all(callback_query: CallbackQuery, bot: Bot):
+    user_id = callback_query.from_user.id
+    if is_admin(user_id):
+        chats = await get_chats_id_from_db()
+        if SEND_DATA[user_id]:
+            for chat in chats:
+                await bot.send_media_group(chat_id=chat, media=SEND_DATA[user_id])
+        else:
+            await callback_query.answer(text=messages.MESSAGE_NO_POST)

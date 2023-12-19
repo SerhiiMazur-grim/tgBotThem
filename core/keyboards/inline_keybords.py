@@ -151,3 +151,15 @@ def choice_category_db_get_ikb():
         keyboard.button(text=category, callback_data=index)
     keyboard.adjust(3)
     return keyboard.as_markup()
+
+
+def send_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_SEND_TO_ALL, callback_data='post_send_all')
+    keyboard.button(text=messages.BUTTON_SEND_TO_PRIVATE, callback_data='post_send_private')
+    keyboard.button(text=messages.BUTTON_SEND_TO_GROUP, callback_data='post_send_group')
+    keyboard.button(text=messages.BUTTON_DELETE_POST, callback_data='post_delete')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()

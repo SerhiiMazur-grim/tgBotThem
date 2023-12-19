@@ -47,6 +47,8 @@ async def handler_abort(callback_query: CallbackQuery, bot: Bot):
 
 async def handle_photo(message: Message, bot: Bot):
     """ Отримуємо фото від користувача та оброблємо його """
+    if message.media_group_id:
+        return
     
     admin = message.from_user.id
     if is_admin(admin) and ADMIN_ADD_DATA.get(admin):
@@ -77,6 +79,7 @@ async def handle_photo(message: Message, bot: Bot):
                 
             elif message.photo:
                 photo = message.photo[-1]
+            else: return
                 
         elif message.chat.type != 'private' and message.caption == '/theme':
             if message.document:
