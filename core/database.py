@@ -97,6 +97,28 @@ async def get_chats_id_from_db():
     return chats_ids
 
 
+async def get_private_chats_id_from_db():
+    db = sq.connect(USERS_DB)
+    cur = db.cursor()
+    
+    query = "SELECT chat_id FROM users WHERE chat_type = 'private';"
+    chats = cur.execute(query).fetchall()
+    chats_ids = [i[0] for i in chats]
+    
+    return chats_ids
+
+
+async def get_group_chats_id_from_db():
+    db = sq.connect(USERS_DB)
+    cur = db.cursor()
+    
+    query = "SELECT chat_id FROM users WHERE chat_type != 'private';"
+    chats = cur.execute(query).fetchall()
+    chats_ids = [i[0] for i in chats]
+    
+    return chats_ids
+
+
 async def get_chats_count_from_db():
     db = sq.connect(USERS_DB)
     cur = db.cursor()

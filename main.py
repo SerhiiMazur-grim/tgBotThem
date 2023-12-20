@@ -4,7 +4,7 @@ import sys
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, and_f, invert_f
+from aiogram.filters import Command
 
 from config.api_keys import TOKEN_API
 from config import messages
@@ -32,16 +32,20 @@ async def main():
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
-    dp.message.register(mailing_handlers.save_post_media, F.media_group_id | F.caption.startswith('POST\n'))
+    dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption | F.text.startswith('POST\n'))
     dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
     dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
-    
+    dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')
+    dp.callback_query.register(mailing_handlers.send_post_to_group, F.data == 'post_send_group')
+    dp.callback_query.register(mailing_handlers.delete_post, F.data == 'post_delete')
+    dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')
     
     # theme handlers
     dp.message.register(theme_handlers.command_user_kb, F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(theme_handlers.start_add_theme, F.text == messages.BUTTON_ADD_THEME)
-    dp.message.register(theme_handlers.handle_photo, F.photo)
-    dp.message.register(theme_handlers.handle_photo, F.document)
+    dp.callback_query.register(theme_handlers.abort_add_theme, F.data == 'abort_add_theme')
+    dp.message.register(theme_handlers.handle_photo, F.photo | F.document)
+    # dp.message.register(theme_handlers.handle_photo, F.document)
     dp.callback_query.register(theme_handlers.add_theme_category, F.data.startswith('cat_'))
     dp.callback_query.register(theme_handlers.handler_abort, F.data == 'abort')
     dp.callback_query.register(theme_handlers.handler_device, F.data.startswith('device_'))
