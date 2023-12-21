@@ -178,3 +178,11 @@ def abort_create_post_ikb():
     
     keyboard.adjust(1)
     return keyboard.as_markup()
+
+def fonts_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for view, font in messages.FONTS_BUTTONS.items():
+        keyboard.button(text=view, callback_data=font)
+    keyboard.adjust(2)
+    return keyboard.as_markup()

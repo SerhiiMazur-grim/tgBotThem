@@ -2,13 +2,14 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher, F, types
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 
 from config.api_keys import TOKEN_API
 from config import messages
-from core.handlers import basic, theme_handlers, theme_catalog_handlers, mailing_handlers
+from core.handlers import basic, theme_handlers, \
+theme_catalog_handlers, mailing_handlers, fonts_handlers
 from core.middleware import CleanupMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 
@@ -30,9 +31,13 @@ async def main():
     dp.message.register(basic.command_add_to_chat, F.text == messages.BUTTON_ADD_TO_CHAT)
     dp.message.register(basic.command_faq, F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
+    
+    dp.message.register(fonts_handlers.font_catalog, F.text == messages.BUTTON_FONTS_CATALOG)
+    dp.message.register(fonts_handlers.get_text_from_user, F.text.startswith('//'))
+    dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_'))
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
-    dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption | F.text.startswith('POST\n'))
+    dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
     dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
     dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
     dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')

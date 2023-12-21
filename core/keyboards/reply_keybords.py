@@ -23,11 +23,10 @@ def user_keyboard(user_id):
 def admin_keyboard():
     keyboard = ReplyKeyboardBuilder()
     keyboard.button(text=messages.BUTTON_ADD_THEME)
-    keyboard.button(text=messages.BUTTON_ADD_FONT)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)
-    keyboard.adjust(2, 2, 1)
+    keyboard.adjust(1, 2, 1)
     
     return keyboard.as_markup(resize_keyboard=True)
 

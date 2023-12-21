@@ -86,7 +86,7 @@ async def handle_photo(message: Message, bot: Bot):
                     await message.reply(text=messages.NOT_IMAGE)
                     return
                 
-            elif message.photo and not message.caption:
+            elif message.photo:
                 photo = message.photo[-1]
             else: return
                 

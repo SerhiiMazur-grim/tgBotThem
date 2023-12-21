@@ -19,6 +19,10 @@ async def command_start(message: Message, bot: Bot):
         await message.delete()
         if await is_user_subscribed(message=message, bot=bot):
             await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id))
+    else:
+        await message.answer_photo(photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
+                                    caption=messages.MESSAGE_ON_START_IN_GROUP,
+                                    reply_markup=None)
 
 
 async def command_create_theme(message: Message, bot: Bot):

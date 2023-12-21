@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 
 from config.telegram_chats import CHANNEL_IDS
 from config.api_keys import ADMINS
+from config.fonts import FONTS
 from config import messages
 from core.keyboards.inline_keybords import subscribe_keyboard
 from core.database import start_db
@@ -90,3 +91,8 @@ async def dell_data(user_data, chat_id):
             os.remove(gener_img)
     except Exception as e:
         print(e)
+
+
+async def ch_text_font(text, font):
+    converted_text = ''.join(FONTS[font].get(c, c) for c in text)
+    return converted_text

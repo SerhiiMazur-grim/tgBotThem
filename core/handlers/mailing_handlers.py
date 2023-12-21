@@ -34,6 +34,9 @@ async def save_media_group_post_media(message: Message, bot: Bot):
         elif message.animation:
             media = message.animation.file_id
             caption = message.caption
+            if caption != None:
+                if caption.startswith('POST\n'):
+                    caption = caption[5:]
             animation = InputMediaAnimation(media=media, caption=caption)
             SEND_DATA[user_id].append(animation)
             return
@@ -41,6 +44,9 @@ async def save_media_group_post_media(message: Message, bot: Bot):
         elif message.document:
             media = message.document.file_id
             caption = message.caption
+            if caption != None:
+                if caption.startswith('POST\n'):
+                    caption = caption[5:]
             document = InputMediaDocument(media=media, caption=caption)
             SEND_DATA[user_id].append(document)
             return
@@ -48,6 +54,9 @@ async def save_media_group_post_media(message: Message, bot: Bot):
         elif message.audio:
             media = message.audio.file_id
             caption = message.caption
+            if caption != None:
+                if caption.startswith('POST\n'):
+                    caption = caption[5:]
             audio = InputMediaAudio(media=media, caption=caption)
             SEND_DATA[user_id].append(audio)
             return
@@ -55,6 +64,9 @@ async def save_media_group_post_media(message: Message, bot: Bot):
         elif message.photo:
             media = message.photo[-1].file_id
             caption = message.caption
+            if caption != None:
+                if caption.startswith('POST\n'):
+                    caption = caption[5:]
             photo = InputMediaPhoto(media=media, caption=caption)
             SEND_DATA[user_id].append(photo)
             return
@@ -62,6 +74,8 @@ async def save_media_group_post_media(message: Message, bot: Bot):
         elif message.video:
             media = message.video.file_id
             caption = message.caption
+            if caption.startswith('POST\n'):
+                caption = caption[5:]
             video = InputMediaVideo(media=media, caption=caption)
             SEND_DATA[user_id].append(video)
             return
@@ -89,10 +103,10 @@ async def send_post_to_all(callback_query: CallbackQuery, bot: Bot):
         if SEND_DATA.get(user_id) != None:
             for chat in chats:
                 if len(SEND_DATA[user_id]) == 1 and isinstance(SEND_DATA[user_id][0], str): 
-                    bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
+                    await bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
                 else:
                     await bot.send_media_group(chat_id=chat, media=SEND_DATA[user_id])
-                SEND_DATA.pop(user_id)
+            SEND_DATA.pop(user_id)
                 
         else:
             await callback_query.answer(text=messages.MESSAGE_NO_POST)
@@ -105,10 +119,10 @@ async def send_post_to_private(callback_query: CallbackQuery, bot: Bot):
         if SEND_DATA.get(user_id) != None:
             for chat in chats:
                 if len(SEND_DATA[user_id]) == 1 and isinstance(SEND_DATA[user_id][0], str): 
-                    bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
+                    await bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
                 else:
                     await bot.send_media_group(chat_id=chat, media=SEND_DATA[user_id])
-                SEND_DATA.pop(user_id)
+            SEND_DATA.pop(user_id)
                 
         else:
             await callback_query.answer(text=messages.MESSAGE_NO_POST)
@@ -121,10 +135,10 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot):
         if SEND_DATA.get(user_id) != None:
             for chat in chats:
                 if len(SEND_DATA[user_id]) == 1 and isinstance(SEND_DATA[user_id][0], str): 
-                    bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
+                    await bot.send_message(chat_id=chat, text=SEND_DATA[user_id][0])
                 else:
                     await bot.send_media_group(chat_id=chat, media=SEND_DATA[user_id])
-                SEND_DATA.pop(user_id)
+            SEND_DATA.pop(user_id)
                 
         else:
             await callback_query.answer(text=messages.MESSAGE_NO_POST)
