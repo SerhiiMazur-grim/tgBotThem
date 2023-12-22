@@ -14,7 +14,6 @@ from core.database import add_theme_to_catalog
 from core.utils import is_admin, dell_data, is_private_chat
 
 
-# user_data = {}
 USER_DATA = {}
 ADMIN_ADD_DATA = {}
 

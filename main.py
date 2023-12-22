@@ -50,7 +50,6 @@ async def main():
     dp.message.register(theme_handlers.start_add_theme, F.text == messages.BUTTON_ADD_THEME)
     dp.callback_query.register(theme_handlers.abort_add_theme, F.data == 'abort_add_theme')
     dp.message.register(theme_handlers.handle_photo, F.photo | F.document)
-    # dp.message.register(theme_handlers.handle_photo, F.document)
     dp.callback_query.register(theme_handlers.add_theme_category, F.data.startswith('cat_'))
     dp.callback_query.register(theme_handlers.handler_abort, F.data == 'abort')
     dp.callback_query.register(theme_handlers.handler_device, F.data.startswith('device_'))

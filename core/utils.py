@@ -12,7 +12,7 @@ from core.commands import set_commands
 
 
 async def start_bot(bot: Bot):
-    await set_commands(bot)
+    # await set_commands(bot)
     await start_db()
 
 
