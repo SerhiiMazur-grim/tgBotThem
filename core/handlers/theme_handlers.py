@@ -1,7 +1,7 @@
 import os
 
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, PollAnswer
 
 from config import messages
 from core.handlers.basic import is_user_subscribed
@@ -10,36 +10,125 @@ from core.image.image_analiz import image_color_picker
 from core.keyboards import inline_keybords
 from core.keyboards.reply_keybords import user_keyboard
 from core.theme_creator import create_theme
-from core.database import add_theme_to_catalog
+from core.database import add_theme_to_catalog, add_language_to_catalog
 from core.utils import is_admin, dell_data, is_private_chat
+from core.handlers.mailing_handlers import save_media_group_post_media
 
 
 USER_DATA = {}
-ADMIN_ADD_DATA = {}
+ADMIN_ADD_THEME = {}
+ADMIN_ADD_LANGUAGE = {}
 
 
+async def start_add_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    if is_admin(admin):
+        await message.delete()
+        ADMIN_ADD_LANGUAGE[admin] = {'language': {}}
+        ADMIN_ADD_LANGUAGE[admin]['init'] = True
+        await message.answer_poll(
+            question=messages.MESSAGE_CHOICE_DEVICE_FOR_LANGUAGE,
+            options=messages.DEVICE_FOR_LANGUAGE,
+            is_anonymous=False,
+            allows_multiple_answers=True
+        )
+
+
+async def add_language_device(poll: PollAnswer, bot: Bot):
+    admin = poll.user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            devices = [messages.DEVICE_FOR_LANGUAGE[i] for i in poll.option_ids]
+            ADMIN_ADD_LANGUAGE[admin]['language']['devices'] = {
+                'android': 'True' if 'android' in devices else 'False',
+                'ios': 'True' if 'ios' in devices else 'False',
+                'computer': 'True' if 'computer' in devices else 'False',
+            }
+            await bot.send_message(chat_id=poll.user.id,
+                                   text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
+                                   reply_markup=inline_keybords.language_categories_ikb())
+
+
+async def add_language_preview(callback_query: CallbackQuery):
+    admin = callback_query.from_user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            ADMIN_ADD_LANGUAGE[admin]['language']['category'] = callback_query.data.split('_')[-1]
+            await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT)
+
+
+async def add_previev_and_desc_for_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            media_group_id = message.media_group_id
+            preview = message.photo[-1].file_id
+            description = message.caption[5:]
+            ADMIN_ADD_LANGUAGE[admin]['language']['preview'] = [preview]
+            ADMIN_ADD_LANGUAGE[admin]['language']['description'] = description
+            ADMIN_ADD_LANGUAGE[admin]['media_group_id'] = media_group_id
+
+
+async def add_preview_for_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    media_group_id = message.media_group_id
+    try:
+        if ADMIN_ADD_LANGUAGE[admin]['media_group_id'] == media_group_id:
+            if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+                if ADMIN_ADD_LANGUAGE[admin]['init']:
+                    ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
+                        
+        else:
+            await save_media_group_post_media(message)
+    except:
+        await save_media_group_post_media(message)
+
+
+async def save_language_to_db(message: Message, bot: Bot):
+    admin = message.from_user.id
+    await message.delete()
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            android = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['android']
+            ios = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['ios']
+            computer = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['computer']
+            category = ADMIN_ADD_LANGUAGE[admin]['language']['category']
+            preview = ', '.join(ADMIN_ADD_LANGUAGE[admin]['language']['preview'])
+            description = ADMIN_ADD_LANGUAGE[admin]['language']['description']
+            await add_language_to_catalog(
+                android=android,
+                ios=ios,
+                computer=computer,
+                category=category,
+                preview=preview,
+                description=description
+            )
+            await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
+    else: await message.answer(text=messages.MESSAGE_NO_DATA_TO_SAVE_LANGUAGE)
+
+        
 async def start_add_theme(message: Message, bot: Bot):
     admin = message.from_user.id
     if is_admin(admin):
         await message.delete()
-        ADMIN_ADD_DATA[admin] = {'theme': {}}
-        ADMIN_ADD_DATA[admin]['init'] = True
+        ADMIN_ADD_THEME[admin] = {'theme': {}}
+        ADMIN_ADD_THEME[admin]['init'] = True
         await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
                              reply_markup=inline_keybords.choice_device_db_ikb_keyboard())
 
 
 async def abort_add_theme(callback_query: CallbackQuery):
     admin = callback_query.from_user.id
-    if is_admin(admin) and ADMIN_ADD_DATA.get(admin):
-        ADMIN_ADD_DATA[admin] = {}
+    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+        ADMIN_ADD_THEME[admin] = {}
         await callback_query.message.delete()
 
 
 async def add_theme_device(callback_query: CallbackQuery):
     admin = callback_query.from_user.id
-    if is_admin(admin) and ADMIN_ADD_DATA.get(admin):
-        if ADMIN_ADD_DATA[admin]['init']:
-            ADMIN_ADD_DATA[admin]['theme']['device'] = callback_query.data.split('_')[-1]
+    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+        if ADMIN_ADD_THEME[admin]['init']:
+            ADMIN_ADD_THEME[admin]['theme']['device'] = callback_query.data.split('_')[-1]
             await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
 
 
@@ -58,18 +147,18 @@ async def handle_photo(message: Message, bot: Bot):
         return
     
     admin = message.from_user.id
-    if is_admin(admin) and ADMIN_ADD_DATA.get(admin):
-        if ADMIN_ADD_DATA[admin]['init'] and message.photo:
+    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+        if ADMIN_ADD_THEME[admin]['init'] and message.photo:
             preview = message.photo[-1]
             
-            ADMIN_ADD_DATA[admin]['theme']['preview'] = preview.file_id
+            ADMIN_ADD_THEME[admin]['theme']['preview'] = preview.file_id
             await message.answer(text=messages.MESSAGE_SEND_THEME_FILE)
             return
             
-        elif ADMIN_ADD_DATA[admin]['init'] and message.document:
+        elif ADMIN_ADD_THEME[admin]['init'] and message.document:
             theme_file = message.document
             if theme_file.file_name.split('.')[-1] in ('attheme', 'tdesktop-theme', 'tgios-theme'):
-                ADMIN_ADD_DATA[admin]['theme']['file'] = theme_file.file_id
+                ADMIN_ADD_THEME[admin]['theme']['file'] = theme_file.file_id
                 await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
                                      reply_markup=inline_keybords.choice_category_ikb_keyboard())
                 return
@@ -134,17 +223,17 @@ async def handle_photo(message: Message, bot: Bot):
 
 
 async def add_theme_category(callback_query: CallbackQuery):
-    if ADMIN_ADD_DATA:
+    if ADMIN_ADD_THEME:
         admin = callback_query.from_user.id
-        if is_admin(admin) and ADMIN_ADD_DATA[admin]['init']:
+        if is_admin(admin) and ADMIN_ADD_THEME[admin]['init']:
             category = callback_query.data.split('_')[-1]
-            preview = ADMIN_ADD_DATA[admin]['theme']['preview']
-            theme = ADMIN_ADD_DATA[admin]['theme']['file']
-            device = ADMIN_ADD_DATA[admin]['theme']['device']
+            preview = ADMIN_ADD_THEME[admin]['theme']['preview']
+            theme = ADMIN_ADD_THEME[admin]['theme']['file']
+            device = ADMIN_ADD_THEME[admin]['theme']['device']
             
             await add_theme_to_catalog(category, preview, theme, device)
             
-            ADMIN_ADD_DATA[admin] = {}
+            ADMIN_ADD_THEME[admin] = {}
             
             await callback_query.message.answer(text=messages.MESSAGE_ADDED_TO_DB)
 
@@ -153,7 +242,7 @@ async def command_user_kb(message: Message, bot: Bot):
     user_id = message.from_user.id
     if is_private_chat(message) and is_admin(user_id):
         await message.delete()
-        ADMIN_ADD_DATA[user_id] = {}
+        ADMIN_ADD_THEME[user_id] = {}
         
         await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 

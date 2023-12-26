@@ -1,7 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
-from config.categories import CATEGORIES, CATEGORIES_GET, DRVICES, DRVICES_GET
+from config.categories import CATEGORIES, CATEGORIES_GET, DRVICES, DRVICES_GET, CATEGORIES_LANGUAGES, \
+    CATEGORIES_LANGUAGES_GET, DRVICES_LANGUAGES_GET
 
 
 def subscribe_keyboard(checked_channels):
@@ -179,10 +180,40 @@ def abort_create_post_ikb():
     keyboard.adjust(1)
     return keyboard.as_markup()
 
+
 def fonts_ikb():
     keyboard = InlineKeyboardBuilder()
 
     for view, font in messages.FONTS_BUTTONS.items():
         keyboard.button(text=view, callback_data=font)
     keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
+def language_categories_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    for category, index in CATEGORIES_LANGUAGES.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_device_lang_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for device, value in DRVICES_LANGUAGES_GET.items():
+        keyboard.button(text=device, callback_data=value)
+    
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_category_lang_db_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for category, index in CATEGORIES_LANGUAGES_GET.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
     return keyboard.as_markup()

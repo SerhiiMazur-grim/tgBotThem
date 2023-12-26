@@ -2,13 +2,13 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher, F, types
+from aiogram import Bot, Dispatcher, F
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 
 from config.api_keys import TOKEN_API
 from config import messages
-from core.handlers import basic, theme_handlers, \
+from core.handlers import basic, theme_handlers, language_handlers, \
 theme_catalog_handlers, mailing_handlers, fonts_handlers
 from core.middleware import CleanupMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
@@ -32,12 +32,26 @@ async def main():
     dp.message.register(basic.command_faq, F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
     
+    dp.message.register(language_handlers.get_catalog_languages, F.text == messages.BUTTON_LANGUAGE_CATALOG)
+    dp.callback_query.register(language_handlers.get_device_catalog_languages, F.data.startswith('dev_lang_get_'))
+    dp.callback_query.register(language_handlers.get_category_catalog_themes, F.data.startswith('lang_cat_get_'))
+    dp.message.register(language_handlers.get_next_languages, F.text == messages.BUTTON_NEXT_LANGUAGES)
+    dp.message.register(language_handlers.go_to_main_menu_from_lang_catalog, F.text == messages.BUTTON_BACK_FROM_LANG_CAT)
+    
     dp.message.register(fonts_handlers.font_catalog, F.text == messages.BUTTON_FONTS_CATALOG)
     dp.message.register(fonts_handlers.get_text_from_user, F.text.startswith('//'))
     dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_'))
+    
+    dp.message.register(theme_handlers.start_add_language, F.text == messages.BUTTON_ADD_LANGUAGE)
+    dp.poll_answer.register(theme_handlers.add_language_device)
+    dp.callback_query.register(theme_handlers.add_language_preview, F.data.startswith('lang_cat_'))
+    dp.message.register(theme_handlers.add_previev_and_desc_for_language, F.caption.startswith('LANG\n'))
+    dp.message.register(theme_handlers.add_preview_for_language, F.media_group_id)
+    dp.message.register(theme_handlers.save_language_to_db, F.text == messages.BUTTON_SAVE_LANGUAGE)
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
-    dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
+    # dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
+    dp.message.register(mailing_handlers.save_media_group_post_media, F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
     dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
     dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
     dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')

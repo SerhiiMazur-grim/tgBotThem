@@ -1,7 +1,5 @@
 import sqlite3 as sq
 
-from config import messages
-
 
 CATALOG_DB = 'catalog.db'
 USERS_DB = 'users.db'
@@ -23,12 +21,14 @@ async def start_db():
             'device TEXT)'
     )
     cur_catalog.execute(
-        'CREATE TABLE IF NOT EXISTS fonts('
+        'CREATE TABLE IF NOT EXISTS languages('
             'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+            'android TEXT, '
+            'ios TEXT, '
+            'computer TEXT, '
             'category TEXT, '
             'preview TEXT, '
-            'font TEXT, '
-            'device TEXT)'
+            'description TEXT)'
     )
     
     cur_users.execute(
@@ -52,6 +52,16 @@ async def add_theme_to_catalog(category, preview, theme, device):
     
     query = f"INSERT INTO themes (category, preview, theme, device) VALUES (?, ?, ?, ?);"
     cur.execute(query, (category, preview, theme, device))
+    db.commit()
+    db.close()
+
+
+async def add_language_to_catalog(android, ios, computer, category, preview, description):
+    db = sq.connect(CATALOG_DB)
+    cur = db.cursor()
+    
+    query = f"INSERT INTO languages (android, ios, computer, category, preview, description) VALUES (?, ?, ?, ?, ?, ?);"
+    cur.execute(query, (android, ios, computer, category, preview, description))
     db.commit()
     db.close()
 
@@ -84,6 +94,30 @@ async def get_themes_from_catalog(device, category):
 
     db.close()
     return result
+
+
+async def get_languages_from_catalog(device, category):
+    db = sq.connect(CATALOG_DB)
+    cur = db.cursor()
+    
+    query = f"SELECT * FROM languages WHERE {device} = 'True' AND category = ?;"
+    cur.execute(query, (category))
+
+    result = cur.fetchall()
+    rez_list = []
+    for row in result:
+        dict_row = {
+            'android': row[1],
+            'ios': row[2],
+            'computer': row[3],
+            'category': row[4],
+            'preview': row[5].split(', '),
+            'description': row[6]
+        }
+        rez_list.append(dict_row)
+
+    db.close()
+    return rez_list
 
 
 async def get_chats_id_from_db():

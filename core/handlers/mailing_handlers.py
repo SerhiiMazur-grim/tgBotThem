@@ -23,7 +23,7 @@ async def create_mailing(message: Message, bot: Bot):
         await message.answer(text=messages.MESSAGE_GIVE_ME_POST, reply_markup=abort_create_post_ikb())
 
 
-async def save_media_group_post_media(message: Message, bot: Bot):
+async def save_media_group_post_media(message: Message):
     user_id = message.from_user.id
     if is_admin(user_id) and SEND_DATA.get(user_id) != None:
         if message.text:

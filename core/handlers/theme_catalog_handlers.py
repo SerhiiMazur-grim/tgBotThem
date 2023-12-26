@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery, URLInputFile
+from aiogram.types import Message, CallbackQuery
 
 from config import messages
 from core.utils import is_user_subscribed, is_private_chat
