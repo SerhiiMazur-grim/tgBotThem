@@ -1,5 +1,6 @@
 from aiogram import Bot
 from aiogram.types import Message
+from aiogram.enums import ParseMode
 
 from config import messages
 from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard
@@ -47,7 +48,7 @@ async def command_faq(message: Message, bot: Bot):
     if is_private_chat(message):
         await message.delete()
         if await is_user_subscribed(message=message, bot=bot):
-            await message.answer(text=messages.MESSAGE_ON_FAQ, disable_web_page_preview=True)
+            await message.answer(text=messages.MESSAGE_ON_FAQ, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 
 async def command_admin_kb(message: Message, bot: Bot):

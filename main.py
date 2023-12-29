@@ -17,7 +17,7 @@ from core.utils import start_bot, sub_checker
 async def main():
     await check_and_delete_files()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    bot = Bot(token=TOKEN_API, parse_mode=ParseMode.HTML)
+    bot = Bot(token=TOKEN_API)
     await bot.delete_webhook(drop_pending_updates=True)
     dp = Dispatcher()
 
@@ -47,18 +47,18 @@ async def main():
     dp.callback_query.register(theme_handlers.add_language_preview, F.data.startswith('lang_cat_'))
     dp.message.register(theme_handlers.add_previev_and_desc_for_language, F.caption.startswith('LANG\n'))
     dp.message.register(theme_handlers.add_preview_for_language, F.media_group_id)
-    dp.message.register(theme_handlers.save_language_to_db, F.text == messages.BUTTON_SAVE_LANGUAGE)
+    # dp.message.register(theme_handlers.save_language_to_db, F.text == messages.BUTTON_SAVE_LANGUAGE)
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
-    # dp.message.register(mailing_handlers.save_media_group_post_media, F.media_group_id | F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
-    dp.message.register(mailing_handlers.save_media_group_post_media, F.caption.startswith('POST\n') | F.text.startswith('POST\n'))
+    dp.message.register(mailing_handlers.forward_post_message, (F.forward_from | F.forward_from_chat) & ~F.media_group_id)
+    dp.message.register(mailing_handlers.save_media_group_post_media, 
+                        (F.caption.startswith('POST\n') | F.text.startswith('POST\n')) | ((F.forward_from | F.forward_from_chat) & F.media_group_id))
     dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
     dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
     dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')
     dp.callback_query.register(mailing_handlers.send_post_to_group, F.data == 'post_send_group')
     dp.callback_query.register(mailing_handlers.delete_post, F.data == 'post_delete')
-    dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')
-    
+    dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')    
     # theme handlers
     dp.message.register(theme_handlers.command_user_kb, F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(theme_handlers.start_add_theme, F.text == messages.BUTTON_ADD_THEME)

@@ -2,6 +2,7 @@ import os
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, FSInputFile, PollAnswer
+from aiogram.enums import ParseMode
 
 from config import messages
 from core.handlers.basic import is_user_subscribed
@@ -54,7 +55,7 @@ async def add_language_preview(callback_query: CallbackQuery):
     if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
         if ADMIN_ADD_LANGUAGE[admin]['init']:
             ADMIN_ADD_LANGUAGE[admin]['language']['category'] = callback_query.data.split('_')[-1]
-            await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT)
+            await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT, parse_mode=ParseMode.HTML)
 
 
 async def add_previev_and_desc_for_language(message: Message, bot: Bot):
@@ -69,6 +70,24 @@ async def add_previev_and_desc_for_language(message: Message, bot: Bot):
             ADMIN_ADD_LANGUAGE[admin]['media_group_id'] = media_group_id
 
 
+async def save_language_to_db(message, admin):
+    android = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['android']
+    ios = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['ios']
+    computer = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['computer']
+    category = ADMIN_ADD_LANGUAGE[admin]['language']['category']
+    preview = ', '.join(ADMIN_ADD_LANGUAGE[admin]['language']['preview'])
+    description = ADMIN_ADD_LANGUAGE[admin]['language']['description']
+    await add_language_to_catalog(
+        android=android,
+        ios=ios,
+        computer=computer,
+        category=category,
+        preview=preview,
+        description=description
+    )
+    await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
+
+
 async def add_preview_for_language(message: Message, bot: Bot):
     admin = message.from_user.id
     media_group_id = message.media_group_id
@@ -77,34 +96,13 @@ async def add_preview_for_language(message: Message, bot: Bot):
             if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
                 if ADMIN_ADD_LANGUAGE[admin]['init']:
                     ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
+                if len(ADMIN_ADD_LANGUAGE[admin]['language']['preview']) == 3:
+                    await save_language_to_db(message, admin)
                         
         else:
             await save_media_group_post_media(message)
     except:
         await save_media_group_post_media(message)
-
-
-async def save_language_to_db(message: Message, bot: Bot):
-    admin = message.from_user.id
-    await message.delete()
-    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
-        if ADMIN_ADD_LANGUAGE[admin]['init']:
-            android = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['android']
-            ios = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['ios']
-            computer = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['computer']
-            category = ADMIN_ADD_LANGUAGE[admin]['language']['category']
-            preview = ', '.join(ADMIN_ADD_LANGUAGE[admin]['language']['preview'])
-            description = ADMIN_ADD_LANGUAGE[admin]['language']['description']
-            await add_language_to_catalog(
-                android=android,
-                ios=ios,
-                computer=computer,
-                category=category,
-                preview=preview,
-                description=description
-            )
-            await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
-    else: await message.answer(text=messages.MESSAGE_NO_DATA_TO_SAVE_LANGUAGE)
 
         
 async def start_add_theme(message: Message, bot: Bot):

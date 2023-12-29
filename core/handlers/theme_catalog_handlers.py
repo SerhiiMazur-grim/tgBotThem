@@ -46,7 +46,6 @@ async def get_category_catalog_themes(callback_query: CallbackQuery):
         for theme in catalog[:5]:
             await callback_query.message.answer_photo(photo=theme['preview'])
             await callback_query.message.answer_document(document=theme['theme'])
-            await callback_query.message.answer(text=messages.DIVIVER)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_THEMES_IN_CATALOG)
 
@@ -62,7 +61,6 @@ async def get_next_themes(message: Message, bot: Bot):
             for theme in catalog[start:end]:
                 await message.answer_photo(photo=theme['preview'])
                 await message.answer_document(document=theme['theme'])
-                await message.answer(text=messages.DIVIVER)
             
             USER_THEME_CATALOG[user_id]['start'] += start
             USER_THEME_CATALOG[user_id]['end'] += end

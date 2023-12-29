@@ -55,7 +55,6 @@ async def get_category_catalog_themes(callback_query: CallbackQuery):
                     caption=caption
                 ))
             await callback_query.message.answer_media_group(media=send_data)
-            await callback_query.message.answer(text=messages.DIVIVER)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_LANGUAGES_IN_CATALOG)
 
@@ -79,7 +78,6 @@ async def get_next_languages(message: Message, bot: Bot):
                         caption=caption
                     ))
                 await message.answer_media_group(media=send_data)
-                await message.answer(text=messages.DIVIVER)
             
             USER_LANGUAGE_CATALOG[user_id]['start'] += start
             USER_LANGUAGE_CATALOG[user_id]['end'] += end
