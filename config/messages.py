@@ -106,6 +106,10 @@ MESSAGE_GIVE_ME_POST = """
 Текст розсилки.".
 """
 BUTTON_CREATE_MAILING = 'Створити пост'
+BUTTON_CREATE_LIMITED_POST = 'Пост для певної кількості юзерів'
+MESSAGE_SEND_USERS_COUNT = 'Відправте кількість користувачів які побачать пост у такому форматі "USERS пробіл число". Наприклад "USERS 1000"/ '
+MESSAGE_USERS_COUNT_INSERT = 'Кількість юзерів для розсилки встановлено на: '
+BUTTON_SEND_LIMITED_POST = 'Відправити пост користувачам!'
 BUTTON_VIEW_MAILING = 'Показати пост'
 MESSAGE_IS_YOUR_POST = 'Це пост який ви хочите відправити.\nЩо мені слід з ним зробити?'
 BUTTON_DELETE_POST = 'Видалити пост'

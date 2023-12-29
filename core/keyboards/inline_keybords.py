@@ -172,10 +172,21 @@ def send_post_ikb():
     return keyboard.as_markup()
 
 
-def abort_create_post_ikb():
+def start_create_post_ikb():
     keyboard = InlineKeyboardBuilder()
 
+    keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
     keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def send_limited_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_SEND_LIMITED_POST, callback_data='send_limited_post')
+    keyboard.button(text=messages.BUTTON_DELETE_POST, callback_data='post_delete')
     
     keyboard.adjust(1)
     return keyboard.as_markup()

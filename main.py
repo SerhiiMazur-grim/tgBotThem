@@ -47,9 +47,10 @@ async def main():
     dp.callback_query.register(theme_handlers.add_language_preview, F.data.startswith('lang_cat_'))
     dp.message.register(theme_handlers.add_previev_and_desc_for_language, F.caption.startswith('LANG\n'))
     dp.message.register(theme_handlers.add_preview_for_language, F.media_group_id)
-    # dp.message.register(theme_handlers.save_language_to_db, F.text == messages.BUTTON_SAVE_LANGUAGE)
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
+    dp.callback_query.register(mailing_handlers.start_limited_post, F.data == 'create_limited_post')
+    dp.message.register(mailing_handlers.init_limited_post, F.text.startswith('USERS'))
     dp.message.register(mailing_handlers.forward_post_message, (F.forward_from | F.forward_from_chat) & ~F.media_group_id)
     dp.message.register(mailing_handlers.save_media_group_post_media, 
                         (F.caption.startswith('POST\n') | F.text.startswith('POST\n')) | ((F.forward_from | F.forward_from_chat) & F.media_group_id))
