@@ -11,7 +11,8 @@ from aiogram.types.input_media_video import InputMediaVideo
 
 from config import messages
 from core.utils import is_admin
-from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb
+from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, abort_create_limited_post_ikb, \
+    abort_sending_limited_post_ikb
 from core.database import get_chats_id_from_db, get_private_chats_id_from_db, get_group_chats_id_from_db
 
 
@@ -36,8 +37,37 @@ async def create_mailing(message: Message, bot: Bot):
 async def start_limited_post(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     if is_admin(user_id) and SEND_DATA.get(user_id) != None:
-        SEND_DATA[user_id]['for_activ_users'] = True
-        await callback_query.message.answer(text=messages.MESSAGE_SEND_USERS_COUNT)
+        with open('SEND_POST.json', 'r') as file:
+            send_post = json.load(file)
+        if send_post['send_post']:
+            with open('POST_DATA.json', 'r') as file:
+                data = json.load(file)
+            await callback_query.message.answer(text=f'{messages.MESSAGE_PREV_POST_NOT_SENDED}{data["count"]}',
+                                                reply_markup=abort_sending_limited_post_ikb())
+        else:            
+            SEND_DATA[user_id]['for_activ_users'] = True
+            await callback_query.message.answer(text=messages.MESSAGE_SEND_USERS_COUNT)
+
+
+async def abort_sending_limit_post(callback_query: CallbackQuery):
+    user_id = callback_query.from_user.id
+    if is_admin(user_id):
+        with open('SEND_POST.json', 'w') as file:
+                data = {"send_post": False}
+                json.dump(data, file, indent=4)
+        
+        with open('POST_DATA.json', 'w') as file:
+            data = {
+                    "text": "",
+                    "message": {},
+                    "group_message": [],
+                    "key": "",
+                    "count": 0,
+                    "users": []
+                    
+                }   
+            json.dump(data, file, indent=4)
+        await callback_query.message.answer(text=messages.MESSAGE_SENDING_IS_STOP)
 
 
 async def init_limited_post(message: Message):
@@ -49,12 +79,14 @@ async def init_limited_post(message: Message):
                 "message": {},
                 "group_message": [],
                 "key": "",
-                "count": int(count)
+                "count": int(count),
+                "users": []
             }
         
         with open('POST_DATA.json', 'w') as file:
             json.dump(data, file, indent=4)
-        await message.answer(text=f"{messages.MESSAGE_USERS_COUNT_INSERT}{count}")
+        await message.answer(text=f"{messages.MESSAGE_USERS_COUNT_INSERT}{count} {messages.MESSAGE_SEND_ME_POST_FOR_LIMIT_SENDS}",
+                             reply_markup=abort_create_limited_post_ikb())
 
 
 async def forward_post_message(message: Message, bot: Bot):
@@ -223,7 +255,8 @@ async def view_post_media(message: Message, bot: Bot):
         await message.delete()
         if SEND_DATA.get(user_id) != None:
             key = SEND_DATA[user_id]['key']
-            if key:
+            for_active_users = SEND_DATA[user_id]['for_activ_users']
+            if key and not for_active_users:
                 if key == 'text':
                     await message.answer(text=SEND_DATA[user_id]['text'], reply_markup=send_post_ikb())
                     return
@@ -325,7 +358,6 @@ async def view_post_media(message: Message, bot: Bot):
                         await message.answer(text=f'Кількість юзерів яким буде відправлено цей пост: {data["count"]}',
                                              reply_markup=send_limited_post_ikb())
                         
-                
                 else:
                     await message.answer(text=messages.MESSAGE_NO_POST)
             
@@ -333,7 +365,19 @@ async def view_post_media(message: Message, bot: Bot):
             await message.answer(text=messages.MESSAGE_NO_POST)
 
 
-#####
+async def send_limited_post(callback_query: CallbackQuery, bot: Bot):
+    user_id = callback_query.from_user.id
+    if is_admin(user_id):  
+        with open('POST_DATA.json', 'r') as file:
+            post_data = json.load(file)
+        key = post_data['key']
+        if key:
+            with open('SEND_POST.json', 'w') as file:
+                data = {"send_post": True}
+                json.dump(data, file, indent=4)
+            await callback_query.message.answer(text=messages.MESSAGE_LIMITED_POST_SEND)
+        else:
+            await callback_query.message.answer(text=messages.MESSAGE_LIMITED_POST_NOT_SEND)
 
 
 async def send_post_to_all(callback_query: CallbackQuery, bot: Bot):
@@ -399,6 +443,19 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot):
 async def delete_post(callback_query: CallbackQuery, bot: Bot):
     user_id = callback_query.from_user.id
     if is_admin(user_id):
+        if SEND_DATA[user_id]['for_activ_users']:
+            data = {
+                    "text": "",
+                    "message": {},
+                    "group_message": [],
+                    "key": "",
+                    "count": 0,
+                    "users": []
+                    
+                }
+            
+            with open('POST_DATA.json', 'w') as file:
+                json.dump(data, file, indent=4)
         SEND_DATA.pop(user_id)
         await callback_query.message.delete()
         await callback_query.answer(text=messages.MESSAGE_DELETE_POST)
@@ -407,5 +464,18 @@ async def delete_post(callback_query: CallbackQuery, bot: Bot):
 async def abort_create_post(callback_query: CallbackQuery, bot: Bot):
     user_id = callback_query.from_user.id
     if is_admin(user_id):
+        if SEND_DATA[user_id]['for_activ_users']:
+            data = {
+                    "text": "",
+                    "message": {},
+                    "group_message": [],
+                    "key": "",
+                    "count": 0,
+                    "users": []
+                    
+                }
+            
+            with open('POST_DATA.json', 'w') as file:
+                json.dump(data, file, indent=4)
         SEND_DATA.pop(user_id)
         await callback_query.message.delete()

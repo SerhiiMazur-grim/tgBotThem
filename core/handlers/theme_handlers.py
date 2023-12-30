@@ -165,6 +165,7 @@ async def handle_photo(message: Message, bot: Bot):
                 return
 
     elif await is_user_subscribed(message, bot):
+        chat_id = message.chat.id
         if message.chat.type == 'private':
             if message.document:
                 photo = message.document
@@ -189,8 +190,8 @@ async def handle_photo(message: Message, bot: Bot):
             return
         
         wait_message = await message.answer(text=messages.WAIT_MESSAGE)
-        chat_id = message.chat.id
         USER_DATA[chat_id] = {}
+        USER_DATA[chat_id]['user_id'] = message.from_user.id
         USER_DATA[chat_id]['sended_photo'] = message
 
         photo_id = photo.file_id
@@ -247,111 +248,116 @@ async def command_user_kb(message: Message, bot: Bot):
 
 async def handler_device(callback_query: CallbackQuery):
     """ Обробник вибору девайса """
-
+    
     chat_id = callback_query.message.chat.id
-    device = callback_query.data.split('_')[-1]
-    USER_DATA[chat_id]['device'] = device
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        device = callback_query.data.split('_')[-1]
+        USER_DATA[chat_id]['device'] = device
 
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_BACKGROUND_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_background_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_BACKGROUND_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_background_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_back_to_device_choose(callback_query: CallbackQuery):
     """ Обробник повернення до вибору девайса """
-
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_DEVICE_TEXT,
-        reply_markup=inline_keybords.choose_device_keyboard()
-    )
+    chat_id = callback_query.message.chat.id
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_DEVICE_TEXT,
+            reply_markup=inline_keybords.choose_device_keyboard()
+        )
 
 
 async def handler_background_color(callback_query: CallbackQuery):
     """ Обробник вибору кольору фону """
 
     chat_id = callback_query.message.chat.id
-    color = callback_query.data.split('_')[-1]
-    USER_DATA[chat_id]['background_color'] = color
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        color = callback_query.data.split('_')[-1]
+        USER_DATA[chat_id]['background_color'] = color
 
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_PRIMARY_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_primary_text_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_PRIMARY_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_primary_text_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_back_to_background_color_choose(callback_query: CallbackQuery):
     """ Обробник повернення до вибору кольору фону """
 
     chat_id = callback_query.message.chat.id
-
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_BACKGROUND_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_background_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_BACKGROUND_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_background_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_primary_text_color(callback_query: CallbackQuery):
     """ Обробник вибору кольору основного тексту """
 
     chat_id = callback_query.message.chat.id
-    color = callback_query.data.split('_')[-1]
-    USER_DATA[chat_id]['primary_text_color'] = color
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        color = callback_query.data.split('_')[-1]
+        USER_DATA[chat_id]['primary_text_color'] = color
 
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_SECONDARY_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_secondary_text_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_SECONDARY_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_secondary_text_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_back_to_primary_text_color_choose(callback_query: CallbackQuery):
     """ Обробник повернення до вибору кольору основного тексту """
 
     chat_id = callback_query.message.chat.id
-
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_PRIMARY_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_primary_text_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_PRIMARY_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_primary_text_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_secondary_text_color(callback_query: CallbackQuery):
     """ Обробник вибору кольору не основного тексту """
 
     chat_id = callback_query.message.chat.id
-    color = callback_query.data.split('_')[-1]
-    USER_DATA[chat_id]['secondary_text_color'] = color
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        color = callback_query.data.split('_')[-1]
+        USER_DATA[chat_id]['secondary_text_color'] = color
 
-    if USER_DATA[chat_id]['device'] != 'iphone':
-        await callback_query.message.edit_caption(
-            caption=messages.CHOOSE_ALFA,
-            reply_markup=inline_keybords.choose_alfa_background_color_keyboard()
-        )
-    else:
-        theme = await create_theme(USER_DATA[chat_id], chat_id)
-        await callback_query.message.delete()
-        await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
-                                                                caption=messages.MESSAGE_THEME_DONE)
-        await dell_data(user_data=USER_DATA, chat_id=chat_id)
-        USER_DATA[chat_id] = {}
+        if USER_DATA[chat_id]['device'] != 'iphone':
+            await callback_query.message.edit_caption(
+                caption=messages.CHOOSE_ALFA,
+                reply_markup=inline_keybords.choose_alfa_background_color_keyboard()
+            )
+        else:
+            theme = await create_theme(USER_DATA[chat_id], chat_id)
+            await callback_query.message.delete()
+            await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                                                                    caption=messages.MESSAGE_THEME_DONE)
+            await dell_data(user_data=USER_DATA, chat_id=chat_id)
+            USER_DATA[chat_id] = {}
 
 
 async def handler_back_to_secondary_text_color_choose(callback_query: CallbackQuery):
     """ Обробник повернення до вибору кольору не основного тексту """
 
     chat_id = callback_query.message.chat.id
-
-    await callback_query.message.edit_caption(
-        caption=messages.CHOOSE_SECONDARY_COLOR_TEXT,
-        reply_markup=inline_keybords.choose_secondary_text_color_keyboard(USER_DATA[chat_id]['colors'])
-    )
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        await callback_query.message.edit_caption(
+            caption=messages.CHOOSE_SECONDARY_COLOR_TEXT,
+            reply_markup=inline_keybords.choose_secondary_text_color_keyboard(USER_DATA[chat_id]['colors'])
+        )
 
 
 async def handler_alfa_background_color(callback_query: CallbackQuery):
     """ Обробник вибору прозорості для повідомлення """
 
     chat_id = callback_query.message.chat.id
-    if USER_DATA[chat_id]['device'] != 'iphone':
+    if USER_DATA[chat_id]['device'] != 'iphone' and USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
         background_alfa = callback_query.data.split('_')[-1]
         USER_DATA[chat_id]['background_alfa'] = background_alfa
 
@@ -367,43 +373,44 @@ async def handler_auto_theme(callback_query: CallbackQuery):
     """ Обробник автоматичного вибору кольору для теми """
 
     chat_id = callback_query.message.chat.id
-    if USER_DATA[chat_id]['device'] == 'android':
+    if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
+        if USER_DATA[chat_id]['device'] == 'android':
 
-        USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
-        USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
-        USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
-        USER_DATA[chat_id]['background_alfa'] = 'a20'
+            USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
+            USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
+            USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
+            USER_DATA[chat_id]['background_alfa'] = 'a20'
 
-        theme = await create_theme(USER_DATA[chat_id], chat_id)
-        await callback_query.message.delete()
-        await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
-                                                                caption=messages.MESSAGE_THEME_DONE)
-        await dell_data(user_data=USER_DATA, chat_id=chat_id)
-        USER_DATA[chat_id] = {}
+            theme = await create_theme(USER_DATA[chat_id], chat_id)
+            await callback_query.message.delete()
+            await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                                                                    caption=messages.MESSAGE_THEME_DONE)
+            await dell_data(user_data=USER_DATA, chat_id=chat_id)
+            USER_DATA[chat_id] = {}
 
-    elif USER_DATA[chat_id]['device'] == 'iphone':
+        elif USER_DATA[chat_id]['device'] == 'iphone':
 
-        USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
-        USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
-        USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
+            USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
+            USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
+            USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
 
-        theme = await create_theme(USER_DATA[chat_id], chat_id)
-        await callback_query.message.delete()
-        await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
-                                                                caption=messages.MESSAGE_THEME_DONE)
-        await dell_data(user_data=USER_DATA, chat_id=chat_id)
-        USER_DATA[chat_id] = {}
+            theme = await create_theme(USER_DATA[chat_id], chat_id)
+            await callback_query.message.delete()
+            await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                                                                    caption=messages.MESSAGE_THEME_DONE)
+            await dell_data(user_data=USER_DATA, chat_id=chat_id)
+            USER_DATA[chat_id] = {}
 
-    elif USER_DATA[chat_id]['device'] == 'desktop':
+        elif USER_DATA[chat_id]['device'] == 'desktop':
 
-        USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
-        USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
-        USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
-        USER_DATA[chat_id]['background_alfa'] = 'a20'
+            USER_DATA[chat_id]['background_color'] = USER_DATA[chat_id]['colors'][0]
+            USER_DATA[chat_id]['primary_text_color'] = USER_DATA[chat_id]['colors'][4]
+            USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
+            USER_DATA[chat_id]['background_alfa'] = 'a20'
 
-        theme = await create_theme(USER_DATA[chat_id], chat_id)
-        await callback_query.message.delete()
-        await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
-                                                                caption=messages.MESSAGE_THEME_DONE)
-        await dell_data(user_data=USER_DATA, chat_id=chat_id)
-        USER_DATA[chat_id] = {}
+            theme = await create_theme(USER_DATA[chat_id], chat_id)
+            await callback_query.message.delete()
+            await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                                                                    caption=messages.MESSAGE_THEME_DONE)
+            await dell_data(user_data=USER_DATA, chat_id=chat_id)
+            USER_DATA[chat_id] = {}

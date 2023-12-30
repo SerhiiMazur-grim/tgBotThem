@@ -10,7 +10,7 @@ from config.api_keys import TOKEN_API
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
 theme_catalog_handlers, mailing_handlers, fonts_handlers
-from core.middleware import CleanupMiddleware, check_and_delete_files
+from core.middleware import CleanupMiddleware, PostSenderMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 
 
@@ -22,6 +22,7 @@ async def main():
     dp = Dispatcher()
 
     dp.message.middleware.register(CleanupMiddleware())
+    dp.message.middleware.register(PostSenderMiddleware(bot))
     
     # basic handlers
     dp.startup.register(start_bot)
@@ -50,16 +51,20 @@ async def main():
 
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
     dp.callback_query.register(mailing_handlers.start_limited_post, F.data == 'create_limited_post')
+    dp.callback_query.register(mailing_handlers.abort_sending_limit_post, F.data == 'abort_sending_limited_post')
     dp.message.register(mailing_handlers.init_limited_post, F.text.startswith('USERS'))
-    dp.message.register(mailing_handlers.forward_post_message, (F.forward_from | F.forward_from_chat) & ~F.media_group_id)
+    dp.message.register(mailing_handlers.forward_post_message,
+                        (F.forward_from | F.forward_from_chat) & ~F.media_group_id)
     dp.message.register(mailing_handlers.save_media_group_post_media, 
                         (F.caption.startswith('POST\n') | F.text.startswith('POST\n')) | ((F.forward_from | F.forward_from_chat) & F.media_group_id))
     dp.message.register(mailing_handlers.view_post_media, F.text == messages.BUTTON_VIEW_MAILING)
+    dp.callback_query.register(mailing_handlers.send_limited_post, F.data == 'send_limited_post')
     dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
     dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')
     dp.callback_query.register(mailing_handlers.send_post_to_group, F.data == 'post_send_group')
     dp.callback_query.register(mailing_handlers.delete_post, F.data == 'post_delete')
-    dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')    
+    dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')
+      
     # theme handlers
     dp.message.register(theme_handlers.command_user_kb, F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(theme_handlers.start_add_theme, F.text == messages.BUTTON_ADD_THEME)

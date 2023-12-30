@@ -13,6 +13,12 @@ USER_QUERY = {}
 USER_LANGUAGE_CATALOG = {}
 
 
+
+
+
+#----------------------------------------------------------------------------------------#
+
+
 async def get_catalog_languages(message: Message, bot: Bot):
     user_id = message.from_user.id
     if await is_user_subscribed(message, bot) and is_private_chat(message):
