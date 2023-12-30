@@ -1,17 +1,103 @@
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, PollAnswer
 from aiogram.types.input_media_photo import InputMediaPhoto
+from aiogram.enums import ParseMode
 
 from config import messages
-from core.utils import is_user_subscribed, is_private_chat
+from core.utils import is_user_subscribed, is_private_chat, is_admin
 from core.keyboards.reply_keybords import nex_languages_keyboard, user_keyboard
-from core.keyboards.inline_keybords import choice_device_lang_get_ikb, choice_category_lang_db_get_ikb
-from core.database import get_languages_from_catalog
+from core.keyboards import inline_keybords
+from core.database import get_languages_from_catalog, add_language_to_catalog
+from core.handlers.mailing_handlers import save_media_group_post_media
 
 
 USER_QUERY = {}
 USER_LANGUAGE_CATALOG = {}
+ADMIN_ADD_LANGUAGE = {}
 
+
+async def start_add_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    if is_admin(admin):
+        await message.delete()
+        ADMIN_ADD_LANGUAGE[admin] = {'language': {}}
+        ADMIN_ADD_LANGUAGE[admin]['init'] = True
+        await message.answer_poll(
+            question=messages.MESSAGE_CHOICE_DEVICE_FOR_LANGUAGE,
+            options=messages.DEVICE_FOR_LANGUAGE,
+            is_anonymous=False,
+            allows_multiple_answers=True
+        )
+
+
+async def add_language_device(poll: PollAnswer, bot: Bot):
+    admin = poll.user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            devices = [messages.DEVICE_FOR_LANGUAGE[i] for i in poll.option_ids]
+            ADMIN_ADD_LANGUAGE[admin]['language']['devices'] = {
+                'android': 'True' if 'android' in devices else 'False',
+                'ios': 'True' if 'ios' in devices else 'False',
+                'computer': 'True' if 'computer' in devices else 'False',
+            }
+            await bot.send_message(chat_id=poll.user.id,
+                                   text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
+                                   reply_markup=inline_keybords.language_categories_ikb())
+
+
+async def add_language_preview(callback_query: CallbackQuery):
+    admin = callback_query.from_user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            ADMIN_ADD_LANGUAGE[admin]['language']['category'] = callback_query.data.split('_')[-1]
+            await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT, parse_mode=ParseMode.HTML)
+
+
+async def add_previev_and_desc_for_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+        if ADMIN_ADD_LANGUAGE[admin]['init']:
+            media_group_id = message.media_group_id
+            preview = message.photo[-1].file_id
+            description = message.caption[5:]
+            ADMIN_ADD_LANGUAGE[admin]['language']['preview'] = [preview]
+            ADMIN_ADD_LANGUAGE[admin]['language']['description'] = description
+            ADMIN_ADD_LANGUAGE[admin]['media_group_id'] = media_group_id
+
+
+async def save_language_to_db(message, admin):
+    android = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['android']
+    ios = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['ios']
+    computer = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['computer']
+    category = ADMIN_ADD_LANGUAGE[admin]['language']['category']
+    preview = ', '.join(ADMIN_ADD_LANGUAGE[admin]['language']['preview'])
+    description = ADMIN_ADD_LANGUAGE[admin]['language']['description']
+    await add_language_to_catalog(
+        android=android,
+        ios=ios,
+        computer=computer,
+        category=category,
+        preview=preview,
+        description=description
+    )
+    await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
+
+
+async def add_preview_for_language(message: Message, bot: Bot):
+    admin = message.from_user.id
+    media_group_id = message.media_group_id
+    try:
+        if ADMIN_ADD_LANGUAGE[admin]['media_group_id'] == media_group_id:
+            if is_admin(admin) and ADMIN_ADD_LANGUAGE.get(admin):
+                if ADMIN_ADD_LANGUAGE[admin]['init']:
+                    ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
+                if len(ADMIN_ADD_LANGUAGE[admin]['language']['preview']) == 3:
+                    await save_language_to_db(message, admin)
+                        
+        else:
+            await save_media_group_post_media(message)
+    except:
+        await save_media_group_post_media(message)
 
 
 
@@ -26,7 +112,7 @@ async def get_catalog_languages(message: Message, bot: Bot):
         USER_LANGUAGE_CATALOG[user_id] = {}
         await message.delete()
         await message.answer(text=messages.MESSAGE_CHOICE_DEVICE_FOR_LANG,
-                             reply_markup=choice_device_lang_get_ikb())
+                             reply_markup=inline_keybords.choice_device_lang_get_ikb())
 
 
 async def get_device_catalog_languages(callback_query: CallbackQuery):
@@ -34,7 +120,7 @@ async def get_device_catalog_languages(callback_query: CallbackQuery):
     USER_QUERY[user_id]['device'] = callback_query.data.split('_')[-1]
     
     await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                            reply_markup=choice_category_lang_db_get_ikb())
+                            reply_markup=inline_keybords.choice_category_lang_db_get_ikb())
     
 
 async def get_category_catalog_themes(callback_query: CallbackQuery):

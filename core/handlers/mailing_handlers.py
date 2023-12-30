@@ -14,6 +14,7 @@ from core.utils import is_admin
 from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, abort_create_limited_post_ikb, \
     abort_sending_limited_post_ikb
 from core.database import get_chats_id_from_db, get_private_chats_id_from_db, get_group_chats_id_from_db
+from core.handlers.theme_handlers import handle_photo
 
 
 SEND_DATA = {}
@@ -104,6 +105,8 @@ async def forward_post_message(message: Message, bot: Bot):
         else:    
             SEND_DATA[user_id]['forward'] = message
             SEND_DATA[user_id]['key'] = 'forward'
+    else:
+        await handle_photo(message, bot)
     
 
 
@@ -442,7 +445,7 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot):
 
 async def delete_post(callback_query: CallbackQuery, bot: Bot):
     user_id = callback_query.from_user.id
-    if is_admin(user_id):
+    if is_admin(user_id) and SEND_DATA.get(user_id):
         if SEND_DATA[user_id]['for_activ_users']:
             data = {
                     "text": "",
@@ -463,7 +466,7 @@ async def delete_post(callback_query: CallbackQuery, bot: Bot):
 
 async def abort_create_post(callback_query: CallbackQuery, bot: Bot):
     user_id = callback_query.from_user.id
-    if is_admin(user_id):
+    if is_admin(user_id) and SEND_DATA.get(user_id):
         if SEND_DATA[user_id]['for_activ_users']:
             data = {
                     "text": "",

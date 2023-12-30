@@ -38,17 +38,16 @@ async def main():
     dp.callback_query.register(language_handlers.get_category_catalog_themes, F.data.startswith('lang_cat_get_'))
     dp.message.register(language_handlers.get_next_languages, F.text == messages.BUTTON_NEXT_LANGUAGES)
     dp.message.register(language_handlers.go_to_main_menu_from_lang_catalog, F.text == messages.BUTTON_BACK_FROM_LANG_CAT)
+    dp.message.register(language_handlers.start_add_language, F.text == messages.BUTTON_ADD_LANGUAGE)
+    dp.poll_answer.register(language_handlers.add_language_device)
+    dp.callback_query.register(language_handlers.add_language_preview, F.data.startswith('lang_cat_'))
+    dp.message.register(language_handlers.add_previev_and_desc_for_language, F.caption.startswith('LANG\n'))
+    dp.message.register(language_handlers.add_preview_for_language, F.media_group_id)
     
     dp.message.register(fonts_handlers.font_catalog, F.text == messages.BUTTON_FONTS_CATALOG)
     dp.message.register(fonts_handlers.get_text_from_user, F.text.startswith('//'))
     dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_'))
     
-    dp.message.register(theme_handlers.start_add_language, F.text == messages.BUTTON_ADD_LANGUAGE)
-    dp.poll_answer.register(theme_handlers.add_language_device)
-    dp.callback_query.register(theme_handlers.add_language_preview, F.data.startswith('lang_cat_'))
-    dp.message.register(theme_handlers.add_previev_and_desc_for_language, F.caption.startswith('LANG\n'))
-    dp.message.register(theme_handlers.add_preview_for_language, F.media_group_id)
-
     dp.message.register(mailing_handlers.create_mailing, F.text == messages.BUTTON_CREATE_MAILING)
     dp.callback_query.register(mailing_handlers.start_limited_post, F.data == 'create_limited_post')
     dp.callback_query.register(mailing_handlers.abort_sending_limit_post, F.data == 'abort_sending_limited_post')
