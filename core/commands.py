@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
 from config.messages import START_COMMAND_DESCRIPTION
 
@@ -12,4 +12,4 @@ async def set_commands(bot: Bot):
         )
     ]
 
-    await bot.set_my_commands(commands, BotCommandScopeDefault())
+    await bot.set_my_commands(commands, BotCommandScopeAllPrivateChats())

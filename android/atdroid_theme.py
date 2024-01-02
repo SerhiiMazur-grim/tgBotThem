@@ -31,7 +31,7 @@ async def img_to_binar(image_path):
     return binary_data
 
 
-async def adjust_color_brightness(hex_color, factor=0.2):
+async def adjust_color_brightness(hex_color, factor=0.1):
     # Перетворюємо рядок у форматі "#RRGGBB" у відповідне ціле число.
     color = int(hex_color[1:], 16)
 

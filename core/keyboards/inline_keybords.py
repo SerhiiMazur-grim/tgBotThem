@@ -1,6 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
+from config.categories import CATEGORIES, CATEGORIES_GET, DRVICES, DRVICES_GET, CATEGORIES_LANGUAGES, \
+    CATEGORIES_LANGUAGES_GET, DRVICES_LANGUAGES_GET
 
 
 def subscribe_keyboard(checked_channels):
@@ -104,4 +106,143 @@ def choose_alfa_background_color_keyboard():
 
     keyboard.adjust(3, 3, 3, 1, 2)
 
+    return keyboard.as_markup()
+
+
+def add_bot_to_chat_inl_keyboard():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url='t.me/Grimm_Python_Test_Bot?startgroup&admin=post_messages')
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup()
+
+
+def choice_category_ikb_keyboard():
+    keyboard = InlineKeyboardBuilder()
+
+    for category, index in CATEGORIES.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.button(text=messages.BUTTON_ABORT_ADD_THEME, callback_data='abort_add_theme')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_device_db_ikb_keyboard():
+    keyboard = InlineKeyboardBuilder()
+
+    for device, value in DRVICES.items():
+        keyboard.button(text=device, callback_data=value)
+    keyboard.button(text=messages.BUTTON_ABORT_ADD_THEME, callback_data='abort_add_theme')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_device_db_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for device, value in DRVICES_GET.items():
+        keyboard.button(text=device, callback_data=value)
+    
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_category_db_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for category, index in CATEGORIES_GET.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def send_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_SEND_TO_ALL, callback_data='post_send_all')
+    keyboard.button(text=messages.BUTTON_SEND_TO_PRIVATE, callback_data='post_send_private')
+    keyboard.button(text=messages.BUTTON_SEND_TO_GROUP, callback_data='post_send_group')
+    keyboard.button(text=messages.BUTTON_DELETE_POST, callback_data='post_delete')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def start_create_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
+    keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def abort_create_limited_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def abort_sending_limited_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_sending_limited_post')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def send_limited_post_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_SEND_LIMITED_POST, callback_data='send_limited_post')
+    keyboard.button(text=messages.BUTTON_DELETE_POST, callback_data='post_delete')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def fonts_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for view, font in messages.FONTS_BUTTONS.items():
+        keyboard.button(text=view, callback_data=font)
+    keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
+def language_categories_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    for category, index in CATEGORIES_LANGUAGES.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_device_lang_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for device, value in DRVICES_LANGUAGES_GET.items():
+        keyboard.button(text=device, callback_data=value)
+    
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_category_lang_db_get_ikb():
+    keyboard = InlineKeyboardBuilder()
+
+    for category, index in CATEGORIES_LANGUAGES_GET.items():
+        keyboard.button(text=category, callback_data=index)
+    keyboard.adjust(3)
     return keyboard.as_markup()
