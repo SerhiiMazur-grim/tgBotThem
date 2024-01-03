@@ -2,24 +2,23 @@ from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, PollAnswer
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.enums import ParseMode
+from aiogram.fsm.context import FSMContext
 
 from config import messages
 from core.keyboards.reply_keybords import nex_languages_keyboard, user_keyboard
 from core.keyboards import inline_keybords
 from core.database import get_languages_from_catalog, add_language_to_catalog
 from core.handlers.mailing_handlers import save_media_group_post_media
+from core.states import AddLanguageState
 
 
 USER_QUERY = {}
 USER_LANGUAGE_CATALOG = {}
-ADMIN_ADD_LANGUAGE = {}
 
 
-async def start_add_language(message: Message, bot: Bot):
-    admin = message.from_user.id
+async def start_add_language(message: Message, state: FSMContext):
     await message.delete()
-    ADMIN_ADD_LANGUAGE[admin] = {'language': {}}
-    ADMIN_ADD_LANGUAGE[admin]['init'] = True
+    await state.set_state(AddLanguageState.device)
     await message.answer_poll(
         question=messages.MESSAGE_CHOICE_DEVICE_FOR_LANGUAGE,
         options=messages.DEVICE_FOR_LANGUAGE,
@@ -28,74 +27,72 @@ async def start_add_language(message: Message, bot: Bot):
     )
 
 
-async def add_language_device(poll: PollAnswer, bot: Bot):
-    admin = poll.user.id
-    if ADMIN_ADD_LANGUAGE.get(admin):
-        if ADMIN_ADD_LANGUAGE[admin]['init']:
-            devices = [messages.DEVICE_FOR_LANGUAGE[i] for i in poll.option_ids]
-            ADMIN_ADD_LANGUAGE[admin]['language']['devices'] = {
-                'android': 'True' if 'android' in devices else 'False',
-                'ios': 'True' if 'ios' in devices else 'False',
-                'computer': 'True' if 'computer' in devices else 'False',
-            }
-            await bot.send_message(chat_id=poll.user.id,
-                                   text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
-                                   reply_markup=inline_keybords.language_categories_ikb())
+async def add_language_device(poll: PollAnswer, bot: Bot, state: FSMContext):
+    devices = [messages.DEVICE_FOR_LANGUAGE[i] for i in poll.option_ids]
+    device = {
+        'android': 'True' if 'android' in devices else 'False',
+        'ios': 'True' if 'ios' in devices else 'False',
+        'computer': 'True' if 'computer' in devices else 'False',
+    }
+    await state.update_data(device=device)
+    await state.set_state(AddLanguageState.category)
+    await bot.send_message(chat_id=poll.user.id,
+                            text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
+                            reply_markup=inline_keybords.language_categories_ikb())
 
 
-async def add_language_preview(callback_query: CallbackQuery):
-    admin = callback_query.from_user.id
-    if ADMIN_ADD_LANGUAGE.get(admin):
-        if ADMIN_ADD_LANGUAGE[admin]['init']:
-            ADMIN_ADD_LANGUAGE[admin]['language']['category'] = callback_query.data.split('_')[-1]
-            await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT, parse_mode=ParseMode.HTML)
+async def add_language_category(callback_query: CallbackQuery, state: FSMContext):
+    category = callback_query.data.split('_')[-1]
+    await state.update_data(category=category)
+    await state.set_state(AddLanguageState.preview)
+    await callback_query.message.answer(text=messages.MESAGE_SEND_ME_PREVIEW_AND_TEXT, parse_mode=ParseMode.HTML)
 
 
-async def add_previev_and_desc_for_language(message: Message, bot: Bot):
-    admin = message.from_user.id
-    if ADMIN_ADD_LANGUAGE.get(admin):
-        if ADMIN_ADD_LANGUAGE[admin]['init']:
-            media_group_id = message.media_group_id
-            preview = message.photo[-1].file_id
-            description = message.caption[5:]
-            ADMIN_ADD_LANGUAGE[admin]['language']['preview'] = [preview]
-            ADMIN_ADD_LANGUAGE[admin]['language']['description'] = description
-            ADMIN_ADD_LANGUAGE[admin]['media_group_id'] = media_group_id
+async def add_previev_and_desc_for_language(message: Message, state: FSMContext):
+    preview = message.photo[-1].file_id
+    caption = message.caption
+    data = await state.get_data()
+    preview_list = data.get('preview')
+    
+    if data.get('caption') is None:
+        await state.update_data(caption=caption)
+    
+    if preview_list is None:
+        await state.update_data(preview=[preview])
+    else:
+        preview_list.append(preview)
+        if len(preview_list) == 3:
+            await add_language_to_catalog(
+                android=data['device']['android'],
+                ios=data['device']['ios'],
+                computer=data['device']['computer'],
+                category=data['category'],
+                preview=', '.join(preview_list),
+                description=data['caption']
+            )
+            await state.clear()
+            await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
+        else: 
+            await state.update_data(preview=preview_list)
+        
+    
 
 
-async def save_language_to_db(message, admin):
-    android = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['android']
-    ios = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['ios']
-    computer = ADMIN_ADD_LANGUAGE[admin]['language']['devices']['computer']
-    category = ADMIN_ADD_LANGUAGE[admin]['language']['category']
-    preview = ', '.join(ADMIN_ADD_LANGUAGE[admin]['language']['preview'])
-    description = ADMIN_ADD_LANGUAGE[admin]['language']['description']
-    await add_language_to_catalog(
-        android=android,
-        ios=ios,
-        computer=computer,
-        category=category,
-        preview=preview,
-        description=description
-    )
-    await message.answer(text=messages.MESSAGE_LANGUAGE_IS_SAVE)
-
-
-async def add_preview_for_language(message: Message, bot: Bot):
-    admin = message.from_user.id
-    media_group_id = message.media_group_id
-    try:
-        if ADMIN_ADD_LANGUAGE[admin]['media_group_id'] == media_group_id:
-            if ADMIN_ADD_LANGUAGE.get(admin):
-                if ADMIN_ADD_LANGUAGE[admin]['init']:
-                    ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
-                if len(ADMIN_ADD_LANGUAGE[admin]['language']['preview']) == 3:
-                    await save_language_to_db(message, admin)
+# async def add_preview_for_language(message: Message, state: FSMContext):
+#     admin = message.from_user.id
+#     media_group_id = message.media_group_id
+#     try:
+#         if ADMIN_ADD_LANGUAGE[admin]['media_group_id'] == media_group_id:
+#             if ADMIN_ADD_LANGUAGE.get(admin):
+#                 if ADMIN_ADD_LANGUAGE[admin]['init']:
+#                     ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
+#                 if len(ADMIN_ADD_LANGUAGE[admin]['language']['preview']) == 3:
+                    # await save_language_to_db(message, admin)
                         
-        else:
-            await save_media_group_post_media(message)
-    except:
-        await save_media_group_post_media(message)
+#         else:
+#             await save_media_group_post_media(message)
+#     except:
+#         await save_media_group_post_media(message)
 
 
 async def get_catalog_languages(message: Message, bot: Bot):

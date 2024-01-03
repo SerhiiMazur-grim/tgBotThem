@@ -2,6 +2,7 @@ import os
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.fsm.context import FSMContext
 
 from config import messages
 from core.image.gener_image import create_image
@@ -9,37 +10,11 @@ from core.image.image_analiz import image_color_picker
 from core.keyboards import inline_keybords
 from core.keyboards.reply_keybords import user_keyboard
 from core.theme_creator import create_theme
-from core.database import add_theme_to_catalog
 from core.utils import dell_data
+from core.states import AddThemeState
 
 
 USER_DATA = {}
-ADMIN_ADD_THEME = {}
-
-
-        
-async def start_add_theme(message: Message, bot: Bot):
-    admin = message.from_user.id
-    await message.delete()
-    ADMIN_ADD_THEME[admin] = {'theme': {}}
-    ADMIN_ADD_THEME[admin]['init'] = True
-    await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
-                            reply_markup=inline_keybords.choice_device_db_ikb_keyboard())
-
-
-async def abort_add_theme(callback_query: CallbackQuery):
-    admin = callback_query.from_user.id
-    if ADMIN_ADD_THEME.get(admin):
-        ADMIN_ADD_THEME[admin] = {}
-        await callback_query.message.delete()
-
-
-async def add_theme_device(callback_query: CallbackQuery):
-    admin = callback_query.from_user.id
-    if ADMIN_ADD_THEME.get(admin):
-        if ADMIN_ADD_THEME[admin]['init']:
-            ADMIN_ADD_THEME[admin]['theme']['device'] = callback_query.data.split('_')[-1]
-            await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
 
 
 async def handler_abort(callback_query: CallbackQuery, bot: Bot):
@@ -64,26 +39,6 @@ async def handle_photo(message: Message, bot: Bot):
     if message.media_group_id:
         return
     
-    admin = message.from_user.id
-    if ADMIN_ADD_THEME.get(admin):
-        if ADMIN_ADD_THEME[admin]['init'] and message.photo:
-            preview = message.photo[-1]
-            
-            ADMIN_ADD_THEME[admin]['theme']['preview'] = preview.file_id
-            await message.answer(text=messages.MESSAGE_SEND_THEME_FILE)
-            return
-            
-        elif ADMIN_ADD_THEME[admin]['init'] and message.document:
-            theme_file = message.document
-            if theme_file.file_name.split('.')[-1] in ('attheme', 'tdesktop-theme', 'tgios-theme'):
-                ADMIN_ADD_THEME[admin]['theme']['file'] = theme_file.file_id
-                await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                                     reply_markup=inline_keybords.choice_category_ikb_keyboard())
-                return
-            else:
-                await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
-                return
-
     chat_id = message.chat.id
     if message.chat.type == 'private':
         if message.document:
@@ -141,26 +96,12 @@ async def handle_photo(message: Message, bot: Bot):
     )
 
 
-async def add_theme_category(callback_query: CallbackQuery):
-    if ADMIN_ADD_THEME:
-        admin = callback_query.from_user.id
-        if ADMIN_ADD_THEME[admin]['init']:
-            category = callback_query.data.split('_')[-1]
-            preview = ADMIN_ADD_THEME[admin]['theme']['preview']
-            theme = ADMIN_ADD_THEME[admin]['theme']['file']
-            device = ADMIN_ADD_THEME[admin]['theme']['device']
-            
-            await add_theme_to_catalog(category, preview, theme, device)
-            
-            ADMIN_ADD_THEME[admin] = {}
-            
-            await callback_query.message.answer(text=messages.MESSAGE_ADDED_TO_DB)
 
 
 async def command_user_kb(message: Message, bot: Bot):
     user_id = message.from_user.id
     await message.delete()
-    ADMIN_ADD_THEME[user_id] = {}
+    # ADMIN_ADD_THEME[user_id] = {}
     
     await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 

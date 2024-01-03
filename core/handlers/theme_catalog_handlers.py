@@ -1,38 +1,101 @@
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
+from aiogram.fsm.context import FSMContext
 
 from config import messages
-from core.keyboards.inline_keybords import choice_device_db_get_ikb, choice_category_db_get_ikb
+from core.keyboards import inline_keybords
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard
 from core.database import get_themes_from_catalog
+from core.states import AddThemeState, GetThemesCatalogState
+from core.database import add_theme_to_catalog
 
 
-USER_QUERY = {}
 USER_THEME_CATALOG = {}
 
 
-async def get_catalog_themes(message: Message, bot: Bot):
-    user_id = message.from_user.id
-    USER_QUERY[user_id] = {}
+async def start_add_theme(message: Message, state: FSMContext):
     await message.delete()
+    await state.set_state(AddThemeState.device)
     await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
-                            reply_markup=choice_device_db_get_ikb())
+                            reply_markup=inline_keybords.choice_device_db_ikb_keyboard())
 
 
-async def get_device_catalog_themes(callback_query: CallbackQuery):
-    user_id = callback_query.from_user.id
-    USER_QUERY[user_id]['device'] = callback_query.data.split('_')[-1]
+async def abort_add_theme(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.message.delete()
     
-    await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                            reply_markup=choice_category_db_get_ikb())
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    
+    await state.clear()
+    await callback_query.answer(text='Cancelled')
+    
 
 
-async def get_category_catalog_themes(callback_query: CallbackQuery):
-    user_id = callback_query.from_user.id
-    device = USER_QUERY[user_id]['device']
+async def add_theme_device(callback_query: CallbackQuery, state: FSMContext):
+    device = callback_query.data.split('_')[-1]
+    await state.update_data(device=device)
+    await state.set_state(AddThemeState.preview)
+    await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
+
+
+async def add_theme_preview(message: Message, state: FSMContext):
+    preview = message.photo[-1].file_id
+    await state.update_data(preview=preview)
+    await state.set_state(AddThemeState.file)
+    await message.answer(text=messages.MESSAGE_SEND_THEME_FILE)
+
+
+async def add_theme_file(message: Message, state: FSMContext):
+    file = message.document
+    if file.file_name.split('.')[-1] in ('attheme', 'tdesktop-theme', 'tgios-theme'):
+        await state.update_data(file=file.file_id)
+        await state.set_state(AddThemeState.category)
+        await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
+                                     reply_markup=inline_keybords.choice_category_ikb_keyboard())
+    else:
+        await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
+      
+
+async def add_theme_category(callback_query: CallbackQuery, state: FSMContext):
     category = callback_query.data.split('_')[-1]
+    theme_data = await state.update_data(category=category)
+    await state.clear()
     
-    catalog = await get_themes_from_catalog(device, category)
+    preview = theme_data['preview']
+    theme = theme_data['file']
+    device = theme_data['device']
+    
+    await add_theme_to_catalog(category, preview, theme, device)
+    
+    await callback_query.message.answer(text=messages.MESSAGE_ADDED_TO_DB)
+
+
+#-------------------------------------------------------------------------------
+
+
+async def get_catalog_themes(message: Message, state: FSMContext):
+    await message.delete()
+    await state.set_state(GetThemesCatalogState.device)
+    await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
+                            reply_markup=inline_keybords.choice_device_db_get_ikb())
+
+
+async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
+    device = callback_query.data.split('_')[-1]
+    await state.update_data(device=device)
+    await state.set_state(GetThemesCatalogState.category)
+    await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
+                            reply_markup=inline_keybords.choice_category_db_get_ikb())
+
+
+async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
+    category = callback_query.data.split('_')[-1]
+    data = await state.get_data()
+    await state.clear()
+    
+    catalog = await get_themes_from_catalog(data['device'], category)
+    user_id = callback_query.from_user.id
     USER_THEME_CATALOG[user_id] = {}
     USER_THEME_CATALOG[user_id]['catalog'] = catalog
     USER_THEME_CATALOG[user_id]['start'] = 5
@@ -67,9 +130,12 @@ async def get_next_themes(message: Message, bot: Bot):
         
 
 
-async def go_to_main_menu(message: Message, bot: Bot):
+async def go_to_main_menu(message: Message, state: FSMContext):
     user_id = message.from_user.id
-    USER_QUERY[user_id] = {}
+    current_state = await state.get_state()
+    if current_state is not None:
+        await state.clear()
+        
     USER_THEME_CATALOG[user_id] = {}
     await message.delete()
     await message.answer(text=messages.MESSAGE_ON_BACK,
