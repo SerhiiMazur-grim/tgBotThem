@@ -20,5 +20,10 @@ class GetThemesCatalogState(StatesGroup):
     category = State()
 
 
+class GetLanguageCatalogState(StatesGroup):
+    device = State()
+    category = State()
+
+
 class GetFontTextState(StatesGroup):
     text = State()

@@ -8,11 +8,10 @@ from config import messages
 from core.keyboards.reply_keybords import nex_languages_keyboard, user_keyboard
 from core.keyboards import inline_keybords
 from core.database import get_languages_from_catalog, add_language_to_catalog
-from core.handlers.mailing_handlers import save_media_group_post_media
-from core.states import AddLanguageState
+from core.states import AddLanguageState, GetLanguageCatalogState
 
 
-USER_QUERY = {}
+# USER_QUERY = {}
 USER_LANGUAGE_CATALOG = {}
 
 
@@ -75,47 +74,31 @@ async def add_previev_and_desc_for_language(message: Message, state: FSMContext)
         else: 
             await state.update_data(preview=preview_list)
         
-    
 
-
-# async def add_preview_for_language(message: Message, state: FSMContext):
-#     admin = message.from_user.id
-#     media_group_id = message.media_group_id
-#     try:
-#         if ADMIN_ADD_LANGUAGE[admin]['media_group_id'] == media_group_id:
-#             if ADMIN_ADD_LANGUAGE.get(admin):
-#                 if ADMIN_ADD_LANGUAGE[admin]['init']:
-#                     ADMIN_ADD_LANGUAGE[admin]['language']['preview'].append(message.photo[-1].file_id)
-#                 if len(ADMIN_ADD_LANGUAGE[admin]['language']['preview']) == 3:
-                    # await save_language_to_db(message, admin)
-                        
-#         else:
-#             await save_media_group_post_media(message)
-#     except:
-#         await save_media_group_post_media(message)
-
-
-async def get_catalog_languages(message: Message, bot: Bot):
+async def get_catalog_languages(message: Message, state: FSMContext):
     user_id = message.from_user.id
-    USER_QUERY[user_id] = {}
+    await state.set_state(GetLanguageCatalogState.device)
     USER_LANGUAGE_CATALOG[user_id] = {}
     await message.delete()
     await message.answer(text=messages.MESSAGE_CHOICE_DEVICE_FOR_LANG,
                             reply_markup=inline_keybords.choice_device_lang_get_ikb())
 
 
-async def get_device_catalog_languages(callback_query: CallbackQuery):
-    user_id = callback_query.from_user.id
-    USER_QUERY[user_id]['device'] = callback_query.data.split('_')[-1]
+async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSMContext):
+    device = callback_query.data.split('_')[-1]
+    await state.update_data(device=device)
+    await state.set_state(GetLanguageCatalogState.category)
     
     await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
                             reply_markup=inline_keybords.choice_category_lang_db_get_ikb())
     
 
-async def get_category_catalog_themes(callback_query: CallbackQuery):
+async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
     user_id = callback_query.from_user.id
-    device = USER_QUERY[user_id]['device']
+    data = await state.get_data()
+    device = data['device']
     category = callback_query.data.split('_')[-1]
+    await state.clear()
     
     catalog = await get_languages_from_catalog(device, category)
     USER_LANGUAGE_CATALOG[user_id]['catalog'] = catalog
@@ -140,7 +123,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery):
         await callback_query.message.answer(text=messages.MESSAGE_NO_LANGUAGES_IN_CATALOG)
 
 
-async def get_next_languages(message: Message, bot: Bot):
+async def get_next_languages(message: Message):
     user_id = message.from_user.id
     catalog = USER_LANGUAGE_CATALOG[user_id]['catalog']
     start = USER_LANGUAGE_CATALOG[user_id]['start']
@@ -166,9 +149,11 @@ async def get_next_languages(message: Message, bot: Bot):
         await message.answer(text=messages.MESSAGE_NO_MORE_LANGUAGES)
 
 
-async def go_to_main_menu_from_lang_catalog(message: Message, bot: Bot):
+async def go_to_main_menu_from_lang_catalog(message: Message, state: FSMContext):
     user_id = message.from_user.id
-    USER_QUERY[user_id] = {}
+    current_state = await state.get_state()
+    if current_state is not None:
+        await state.clear()
     USER_LANGUAGE_CATALOG[user_id] = {}
     await message.delete()
     await message.answer(text=messages.BUTTON_BACK_FROM_LANG_CAT,

@@ -12,7 +12,7 @@ theme_catalog_handlers, mailing_handlers, fonts_handlers
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
-from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, AddLanguageState
+from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, AddLanguageState, GetLanguageCatalogState
 
 
 async def main():
@@ -37,8 +37,8 @@ async def main():
     
     # language handlers
     dp.message.register(language_handlers.get_catalog_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_LANGUAGE_CATALOG)
-    dp.callback_query.register(language_handlers.get_device_catalog_languages, F.data.startswith('dev_lang_get_'))
-    dp.callback_query.register(language_handlers.get_category_catalog_themes, F.data.startswith('lang_cat_get_'))
+    dp.callback_query.register(language_handlers.get_device_catalog_languages, GetLanguageCatalogState.device)
+    dp.callback_query.register(language_handlers.get_category_catalog_themes, GetLanguageCatalogState.category)
     dp.message.register(language_handlers.get_next_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_LANGUAGES)
     dp.message.register(language_handlers.go_to_main_menu_from_lang_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_FROM_LANG_CAT)
     dp.message.register(language_handlers.start_add_language, IsAdminFilter(), IsPrivateChatFilter(),
@@ -47,7 +47,6 @@ async def main():
     dp.callback_query.register(language_handlers.add_language_category, AddLanguageState.category)
     dp.message.register(language_handlers.add_previev_and_desc_for_language, IsAdminFilter(), IsPrivateChatFilter(),
                         AddLanguageState.preview)
-    # dp.message.register(language_handlers.add_preview_for_language, IsAdminFilter(), IsPrivateChatFilter(), F.media_group_id)
     
     # fonts handlers
     dp.message.register(fonts_handlers.font_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_FONTS_CATALOG)
