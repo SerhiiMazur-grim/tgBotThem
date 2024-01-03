@@ -4,15 +4,56 @@ from typing import Callable, Awaitable, Dict, Any
 import json
 
 from aiogram import BaseMiddleware, Bot
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.types.input_media_animation import InputMediaAnimation
 from aiogram.types.input_media_document import InputMediaDocument
 from aiogram.types.input_media_audio import InputMediaAudio
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.types.input_media_video import InputMediaVideo
 
+from config.telegram_chats import CHANNEL_IDS
+from config.api_keys import ADMINS
+from core.keyboards.inline_keybords import subscribe_keyboard
+from config import messages
+
 
 clean_time = None
+
+
+class IsSubscribedMiddleware(BaseMiddleware):
+    def __init__(self, bot) -> None:
+        self.bot = bot
+    
+    async def __call__(
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any]
+    ) -> Any:
+        
+        user_id = event.from_user.id
+        if str(user_id) in ADMINS or event.text == '/start':
+            return await handler(event, data)
+        
+        checked_channels = []
+        for channel_id in CHANNEL_IDS:
+            member = await Bot.get_chat_member(self=self.bot, chat_id=channel_id, user_id=user_id)
+
+            # Перевірка, чи користувач є учасником каналу та має статус "member" або "creator"
+            if member.status == 'member' or member.status == 'creator':
+                continue
+            
+            else:
+                checked_channels.append(channel_id)
+
+        if not checked_channels:
+            return await handler(event, data)
+        
+        else:
+            # Якщо користувач не підписаний ні на один з каналів, створимо і покажемо інлайнову клавіатуру
+            await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
+                                    reply_markup=subscribe_keyboard(checked_channels))
+
 
 
 class PostSenderMiddleware(BaseMiddleware):

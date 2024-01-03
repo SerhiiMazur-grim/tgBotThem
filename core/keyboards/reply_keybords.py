@@ -25,7 +25,6 @@ def admin_keyboard():
     keyboard = ReplyKeyboardBuilder()
     keyboard.button(text=messages.BUTTON_ADD_THEME)
     keyboard.button(text=messages.BUTTON_ADD_LANGUAGE)
-    # keyboard.button(text=messages.BUTTON_SAVE_LANGUAGE)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)

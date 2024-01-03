@@ -2,7 +2,7 @@ from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
 
 from config import messages
-from core.utils import is_user_subscribed, is_private_chat
+from core.utils import is_private_chat
 from core.keyboards.inline_keybords import choice_device_db_get_ikb, choice_category_db_get_ikb
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard
 from core.database import get_themes_from_catalog
@@ -14,7 +14,7 @@ USER_THEME_CATALOG = {}
 
 async def get_catalog_themes(message: Message, bot: Bot):
     user_id = message.from_user.id
-    if await is_user_subscribed(message, bot) and is_private_chat(message):
+    if is_private_chat(message):
         USER_QUERY[user_id] = {}
         await message.delete()
         await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
@@ -52,7 +52,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery):
 
 async def get_next_themes(message: Message, bot: Bot):
     user_id = message.from_user.id
-    if await is_user_subscribed(message, bot) and is_private_chat(message):
+    if is_private_chat(message):
         catalog = USER_THEME_CATALOG[user_id]['catalog']
         start = USER_THEME_CATALOG[user_id]['start']
         end = USER_THEME_CATALOG[user_id]['end']

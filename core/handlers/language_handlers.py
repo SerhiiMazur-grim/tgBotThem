@@ -4,7 +4,7 @@ from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.enums import ParseMode
 
 from config import messages
-from core.utils import is_user_subscribed, is_private_chat, is_admin
+from core.utils import is_private_chat, is_admin
 from core.keyboards.reply_keybords import nex_languages_keyboard, user_keyboard
 from core.keyboards import inline_keybords
 from core.database import get_languages_from_catalog, add_language_to_catalog
@@ -107,7 +107,7 @@ async def add_preview_for_language(message: Message, bot: Bot):
 
 async def get_catalog_languages(message: Message, bot: Bot):
     user_id = message.from_user.id
-    if await is_user_subscribed(message, bot) and is_private_chat(message):
+    if is_private_chat(message):
         USER_QUERY[user_id] = {}
         USER_LANGUAGE_CATALOG[user_id] = {}
         await message.delete()
@@ -153,7 +153,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery):
 
 async def get_next_languages(message: Message, bot: Bot):
     user_id = message.from_user.id
-    if await is_user_subscribed(message, bot) and is_private_chat(message):
+    if is_private_chat(message):
         catalog = USER_LANGUAGE_CATALOG[user_id]['catalog']
         start = USER_LANGUAGE_CATALOG[user_id]['start']
         end = USER_LANGUAGE_CATALOG[user_id]['end']

@@ -10,7 +10,7 @@ from config.api_keys import TOKEN_API
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
 theme_catalog_handlers, mailing_handlers, fonts_handlers
-from core.middleware import CleanupMiddleware, PostSenderMiddleware, check_and_delete_files
+from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 
 
@@ -23,6 +23,7 @@ async def main():
 
     dp.message.middleware.register(CleanupMiddleware())
     dp.message.middleware.register(PostSenderMiddleware(bot))
+    dp.message.middleware.register(IsSubscribedMiddleware(bot))
     
     # basic handlers
     dp.startup.register(start_bot)

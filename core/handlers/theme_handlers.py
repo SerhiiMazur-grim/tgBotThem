@@ -4,7 +4,6 @@ from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from config import messages
-from core.handlers.basic import is_user_subscribed
 from core.image.gener_image import create_image
 from core.image.image_analiz import image_color_picker
 from core.keyboards import inline_keybords
@@ -62,6 +61,7 @@ async def handler_abort(callback_query: CallbackQuery, bot: Bot):
 
 async def handle_photo(message: Message, bot: Bot):
     """ Отримуємо фото від користувача та оброблємо його """
+    
     if message.media_group_id:
         return
     
@@ -85,61 +85,61 @@ async def handle_photo(message: Message, bot: Bot):
                 await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
                 return
 
-    elif await is_user_subscribed(message, bot):
-        chat_id = message.chat.id
-        if message.chat.type == 'private':
-            if message.document:
-                photo = message.document
-                if photo.mime_type != 'image/jpeg':
-                    await message.reply(text=messages.NOT_IMAGE)
-                    return
-                
-            elif message.photo:
-                photo = message.photo[-1]
-            else: return
-                
-        elif message.chat.type != 'private' and message.caption == '/theme':
-            if message.document:
-                photo = message.document
-                if photo.mime_type != 'image/jpeg':
-                    await message.reply(text=messages.NOT_IMAGE)
-                    return
-                
-            elif message.photo:
-                photo = message.photo[-1]
-        else:
-            return
-        
-        wait_message = await message.answer(text=messages.WAIT_MESSAGE)
-        USER_DATA[chat_id] = {}
-        USER_DATA[chat_id]['user_id'] = message.from_user.id
-        USER_DATA[chat_id]['sended_photo'] = message
+    chat_id = message.chat.id
+    if message.chat.type == 'private':
+        if message.document:
+            photo = message.document
+            if photo.mime_type != 'image/jpeg':
+                await message.reply(text=messages.NOT_IMAGE)
+                return
+            
+        elif message.photo:
+            photo = message.photo[-1]
+        else: return
+            
+    elif message.chat.type != 'private' and message.caption == '/theme':
+        if message.document:
+            photo = message.document
+            if photo.mime_type != 'image/jpeg':
+                await message.reply(text=messages.NOT_IMAGE)
+                return
+            
+        elif message.photo:
+            photo = message.photo[-1]
+    else:
+        return
+    
+    wait_message = await message.answer(text=messages.WAIT_MESSAGE)
+    USER_DATA[chat_id] = {}
+    USER_DATA[chat_id]['user_id'] = message.from_user.id
+    USER_DATA[chat_id]['sended_photo'] = message
 
-        photo_id = photo.file_id
-        get_photo = await bot.get_file(photo_id)
+    photo_id = photo.file_id
+    get_photo = await bot.get_file(photo_id)
 
-        new_filename = f"{photo_id}.{get_photo.file_path.split('.')[-1]}"
-        USER_DATA[chat_id]['image_name'] = new_filename
-        download_file = os.path.join('download_photo', new_filename)
-        await bot.download_file(file_path=get_photo.file_path, destination=download_file)
+    new_filename = f"{photo_id}.{get_photo.file_path.split('.')[-1]}"
+    USER_DATA[chat_id]['image_name'] = new_filename
+    download_file = os.path.join('download_photo', new_filename)
+    await bot.download_file(file_path=get_photo.file_path, destination=download_file)
 
-        try:
-            colors = await image_color_picker(download_file)
-        except:
-            await wait_message.delete()
-            await message.reply(text=messages.NOT_IMAGE)
-        USER_DATA[chat_id]['colors'] = colors
-        color_pick_image = f'{photo_id}{message.from_user.id}.jpg'
-        USER_DATA[chat_id]['colors_image'] = color_pick_image
-        await create_image(USER_DATA[chat_id]['colors'], color_pick_image)
-
-        path = os.path.join('gener_image', color_pick_image)
+    try:
+        colors = await image_color_picker(download_file)
+    except:
         await wait_message.delete()
-        await message.answer_photo(
-            photo=FSInputFile(path=path),
-            caption=messages.CHOOSE_DEVICE_TEXT,
-            reply_markup=inline_keybords.choose_device_keyboard()
-        )
+        await message.reply(text=messages.NOT_IMAGE)
+        
+    USER_DATA[chat_id]['colors'] = colors
+    color_pick_image = f'{photo_id}{message.from_user.id}.jpg'
+    USER_DATA[chat_id]['colors_image'] = color_pick_image
+    await create_image(USER_DATA[chat_id]['colors'], color_pick_image)
+
+    path = os.path.join('gener_image', color_pick_image)
+    await wait_message.delete()
+    await message.answer_photo(
+        photo=FSInputFile(path=path),
+        caption=messages.CHOOSE_DEVICE_TEXT,
+        reply_markup=inline_keybords.choose_device_keyboard()
+    )
 
 
 async def add_theme_category(callback_query: CallbackQuery):

@@ -31,7 +31,7 @@ async def is_user_subscribed(message, bot: Bot):
     # Перевірка підписки користувача на кожен канал зі списку channel_ids
     checked_channels = []
     user_id = message.from_user.id
-    if is_admin(user_id):
+    if str(user_id) in ADMINS:
         return True
     
     for channel_id in CHANNEL_IDS:
