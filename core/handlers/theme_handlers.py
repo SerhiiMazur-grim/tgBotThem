@@ -10,7 +10,7 @@ from core.keyboards import inline_keybords
 from core.keyboards.reply_keybords import user_keyboard
 from core.theme_creator import create_theme
 from core.database import add_theme_to_catalog
-from core.utils import is_admin, dell_data, is_private_chat
+from core.utils import dell_data
 
 
 USER_DATA = {}
@@ -20,24 +20,23 @@ ADMIN_ADD_THEME = {}
         
 async def start_add_theme(message: Message, bot: Bot):
     admin = message.from_user.id
-    if is_admin(admin):
-        await message.delete()
-        ADMIN_ADD_THEME[admin] = {'theme': {}}
-        ADMIN_ADD_THEME[admin]['init'] = True
-        await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
-                             reply_markup=inline_keybords.choice_device_db_ikb_keyboard())
+    await message.delete()
+    ADMIN_ADD_THEME[admin] = {'theme': {}}
+    ADMIN_ADD_THEME[admin]['init'] = True
+    await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
+                            reply_markup=inline_keybords.choice_device_db_ikb_keyboard())
 
 
 async def abort_add_theme(callback_query: CallbackQuery):
     admin = callback_query.from_user.id
-    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+    if ADMIN_ADD_THEME.get(admin):
         ADMIN_ADD_THEME[admin] = {}
         await callback_query.message.delete()
 
 
 async def add_theme_device(callback_query: CallbackQuery):
     admin = callback_query.from_user.id
-    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+    if ADMIN_ADD_THEME.get(admin):
         if ADMIN_ADD_THEME[admin]['init']:
             ADMIN_ADD_THEME[admin]['theme']['device'] = callback_query.data.split('_')[-1]
             await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
@@ -66,7 +65,7 @@ async def handle_photo(message: Message, bot: Bot):
         return
     
     admin = message.from_user.id
-    if is_admin(admin) and ADMIN_ADD_THEME.get(admin):
+    if ADMIN_ADD_THEME.get(admin):
         if ADMIN_ADD_THEME[admin]['init'] and message.photo:
             preview = message.photo[-1]
             
@@ -145,7 +144,7 @@ async def handle_photo(message: Message, bot: Bot):
 async def add_theme_category(callback_query: CallbackQuery):
     if ADMIN_ADD_THEME:
         admin = callback_query.from_user.id
-        if is_admin(admin) and ADMIN_ADD_THEME[admin]['init']:
+        if ADMIN_ADD_THEME[admin]['init']:
             category = callback_query.data.split('_')[-1]
             preview = ADMIN_ADD_THEME[admin]['theme']['preview']
             theme = ADMIN_ADD_THEME[admin]['theme']['file']
@@ -160,11 +159,10 @@ async def add_theme_category(callback_query: CallbackQuery):
 
 async def command_user_kb(message: Message, bot: Bot):
     user_id = message.from_user.id
-    if is_private_chat(message) and is_admin(user_id):
-        await message.delete()
-        ADMIN_ADD_THEME[user_id] = {}
-        
-        await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
+    await message.delete()
+    ADMIN_ADD_THEME[user_id] = {}
+    
+    await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 
 
 async def handler_device(callback_query: CallbackQuery, bot: Bot):

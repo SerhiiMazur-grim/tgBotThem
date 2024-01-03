@@ -8,22 +8,10 @@ from config.fonts import FONTS
 from config import messages
 from core.keyboards.inline_keybords import subscribe_keyboard
 from core.database import start_db
-from core.commands import set_commands
 
 
 async def start_bot(bot: Bot):
-    # await set_commands(bot)
     await start_db()
-
-
-def is_admin(user_id):
-    return str(user_id) in ADMINS
-
-
-def is_private_chat(message):
-    if message.chat.type == 'private':
-        return True
-    return False
 
 
 async def is_user_subscribed(message, bot: Bot):
