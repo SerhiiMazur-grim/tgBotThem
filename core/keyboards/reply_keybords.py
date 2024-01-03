@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from config import messages
-from core.utils import is_admin
+from config.api_keys import ADMINS
 
 
 def user_keyboard(user_id):
@@ -13,7 +13,7 @@ def user_keyboard(user_id):
     keyboard.button(text=messages.BUTTON_FONTS_CATALOG)
     keyboard.button(text=messages.BUTTON_FAQ)
     
-    if is_admin(user_id):
+    if str(user_id) in ADMINS:
         keyboard.button(text=messages.BUTTON_ADMIN)
     
     keyboard.adjust(2, 2, 2, 1)
