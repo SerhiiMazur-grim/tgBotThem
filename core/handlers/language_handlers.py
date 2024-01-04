@@ -11,7 +11,6 @@ from core.database import get_languages_from_catalog, add_language_to_catalog
 from core.states import AddLanguageState, GetLanguageCatalogState
 
 
-# USER_QUERY = {}
 USER_LANGUAGE_CATALOG = {}
 
 

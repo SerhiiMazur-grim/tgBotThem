@@ -166,6 +166,7 @@ def send_post_ikb():
     keyboard.button(text=messages.BUTTON_SEND_TO_ALL, callback_data='post_send_all')
     keyboard.button(text=messages.BUTTON_SEND_TO_PRIVATE, callback_data='post_send_private')
     keyboard.button(text=messages.BUTTON_SEND_TO_GROUP, callback_data='post_send_group')
+    keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
     keyboard.button(text=messages.BUTTON_DELETE_POST, callback_data='post_delete')
     
     keyboard.adjust(1)
@@ -175,7 +176,7 @@ def send_post_ikb():
 def start_create_post_ikb():
     keyboard = InlineKeyboardBuilder()
 
-    keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
+    # keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
     keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
     
     keyboard.adjust(1)

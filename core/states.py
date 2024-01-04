@@ -27,3 +27,10 @@ class GetLanguageCatalogState(StatesGroup):
 
 class GetFontTextState(StatesGroup):
     text = State()
+
+
+class AddPostState(StatesGroup):
+    post = State()
+    post_type = State()
+    users_count = State()
+    
