@@ -65,25 +65,9 @@ async def main():
     dp.callback_query.register(posts_handlers.delete_post, F.data == 'post_delete')
     dp.callback_query.register(posts_handlers.abort_create_post, F.data == 'abort_create_post')
     dp.callback_query.register(posts_handlers.abort_sending_limit_post, F.data == 'abort_sending_limited_post')
-    
-    
-    # dp.message.register(mailing_handlers.create_mailing, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_CREATE_MAILING)
-    # dp.callback_query.register(mailing_handlers.start_limited_post, F.data == 'create_limited_post')
-    # dp.callback_query.register(mailing_handlers.abort_sending_limit_post, F.data == 'abort_sending_limited_post')
-    # dp.message.register(mailing_handlers.init_limited_post, IsAdminFilter(), IsPrivateChatFilter(), F.text.startswith('USERS'))
-    # dp.message.register(mailing_handlers.forward_post_message,
-    #                     IsAdminFilter(), IsPrivateChatFilter(), (F.forward_from | F.forward_from_chat) & ~F.media_group_id)
-    # dp.message.register(mailing_handlers.save_media_group_post_media, 
-    #                     IsAdminFilter(), IsPrivateChatFilter(),
-    #                     (F.caption.startswith('POST\n') | F.text.startswith('POST\n')) | ((F.forward_from | F.forward_from_chat) & F.media_group_id))
-    # dp.message.register(mailing_handlers.view_post_media, IsAdminFilter(), IsPrivateChatFilter(),
-    #                     F.text == messages.BUTTON_VIEW_MAILING)
-    # dp.callback_query.register(mailing_handlers.send_limited_post, F.data == 'send_limited_post')
-    # dp.callback_query.register(mailing_handlers.send_post_to_all, F.data == 'post_send_all')
-    # dp.callback_query.register(mailing_handlers.send_post_to_private, F.data == 'post_send_private')
-    # dp.callback_query.register(mailing_handlers.send_post_to_group, F.data == 'post_send_group')
-    # dp.callback_query.register(mailing_handlers.delete_post, F.data == 'post_delete')
-    # dp.callback_query.register(mailing_handlers.abort_create_post, F.data == 'abort_create_post')
+    dp.callback_query.register(posts_handlers.send_post_to_all, F.data == 'post_send_all')
+    dp.callback_query.register(posts_handlers.send_post_to_private, F.data == 'post_send_private')
+    dp.callback_query.register(posts_handlers.send_post_to_group, F.data == 'post_send_group')
     
     # theme catalog handlers
     dp.message.register(theme_catalog_handlers.get_catalog_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_THEME_CATALOG)

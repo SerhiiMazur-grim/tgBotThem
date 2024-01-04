@@ -112,13 +112,14 @@ MESSAGE_GIVE_ME_POST = """
 Текст розсилки.".
 """
 BUTTON_CREATE_MAILING = 'Створити пост'
-BUTTON_CREATE_LIMITED_POST = 'Тільки активним'
+BUTTON_CREATE_LIMITED_POST = 'Відправити тільки активним'
 MESSAGE_SEND_USERS_COUNT = 'Відправте число яке відповідає кількості користувачів, що побачуть цей пост.'
 MESSAGE_IS_NOT_NUMBER = 'Ви відправили не число!'
 MESSAGE_USERS_COUNT_INSERT = 'Кількість користувачів для розсилки встановлено на: '
 MESSAGE_SEND_ME_POST_FOR_LIMIT_SENDS = 'Відправте мені пост для розсилки цим користувачам.'
 BUTTON_SEND_LIMITED_POST = 'Відправити пост користувачам!'
-MESSAGE_LIMITED_POST_SEND = 'Пост відправлено на розсилку!'
+MESSAGE_LIMITED_POST_SEND = 'Пост для активних користувачів відправлено на розсилку!'
+MESSAGE_POST_IS_SEND = 'Пост відправлено на розсилку!'
 MESSAGE_LIMITED_POST_NOT_SEND = 'Немає поста для розсилки!'
 MESSAGE_PREV_POST_NOT_SENDED = 'Попередній пост ще не розіслано до кінця, залишилося ще розіслати: '
 MESSAGE_SENDING_IS_STOP = 'Розсилку припинено!\nСтворіть пост для розсилки заново!'
