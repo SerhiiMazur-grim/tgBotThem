@@ -129,6 +129,14 @@ def choice_category_ikb_keyboard():
     return keyboard.as_markup()
 
 
+def abort_add_theme_ikb():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_ABORT_ADD_THEME, callback_data='abort_add_theme')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
 def choice_device_db_ikb_keyboard():
     keyboard = InlineKeyboardBuilder()
 
@@ -195,7 +203,8 @@ def abort_create_limited_post_ikb():
 def abort_sending_limited_post_ikb():
     keyboard = InlineKeyboardBuilder()
 
-    keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_sending_limited_post')
+    keyboard.button(text=messages.BUTTON_STOP_SENDING_POST, callback_data='abort_sending_limited_post')
+    keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
     
     keyboard.adjust(1)
     return keyboard.as_markup()

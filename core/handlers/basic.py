@@ -15,13 +15,20 @@ async def command_start(message: Message, bot: Bot):
     
     await add_user_to_db(user_id, chat_id, chat_type)
     
-    await message.delete()
     if message.chat.type == 'private':
+        await message.delete()
         await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id))
     else:
         await message.answer_photo(photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
                                     caption=messages.MESSAGE_ON_START_IN_GROUP,
                                     reply_markup=None)
+
+
+async def command_user_kb(message: Message):
+    user_id = message.from_user.id
+    await message.delete()
+    
+    await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 
 
 async def command_create_theme(message: Message, bot: Bot):

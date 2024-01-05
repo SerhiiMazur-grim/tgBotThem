@@ -42,6 +42,22 @@ def nex_themes_keyboard():
     return keyboard.as_markup(resize_keyboard=True)
 
 
+def catalog_theme_keyboard():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_BACK)
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def catalog_language_keyboard():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_BACK_FROM_LANG_CAT)
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
 def nex_languages_keyboard():
     keyboard = ReplyKeyboardBuilder()
     keyboard.button(text=messages.BUTTON_NEXT_LANGUAGES)

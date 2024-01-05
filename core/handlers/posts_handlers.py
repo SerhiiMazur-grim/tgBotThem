@@ -11,10 +11,9 @@ from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.types.input_media_video import InputMediaVideo
 
 from config import messages
-from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, abort_create_limited_post_ikb, \
+from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, \
     abort_sending_limited_post_ikb
 from core.database import get_chats_id_from_db, get_private_chats_id_from_db, get_group_chats_id_from_db
-from core.handlers.theme_handlers import handle_photo
 from core.states import AddPostState
 
 
@@ -129,6 +128,7 @@ async def view_post(message: Message, state: FSMContext):
 
 
 async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback_query.answer()
     data = await state.get_data()
     await state.clear()
     chats = await get_chats_id_from_db()
@@ -147,6 +147,7 @@ async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMCo
 
 
 async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback_query.answer()
     data = await state.get_data()
     await state.clear()
     chats = await get_private_chats_id_from_db()
@@ -165,6 +166,7 @@ async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: F
 
 
 async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback_query.answer()
     data = await state.get_data()
     await state.clear()
     chats = await get_group_chats_id_from_db()
@@ -183,6 +185,8 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSM
 
 
 async def start_limited_post(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
+    await callback_query.message.delete()
     with open('SEND_POST.json', 'r') as file:
         send_post = json.load(file)
     if send_post['send_post']:
@@ -209,6 +213,7 @@ async def get_users_count(message: Message, state: FSMContext):
 
 
 async def send_limited_post(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     await callback_query.message.delete()
     data = await state.get_data()
     await state.clear()
@@ -285,6 +290,7 @@ async def send_limited_post(callback_query: CallbackQuery, state: FSMContext):
     
     
 async def delete_post(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     await callback_query.message.delete()
     current_state = await state.get_state()
     
@@ -295,6 +301,7 @@ async def delete_post(callback_query: CallbackQuery, state: FSMContext):
 
 
 async def abort_create_post(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     await callback_query.message.delete()
     current_state = await state.get_state()
         
@@ -303,6 +310,7 @@ async def abort_create_post(callback_query: CallbackQuery, state: FSMContext):
 
 
 async def abort_sending_limit_post(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     current_state = await state.get_state()
         
     if current_state is not None:

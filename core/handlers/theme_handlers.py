@@ -2,16 +2,13 @@ import os
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.fsm.context import FSMContext
 
 from config import messages
 from core.image.gener_image import create_image
 from core.image.image_analiz import image_color_picker
 from core.keyboards import inline_keybords
-from core.keyboards.reply_keybords import user_keyboard
 from core.theme_creator import create_theme
 from core.utils import dell_data
-from core.states import AddThemeState
 
 
 USER_DATA = {}
@@ -94,16 +91,6 @@ async def handle_photo(message: Message, bot: Bot):
         caption=messages.CHOOSE_DEVICE_TEXT,
         reply_markup=inline_keybords.choose_device_keyboard()
     )
-
-
-
-
-async def command_user_kb(message: Message, bot: Bot):
-    user_id = message.from_user.id
-    await message.delete()
-    # ADMIN_ADD_THEME[user_id] = {}
-    
-    await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 
 
 async def handler_device(callback_query: CallbackQuery, bot: Bot):

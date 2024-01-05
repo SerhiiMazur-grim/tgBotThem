@@ -8,7 +8,7 @@ from aiogram.filters import Command
 from config.api_keys import TOKEN_API
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
-theme_catalog_handlers, mailing_handlers, fonts_handlers, posts_handlers
+theme_catalog_handlers, fonts_handlers, posts_handlers
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
@@ -31,6 +31,7 @@ async def main():
     dp.startup.register(start_bot)
     dp.message.register(basic.command_start, Command('start'))
     dp.message.register(basic.command_admin_kb, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN)
+    dp.message.register(basic.command_user_kb, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(basic.command_create_theme, IsPrivateChatFilter(), F.text == messages.BUTTON_CREATE_THEME)
     dp.message.register(basic.command_add_to_chat, IsPrivateChatFilter(), F.text == messages.BUTTON_ADD_TO_CHAT)
     dp.message.register(basic.command_faq, IsPrivateChatFilter(), F.text == messages.BUTTON_FAQ)
@@ -84,7 +85,6 @@ async def main():
     dp.callback_query.register(theme_catalog_handlers.add_theme_category,  AddThemeState.category)
       
     # theme handlers
-    dp.message.register(theme_handlers.command_user_kb, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(theme_handlers.handle_photo, F.photo | F.document)
     dp.callback_query.register(theme_handlers.handler_abort, F.data == 'abort')
     dp.callback_query.register(theme_handlers.handler_device, F.data.startswith('device_'))

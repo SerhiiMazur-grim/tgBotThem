@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 
 from config import messages
 from core.keyboards.reply_keybords import nex_languages_keyboard, user_keyboard
-from core.keyboards import inline_keybords
+from core.keyboards import inline_keybords, reply_keybords
 from core.database import get_languages_from_catalog, add_language_to_catalog
 from core.states import AddLanguageState, GetLanguageCatalogState
 
@@ -40,6 +40,7 @@ async def add_language_device(poll: PollAnswer, bot: Bot, state: FSMContext):
 
 
 async def add_language_category(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     category = callback_query.data.split('_')[-1]
     await state.update_data(category=category)
     await state.set_state(AddLanguageState.preview)
@@ -79,11 +80,14 @@ async def get_catalog_languages(message: Message, state: FSMContext):
     await state.set_state(GetLanguageCatalogState.device)
     USER_LANGUAGE_CATALOG[user_id] = {}
     await message.delete()
+    await message.answer(text=messages.BUTTON_LANGUAGE_CATALOG,
+                         reply_markup=reply_keybords.catalog_language_keyboard())
     await message.answer(text=messages.MESSAGE_CHOICE_DEVICE_FOR_LANG,
                             reply_markup=inline_keybords.choice_device_lang_get_ikb())
 
 
 async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetLanguageCatalogState.category)
@@ -93,6 +97,7 @@ async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSM
     
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     data = await state.get_data()
     device = data['device']
@@ -153,6 +158,7 @@ async def go_to_main_menu_from_lang_catalog(message: Message, state: FSMContext)
     current_state = await state.get_state()
     if current_state is not None:
         await state.clear()
+
     USER_LANGUAGE_CATALOG[user_id] = {}
     await message.delete()
     await message.answer(text=messages.BUTTON_BACK_FROM_LANG_CAT,

@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from config import messages
-from core.keyboards import inline_keybords
+from core.keyboards import inline_keybords, reply_keybords
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard
 from core.database import get_themes_from_catalog
 from core.states import AddThemeState, GetThemesCatalogState
@@ -36,14 +36,16 @@ async def add_theme_device(callback_query: CallbackQuery, state: FSMContext):
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(AddThemeState.preview)
-    await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME)
+    await callback_query.message.answer(text=messages.MESSAGE_SEND_PREVIEW_THEME,
+                                        reply_markup=inline_keybords.abort_add_theme_ikb())
 
 
 async def add_theme_preview(message: Message, state: FSMContext):
     preview = message.photo[-1].file_id
     await state.update_data(preview=preview)
     await state.set_state(AddThemeState.file)
-    await message.answer(text=messages.MESSAGE_SEND_THEME_FILE)
+    await message.answer(text=messages.MESSAGE_SEND_THEME_FILE,
+                         reply_markup=inline_keybords.abort_add_theme_ikb())
 
 
 async def add_theme_file(message: Message, state: FSMContext):
@@ -77,11 +79,14 @@ async def add_theme_category(callback_query: CallbackQuery, state: FSMContext):
 async def get_catalog_themes(message: Message, state: FSMContext):
     await message.delete()
     await state.set_state(GetThemesCatalogState.device)
+    await message.answer(text=messages.BUTTON_THEME_CATALOG,
+                         reply_markup=reply_keybords.catalog_theme_keyboard())
     await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
                             reply_markup=inline_keybords.choice_device_db_get_ikb())
 
 
 async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetThemesCatalogState.category)
@@ -90,6 +95,7 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
 
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     category = callback_query.data.split('_')[-1]
     data = await state.get_data()
     await state.clear()

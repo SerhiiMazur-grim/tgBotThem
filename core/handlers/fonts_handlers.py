@@ -21,6 +21,7 @@ async def get_text_from_user(message: Message, state: FSMContext):
 
 
 async def change_font_in_text(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     font = callback_query.data
     data = await state.get_data()
     await state.clear()
