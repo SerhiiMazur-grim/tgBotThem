@@ -41,7 +41,7 @@ def choose_background_color_keyboard(colors_list):
     keyboard.button(text=messages.BUTTON_WHITE, callback_data='background_color_#ffffff')
     keyboard.button(text=messages.BUTTON_BLACK, callback_data='background_color_#000000')
     keyboard.button(text=messages.BUTTON_AUTO, callback_data='auto_background_color')
-    keyboard.button(text=messages.BUTTON_BACK, callback_data='back_to_device_choose')
+    keyboard.button(text=messages.BUTTON_BACK_IKB, callback_data='back_to_device_choose')
     keyboard.button(text=messages.ABORT, callback_data='abort')
 
     keyboard.adjust(5, 3, 2)
@@ -60,7 +60,7 @@ def choose_primary_text_color_keyboard(colors_list):
 
     keyboard.button(text=messages.BUTTON_WHITE, callback_data='primary_text_color_#ffffff')
     keyboard.button(text=messages.BUTTON_BLACK, callback_data='primary_text_color_#000000')
-    keyboard.button(text=messages.BUTTON_BACK, callback_data='back_to_background_choose')
+    keyboard.button(text=messages.BUTTON_BACK_IKB, callback_data='back_to_background_choose')
     keyboard.button(text=messages.ABORT, callback_data='abort')
 
     keyboard.adjust(5, 3, 1)
@@ -79,7 +79,7 @@ def choose_secondary_text_color_keyboard(colors_list):
 
     keyboard.button(text=messages.BUTTON_WHITE, callback_data='secondary_text_color_#ffffff')
     keyboard.button(text=messages.BUTTON_BLACK, callback_data='secondary_text_color_#000000')
-    keyboard.button(text=messages.BUTTON_BACK, callback_data='back_to_primary_text_choose')
+    keyboard.button(text=messages.BUTTON_BACK_IKB, callback_data='back_to_primary_text_choose')
     keyboard.button(text=messages.ABORT, callback_data='abort')
 
     keyboard.adjust(5, 3, 1)
@@ -101,7 +101,7 @@ def choose_alfa_background_color_keyboard():
     keyboard.button(text=messages.BUTTON_ALFA_90, callback_data="background_alfa_a90")
 
     keyboard.button(text=messages.BUTTON_ALFA_0, callback_data='background_alfa_a0')
-    keyboard.button(text=messages.BUTTON_BACK, callback_data='back_to_secondary_text_choose')
+    keyboard.button(text=messages.BUTTON_BACK_IKB, callback_data='back_to_secondary_text_choose')
     keyboard.button(text=messages.ABORT, callback_data='abort')
 
     keyboard.adjust(3, 3, 3, 1, 2)

@@ -112,7 +112,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                                 reply_markup=nex_themes_keyboard())
         for theme in catalog[:5]:
             await callback_query.message.answer_photo(photo=theme['preview'])
-            await callback_query.message.answer_document(document=theme['theme'])
+            await callback_query.message.answer_document(document=theme['theme'], caption=messages.CAPTION_TO_THEME_IN_CATALOG)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_THEMES_IN_CATALOG)
 

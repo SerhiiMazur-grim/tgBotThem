@@ -8,10 +8,12 @@ from config.fonts import FONTS
 from config import messages
 from core.keyboards.inline_keybords import subscribe_keyboard
 from core.database import start_db
+# from core.commands import set_commands
 
 
 async def start_bot(bot: Bot):
     await start_db()
+    # await set_commands(bot)
 
 
 async def is_user_subscribed(message, bot: Bot):

@@ -172,6 +172,13 @@ async def handler_primary_text_color(callback_query: CallbackQuery, bot: Bot):
     chat_id = callback_query.message.chat.id
     if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
         color = callback_query.data.split('_')[-1]
+        bg_color = USER_DATA[chat_id]['background_color']
+        if color == bg_color:
+            await callback_query.answer(
+                text='Колір фону не повинен бути однаковим з кольорм основного тексту!'
+            )
+            return
+            
         USER_DATA[chat_id]['primary_text_color'] = color
 
         await callback_query.message.edit_caption(
