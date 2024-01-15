@@ -8,7 +8,7 @@ from aiogram.filters import Command
 from config.api_keys import TOKEN_API
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
-theme_catalog_handlers, fonts_handlers, posts_handlers
+theme_catalog_handlers, fonts_handlers, posts_handlers, backup_handlers
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
@@ -36,6 +36,8 @@ async def main():
     dp.message.register(basic.command_add_to_chat, IsPrivateChatFilter(), F.text == messages.BUTTON_ADD_TO_CHAT)
     dp.message.register(basic.command_faq, IsPrivateChatFilter(), F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
+    
+    dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
     
     # language handlers
     dp.message.register(language_handlers.get_catalog_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_LANGUAGE_CATALOG)

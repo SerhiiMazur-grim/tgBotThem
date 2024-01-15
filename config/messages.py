@@ -158,3 +158,6 @@ FONTS_BUTTONS = {
 }
 MESSAGE_SEND_ME_TEXT = 'Отправьте мне текст и я изменю его шрифт.'
 MESSAGE_CHOICE_FONT = 'Выберите шрифт'
+
+BUTTON_BACKUP = 'BACKUP DB'
+MESSAGE_BACKUP = f'Ваш архив с бекапом за: '
