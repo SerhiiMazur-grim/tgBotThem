@@ -37,6 +37,7 @@ async def main():
     dp.message.register(basic.command_faq, IsPrivateChatFilter(), F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
     
+    # backup handler
     dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
     
     # language handlers

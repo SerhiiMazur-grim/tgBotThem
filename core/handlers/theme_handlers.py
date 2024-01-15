@@ -175,7 +175,7 @@ async def handler_primary_text_color(callback_query: CallbackQuery, bot: Bot):
         bg_color = USER_DATA[chat_id]['background_color']
         if color == bg_color:
             await callback_query.answer(
-                text='Колір фону не повинен бути однаковим з кольорм основного тексту!'
+                text=messages.MESSAGE_EQUAL_COLOR_1
             )
             return
             
@@ -216,6 +216,13 @@ async def handler_secondary_text_color(callback_query: CallbackQuery, bot: Bot):
     chat_id = callback_query.message.chat.id
     if USER_DATA[chat_id]['user_id'] == callback_query.from_user.id:
         color = callback_query.data.split('_')[-1]
+        bg_color = USER_DATA[chat_id]['background_color']
+        if color == bg_color:
+            await callback_query.answer(
+                text=messages.MESSAGE_EQUAL_COLOR_2
+            )
+            return
+        
         USER_DATA[chat_id]['secondary_text_color'] = color
 
         if USER_DATA[chat_id]['device'] != 'iphone':
