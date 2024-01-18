@@ -2,6 +2,7 @@ import os
 
 from config.alfa_bg import alfa_bg
 from config.api_keys import NAME
+from core.image.theme_preview import create_android_preview
 
 
 async def color_to_int32(color):
@@ -66,6 +67,9 @@ async def adjust_color_brightness(hex_color, factor=0.1):
 
 
 async def create_android_theme(chat_id, image_path, bg, primary_txt, secondary_txt, alfa):
+    hex_primary_txt = primary_txt
+    hex_secondary_txt = secondary_txt
+    
     alfa = alfa_bg[alfa]
     bg_hex = bg
     file_name = f'{NAME}_{bg}{primary_txt}{secondary_txt}.attheme'
@@ -666,5 +670,11 @@ async def create_android_theme(chat_id, image_path, bg, primary_txt, secondary_t
         f.write('\nWPS\n'.encode('utf-8'))
         f.write(binar_imag)
         f.write('\nWPE'.encode('utf-8'))
+    
+    preview_bg = await adjust_color_brightness(hex_primary_txt, 0.5)
+    preview = await create_android_preview(
+        chat_id, image_path, alfa, bg_hex, hex_primary_txt, hex_secondary_txt,
+        chat_in, avatar_gradient1, avatar_gradient2, preview_bg
+    )
 
-    return theme
+    return theme, preview
