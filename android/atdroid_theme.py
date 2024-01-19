@@ -2,7 +2,7 @@ import os
 
 from config.alfa_bg import alfa_bg
 from config.api_keys import NAME
-from core.image.theme_preview import create_android_preview
+from core.image.theme_preview_android import create_android_preview
 
 
 async def color_to_int32(color):

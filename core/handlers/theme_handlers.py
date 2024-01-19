@@ -274,11 +274,11 @@ async def handler_alfa_background_color(callback_query: CallbackQuery, bot: Bot)
             await callback_query.message.delete()
             wait_message = await callback_query.message.answer(text=messages.MESSAGE_CREATING_THEME)
             
-            # theme, preview = await create_theme(USER_DATA[chat_id], chat_id)
-            theme = await create_theme(USER_DATA[chat_id], chat_id)
+            theme, preview = await create_theme(USER_DATA[chat_id], chat_id)
+            # theme = await create_theme(USER_DATA[chat_id], chat_id)
             
             await wait_message.delete()
-            # await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
+            await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
             await callback_query.message.answer_document(document=FSInputFile(path=theme),
                                                                     caption=messages.MESSAGE_THEME_DONE)
             
@@ -336,10 +336,15 @@ async def handler_auto_theme(callback_query: CallbackQuery, bot: Bot):
             USER_DATA[chat_id]['secondary_text_color'] = USER_DATA[chat_id]['colors'][3]
             USER_DATA[chat_id]['background_alfa'] = 'a20'
 
-            theme = await create_theme(USER_DATA[chat_id], chat_id)
             await callback_query.message.delete()
-            await USER_DATA[chat_id]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+            wait_message = await callback_query.message.answer(text=messages.MESSAGE_CREATING_THEME)
+            theme, preview = await create_theme(USER_DATA[chat_id], chat_id)
+            await wait_message.delete()
+            await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
+            await callback_query.message.answer_document(document=FSInputFile(path=theme),
                                                                     caption=messages.MESSAGE_THEME_DONE)
+            
+            
             await dell_data(user_data=USER_DATA, chat_id=chat_id)
             USER_DATA[chat_id] = {}
     else:

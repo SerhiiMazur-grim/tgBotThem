@@ -1,42 +1,28 @@
 import os
 from PIL import Image, ImageDraw, ImageFont
+
 from config.messages import PREVIEW_WATER_MARK
-
-
-async def hex_to_rgba_v2(hex_colors):
-    rgb_colors = []
-    for hex_color in hex_colors:
-        hex_color = hex_color.lstrip('#')
-
-        if len(hex_color) == 6:
-            rgb = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
-            rgb_colors.append(rgb)
-        elif len(hex_color) == 8:
-            rgba = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4, 6))
-            rgb_colors.append(rgba)
-    
-    return rgb_colors
+from core.utils import hex_to_rgba_v2
 
 
 async def crop_wallpaper(wallpaper_path):
     with Image.open(wallpaper_path) as img:
         width, height = img.size
         
-        if width > int(height*0.7):
-            top_x = width//2 - int(height*0.7)//2
+        if width > height:
+            top_x = width//2 - height//2
             top_y = 0
-            bot_x = width//2 + int(height*0.7)//2
+            bot_x = width//2 + height//2
             bot_y = height
             
         else:
             top_x = 0
-            top_y = height//2 - int(width//0.7)//2
+            top_y = height//2 - width//2
             bot_x = width
-            bot_y = height//2 + int(width//0.7)//2
+            bot_y = height//2 + width//2
 
         cropped_img = img.crop((top_x, top_y, bot_x, bot_y))
-    new_width = int((750 / cropped_img.size[1]) * cropped_img.size[0])
-    wallpaper = cropped_img.resize((new_width, 750))
+    wallpaper = cropped_img.resize((535, 555))
     
     return wallpaper
 
@@ -45,14 +31,14 @@ async def users_icons_v2(colors):
     painted_icons = []
     images = [
     'user_icon_1.png', 'user_icon_2.png', 'user_icon_3.png', 'user_icon_4.png',
-    'user_icon_5.png', 'user_icon_6.png', 'user_icon_7.png', 'user_icon_8.png',
+    'user_icon_5.png', 'user_icon_6.png', 'user_icon_7.png',
     ]
-    fill_start_y = 269
-    fill_end_y = 343
+    fill_start_y = 335
+    fill_end_y = 398
 
     for image in images:
-        with Image.open(os.path.join('core', 'image', 'android_theme_layers', image)) as img:
-            width, height = img.size
+        with Image.open(os.path.join('core', 'image', 'pc_theme_layers', image)) as img:
+            width, _ = img.size
             new_img = Image.new("RGBA", img.size)
             alpha_channel = img.split()[3]
             
@@ -72,10 +58,10 @@ async def users_icons_v2(colors):
             draw.line([(0, y), (width, y)], fill=intermediate_color)
 
         new_img.putalpha(alpha_channel)
-        fill_start_y += 94
-        fill_end_y += 94
+        fill_start_y += 80
+        fill_end_y += 80
         painted_icons.append(new_img)
-    
+        
     return painted_icons
 
 
@@ -105,44 +91,48 @@ async def set_color_v2(images, colors):
     return layers
 
 
-async def create_android_preview(chat_id, photo, alfa, bg, primary_txt, secondary_txt, chat_in,
-                           avatar_gradient1, avatar_gradient2, preview_bg):
+async def create_pc_preview(chat_id, photo, img_bg_color, chat_bg, clouds_in_color, 
+                              secondary_txt_color, prime_txt_color, alfa,):
     background = Image.new('RGB', (1088, 1088), 'white')
 
     layers = []
     wallpaper = await crop_wallpaper(photo)
     images = [
-        os.path.join('core', 'image', 'android_theme_layers', 'bg.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'bg_chat_color_2.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'message_clouds_out.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'message_clouds_in.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'prime_txt.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'second_txt.png'),
-        os.path.join('core', 'image', 'android_theme_layers', 'shadow.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'img_bg.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'chat_bg.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'side_bar.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'selected_chat.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'clouds_in.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'clouds_out.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'prime_txt.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'secondary_txt.png'),
+        os.path.join('core', 'image', 'pc_theme_layers', 'shadows.png'),
     ]
     
     colors = await hex_to_rgba_v2([
-        preview_bg,
-        bg,
-        bg+alfa,
-        chat_in+alfa,
-        primary_txt,
-        secondary_txt,
-        avatar_gradient2
+        img_bg_color,
+        chat_bg,
+        clouds_in_color,
+        secondary_txt_color,
+        clouds_in_color+alfa,
+        chat_bg+alfa,
+        prime_txt_color,
+        secondary_txt_color,
+        secondary_txt_color,
     ])
 
     
     assets = await set_color_v2(images, colors)
     layers.extend(i for i in assets)
     
-    icons = await users_icons_v2(await hex_to_rgba_v2([avatar_gradient1, avatar_gradient2]))
+    icons = await users_icons_v2(await hex_to_rgba_v2([chat_bg, secondary_txt_color]))
     layers.extend(i for i in icons)
     
-    background.paste(wallpaper, (45, 155))
+    background.paste(wallpaper, (511, 304))
     
     for layer in layers:
         background.paste(layer, (0, 0), layer)
-
+    
     draw = ImageDraw.Draw(background)
     font = ImageFont.truetype("arial.ttf", 20)
     text_color = colors[1]
@@ -150,7 +140,7 @@ async def create_android_preview(chat_id, photo, alfa, bg, primary_txt, secondar
 
     draw.text(position, PREVIEW_WATER_MARK, font=font, fill=text_color)
     
-    preview = os.path.join('android', 'theme', str(chat_id), 'preview.jpg')
+    preview = os.path.join('desktop', 'theme', str(chat_id), 'preview.jpg')
     
     background.save(preview)
     
