@@ -5,6 +5,7 @@ from telethon.tl.functions.account import UploadWallPaperRequest
 from telethon.tl.types import InputFile, WallPaperSettings
 
 from config.api_keys import API_ID, API_HASH, NAME
+from core.image.theme_preview_ios import create_ios_preview
 
 api_id = API_ID
 api_hash = API_HASH
@@ -45,11 +46,15 @@ async def adjust_color_brightness(hex_color, factor=0.1):
 
 async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary_txt, not_primary_txt):
     async with TelegramClient('annon', api_id, api_hash) as client:
+        hex_bg = bg
+        hex_primary_txt = primary_txt
+        hex_not_primary_txt = not_primary_txt
+        
         result = await client.upload_file(image_path)
-        darker_bg = await adjust_color_brightness(bg)
-        darker_bg =darker_bg[1:]
-        secondary_txt = await adjust_color_brightness(primary_txt)
-        secondary_txt = secondary_txt[1:]
+        hex_darker_bg = await adjust_color_brightness(bg)
+        darker_bg =hex_darker_bg[1:]
+        hex_secondary_txt = await adjust_color_brightness(primary_txt)
+        secondary_txt = hex_secondary_txt[1:]
         bg = bg[1:]
         primary_txt = primary_txt[1:]
         not_primary_txt = not_primary_txt[1:]
@@ -475,5 +480,10 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
             with open(theme, 'w') as f:
                 for row in ios_data:
                     f.write(str(row) + '\n')
+            
+            preview_bg = await adjust_color_brightness(hex_not_primary_txt, 0.5)
+            preview = await create_ios_preview(
+                chat_id, image_path, preview_bg, hex_bg, hex_primary_txt, hex_not_primary_txt, hex_darker_bg
+            )
 
-    return theme
+    return theme, preview

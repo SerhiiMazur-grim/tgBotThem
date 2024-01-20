@@ -240,9 +240,13 @@ async def handler_secondary_text_color(callback_query: CallbackQuery, bot: Bot):
                     reply_markup=inline_keybords.choose_alfa_background_color_keyboard()
                 )
             else:
-                theme = await create_theme(USER_DATA[key], key)
                 await callback_query.message.delete()
-                await USER_DATA[key]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                wait_message = await callback_query.message.answer(text=messages.MESSAGE_CREATING_THEME)
+                theme, preview = await create_theme(USER_DATA[key], key)
+                
+                await wait_message.delete()
+                await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
+                await callback_query.message.answer_document(document=FSInputFile(path=theme),
                                                                         caption=messages.MESSAGE_THEME_DONE)
                 await dell_data(user_data=USER_DATA, chat_id=key)
                 USER_DATA[key] = {}
@@ -325,9 +329,13 @@ async def handler_auto_theme(callback_query: CallbackQuery, bot: Bot):
                 USER_DATA[key]['primary_text_color'] = USER_DATA[key]['colors'][4]
                 USER_DATA[key]['secondary_text_color'] = USER_DATA[key]['colors'][3]
 
-                theme = await create_theme(USER_DATA[key], key)
                 await callback_query.message.delete()
-                await USER_DATA[key]['sended_photo'].reply_document(document=FSInputFile(path=theme),
+                wait_message = await callback_query.message.answer(text=messages.MESSAGE_CREATING_THEME)
+                theme, preview = await create_theme(USER_DATA[key], key)
+                
+                await wait_message.delete()
+                await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
+                await callback_query.message.answer_document(document=FSInputFile(path=theme),
                                                                         caption=messages.MESSAGE_THEME_DONE)
 
             elif USER_DATA[key]['device'] == 'desktop':
