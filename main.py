@@ -56,7 +56,7 @@ async def main():
     # fonts handlers
     dp.message.register(fonts_handlers.font_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_FONTS_CATALOG)
     dp.message.register(fonts_handlers.get_text_from_user, IsPrivateChatFilter(), GetFontTextState.text)
-    dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_'))
+    dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_')) 
     
     # mailing handlers
     dp.message.register(posts_handlers.create_mailing, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_CREATE_MAILING)
