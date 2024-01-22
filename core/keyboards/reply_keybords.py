@@ -27,8 +27,9 @@ def admin_keyboard():
     keyboard.button(text=messages.BUTTON_ADD_LANGUAGE)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
+    keyboard.button(text=messages.BUTTON_BACKUP)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)
-    keyboard.adjust(2, 2, 1)
+    keyboard.adjust(2, 2, 2)
     
     return keyboard.as_markup(resize_keyboard=True)
 
@@ -37,6 +38,22 @@ def nex_themes_keyboard():
     keyboard = ReplyKeyboardBuilder()
     keyboard.button(text=messages.BUTTON_NEXT_THEMES)
     keyboard.button(text=messages.BUTTON_BACK)
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def catalog_theme_keyboard():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_BACK)
+    keyboard.adjust(1)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def catalog_language_keyboard():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_BACK_FROM_LANG_CAT)
     keyboard.adjust(1)
     
     return keyboard.as_markup(resize_keyboard=True)

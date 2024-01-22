@@ -85,13 +85,11 @@ class PostSenderMiddleware(BaseMiddleware):
             users = post_data['users']
             key = post_data['key']
             if user not in users and key:
-                if key == 'text':
-                        await event.answer(text=post_data[key] if not post_data[key].startswith('POST\n') else post_data[key][5:])
-                elif key == 'message':
+                if key == 'message':
                     load_message = Message.model_validate_json(post_data[key])
                     
                     if load_message.caption:
-                        caption = load_message.caption if not load_message.caption.startswith('POST\n') else load_message.caption[5:]
+                        caption = load_message.caption
                     else:
                         caption = load_message.caption
                         
@@ -109,7 +107,7 @@ class PostSenderMiddleware(BaseMiddleware):
                     for i in data_list:
                         if 'photo' in i.keys():
                             if i['photo']['caption']:
-                                caption = i['photo']['caption'] if not i['photo']['caption'].startswith('POST\n') else i['photo']['caption'][5:]
+                                caption = i['photo']['caption']
                             else:
                                 caption = i['photo']['caption']
                             post_part = InputMediaPhoto(
@@ -121,7 +119,7 @@ class PostSenderMiddleware(BaseMiddleware):
                             continue
                         elif 'video' in i.keys():
                             if i['video']['caption']:
-                                caption = i['video']['caption'] if not i['video']['caption'].startswith('POST\n') else i['video']['caption'][5:]
+                                caption = i['video']['caption']
                             else:
                                 caption = i['video']['caption']
                             post_part = InputMediaVideo(
@@ -133,7 +131,7 @@ class PostSenderMiddleware(BaseMiddleware):
                             continue
                         elif 'audio' in i.keys():
                             if i['audio']['caption']:
-                                caption = i['audio']['caption'] if not i['audio']['caption'].startswith('POST\n') else i['audio']['caption'][5:]
+                                caption = i['audio']['caption']
                             else:
                                 caption = i['audio']['caption']
                             post_part = InputMediaAudio(
@@ -145,7 +143,7 @@ class PostSenderMiddleware(BaseMiddleware):
                             continue
                         elif 'animation' in i.keys():
                             if i['animation']['caption']:
-                                caption = i['animation']['caption'] if not i['animation']['caption'].startswith('POST\n') else i['animation']['caption'][5:]
+                                caption = i['animation']['caption']
                             else:
                                 caption = i['animation']['caption']
                             post_part = InputMediaAnimation(
@@ -157,7 +155,7 @@ class PostSenderMiddleware(BaseMiddleware):
                             continue
                         elif 'document' in i.keys():
                             if i['document']['caption']:
-                                caption = i['document']['caption'] if not i['document']['caption'].startswith('POST\n') else i['document']['caption'][5:]
+                                caption = i['document']['caption']
                             else:
                                 caption = i['document']['caption']
                             post_part = InputMediaDocument(

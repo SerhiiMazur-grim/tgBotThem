@@ -4,6 +4,7 @@ import zipfile
 from config.alfa_bg import alfa_bg
 from config.api_keys import NAME
 from android.atdroid_theme import adjust_color_brightness
+from core.image.theme_preview_pc import create_pc_preview
 
 
 async def create_zip_archive(image_file, text_file, output_filename):
@@ -26,6 +27,8 @@ async def create_pc_theme(chat_id, image_path, background_color, primary_text_co
                             'theme',
                             str(chat_id),
                             f'{NAME}_{background_color}{primary_text_color}{secondary_text_color}.tdesktop-theme')
+
+
 
     write_data = [
         "windowShadowFg: #000000bf;",
@@ -518,4 +521,10 @@ async def create_pc_theme(chat_id, image_path, background_color, primary_text_co
 
     await create_zip_archive(image_path, txt_file_path, zip_name)
 
-    return zip_name
+    preview_bg = await adjust_color_brightness(secondary_text_color, 0.5)
+    preview = await create_pc_preview(
+        chat_id, image_path, preview_bg, background_color, background_color2,
+        secondary_text_color, primary_text_color, background_alfa
+    )
+    
+    return zip_name, preview

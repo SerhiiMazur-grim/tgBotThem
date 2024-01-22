@@ -1,8 +1,31 @@
 {
-    "text": "",
     "message": {},
-    "group_message": [],
-    "key": "",
+    "group_message": [
+        {
+            "photo": {
+                "file_id": "AgACAgIAAxkBAAIc7WWX34VCFuFHiTjhfpSzAecBJKYEAALz1TEbJ6iwSHTyMw6_xUeAAQADAgADeQADNAQ",
+                "caption": "TEST",
+                "caption_entities": null
+            }
+        },
+        {
+            "photo": {
+                "file_id": "AgACAgIAAxkBAAIc7mWX34VqgiJntLEyLVlVDXpPsf8xAAL01TEbJ6iwSEojl8lzWG6cAQADAgADeQADNAQ",
+                "caption": null,
+                "caption_entities": null
+            }
+        },
+        {
+            "photo": {
+                "file_id": "AgACAgIAAxkBAAIc72WX34XCzxZx4XmdxvV6My-cKmsjAALy1TEbJ6iwSM5RAz4xaZs_AQADAgADbQADNAQ",
+                "caption": null,
+                "caption_entities": null
+            }
+        }
+    ],
+    "key": "group_message",
     "count": 0,
-    "users": []
+    "users": [
+        869406474
+    ]
 }
