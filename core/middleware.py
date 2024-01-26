@@ -54,8 +54,6 @@ class IsSubscribedMiddleware(BaseMiddleware):
             await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
                                     reply_markup=subscribe_keyboard(checked_channels))
 
-
-
 class PostSenderMiddleware(BaseMiddleware):
     def __init__(self, bot) -> None:
         self.bot = bot

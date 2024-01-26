@@ -4,8 +4,11 @@ import sys
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
+from aiogram.fsm.storage.memory import MemoryStorage, SimpleEventIsolation
 
-from config.api_keys import TOKEN_API
+from database import create_sessionmaker
+import middlewares
+from config.api_keys import TOKEN_API, DATA_BASE_URL
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
 theme_catalog_handlers, fonts_handlers, posts_handlers, backup_handlers
@@ -16,12 +19,23 @@ from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, 
     AddLanguageState, GetLanguageCatalogState, AddPostState
 
 
+logger = logging.getLogger(__name__)
+
+
 async def main():
     await check_and_delete_files()
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                        stream=sys.stdout)
+    logger.info("Starting bot...")
+    
+    storage = MemoryStorage()
+    sessionmaker = await create_sessionmaker(DATA_BASE_URL)
+    
     bot = Bot(token=TOKEN_API)
     await bot.delete_webhook(drop_pending_updates=True)
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage, events_isolation=SimpleEventIsolation())
+    middlewares.setup(dp, sessionmaker)
 
     dp.message.middleware.register(CleanupMiddleware())
     dp.message.middleware.register(PostSenderMiddleware(bot))
@@ -108,10 +122,11 @@ async def main():
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
+        await dp.fsm.storage.close()
 
 
 if __name__ == '__main__':
     try:
         asyncio.run(main())
-    except KeyboardInterrupt:
-        print('Bot is stop !!!')
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Bot stopped!")
