@@ -59,7 +59,7 @@ async def add_theme_file(message: Message, state: FSMContext):
         await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
       
 
-async def add_theme_category(callback_query: CallbackQuery, state: FSMContext):
+async def add_theme_category(callback_query: CallbackQuery, state: FSMContext, session):
     category = callback_query.data.split('_')[-1]
     theme_data = await state.update_data(category=category)
     await state.clear()

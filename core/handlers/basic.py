@@ -31,7 +31,7 @@ async def command_user_kb(message: Message):
     await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
 
 
-async def command_create_theme(message: Message, bot: Bot):
+async def command_create_theme(message: Message):
     await message.delete()
     await message.answer(text=messages.MESSAGE_ON_CREATE_THEME)
 

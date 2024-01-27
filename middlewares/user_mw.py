@@ -48,7 +48,8 @@ class UserMiddleware(BaseMiddleware):
                                     .values(last_active=datetime.utcnow())
                                 )
                 await session.commit()
-                data["user"] = group_chat
+                data["group_chat"] = group_chat
+                data["user"] = None
                 data["session"] = session
                 
                 return await handler(event, data)
@@ -79,7 +80,6 @@ class UserMiddleware(BaseMiddleware):
                         ref=ref,
                     )
                     session.add(user)
-                
                 else:
                     await session.execute(
                                     update(User)
@@ -89,6 +89,7 @@ class UserMiddleware(BaseMiddleware):
                 
                 await session.commit()
                 data["user"] = user
+                data["group_chat"] = None
             data["session"] = session
             
             return await handler(event, data)
