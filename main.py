@@ -16,7 +16,7 @@ from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribe
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
-    AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat
+    AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat
 
 
 logger = logging.getLogger(__name__)
@@ -55,6 +55,15 @@ async def main():
     dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
     
     # language handlers
+    dp.message.register(language_handlers.admin_language_catalog, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATALOG)
+    dp.message.register(language_handlers.admin_language_category, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATEGORY)
+    dp.callback_query.register(language_handlers.admin_start_add_language_category, IsAdminFilter(), F.data == 'admin_add_language_cat')
+    dp.message.register(language_handlers.admin_get_language_category, AddLanguageCat.category)
+    dp.callback_query.register(language_handlers.admin_start_delete_language_category, IsAdminFilter(), F.data == 'admin_del_language_cat')
+    dp.callback_query.register(language_handlers.admin_delete_language_category, IsAdminFilter(), F.data.startswith('del_language_cat_'))
+    
+    #--------------------------------------------------------------------------------------------------
+    
     dp.message.register(language_handlers.get_catalog_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_LANGUAGE_CATALOG)
     dp.callback_query.register(language_handlers.get_device_catalog_languages, GetLanguageCatalogState.device)
     dp.callback_query.register(language_handlers.get_category_catalog_themes, GetLanguageCatalogState.category)

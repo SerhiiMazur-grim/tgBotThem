@@ -39,7 +39,17 @@ class AddThemeCat(StatesGroup):
     category = State()
 
 
+class AddLanguageCat(StatesGroup):
+    category = State()
+
+
 class ThemesCatalogState(StatesGroup):
+    catalog = State()
+    start = State()
+    end = State()
+ 
+ 
+class LanguagesCatalogState(StatesGroup):
     catalog = State()
     start = State()
     end = State()

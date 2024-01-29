@@ -128,6 +128,16 @@ def admin_add_theme_category_ikb():
     return keyboard.as_markup()
 
 
+def admin_add_language_category_ikb():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=messages.IKB_BUTTON_ADMIN_ADD_LANGUAGE_CATEGORY,
+                    callback_data='admin_add_language_cat')
+    keyboard.button(text=messages.IKB_BUTTON_ADMIN_DEL_LANGUAGE_CATEGORY,
+                    callback_data='admin_del_language_cat')
+    keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
 def admin_del_theme_category_ikb(categories):
     keyboard = InlineKeyboardBuilder()
     
@@ -138,11 +148,31 @@ def admin_del_theme_category_ikb(categories):
     return keyboard.as_markup()
 
 
+def admin_del_language_category_ikb(categories):
+    keyboard = InlineKeyboardBuilder()
+    
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'del_language_cat_{cat.id}')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
 def choice_category_ikb_keyboard(categories):
     keyboard = InlineKeyboardBuilder()
 
     for cat in categories:
         keyboard.button(text=cat.title, callback_data=f'add_theme_cat_{cat.id}')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_category_lang_ikb(categories):
+    keyboard = InlineKeyboardBuilder()
+
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'add_lang_cat_{cat.id}')
     
     keyboard.adjust(3)
     return keyboard.as_markup()
@@ -204,7 +234,6 @@ def send_post_ikb():
 def start_create_post_ikb():
     keyboard = InlineKeyboardBuilder()
 
-    # keyboard.button(text=messages.BUTTON_CREATE_LIMITED_POST, callback_data='create_limited_post')
     keyboard.button(text=messages.BUTTON_ABORT_CREATE_POST, callback_data='abort_create_post')
     
     keyboard.adjust(1)
@@ -261,7 +290,7 @@ def language_categories_ikb():
 def choice_device_lang_get_ikb():
     keyboard = InlineKeyboardBuilder()
 
-    for device, value in DRVICES_LANGUAGES_GET.items():
+    for device, value in DRVICES.items():
         keyboard.button(text=device, callback_data=value)
     
     
@@ -269,10 +298,11 @@ def choice_device_lang_get_ikb():
     return keyboard.as_markup()
 
 
-def choice_category_lang_db_get_ikb():
+def choice_category_lang_db_get_ikb(categories):
     keyboard = InlineKeyboardBuilder()
 
-    for category, index in CATEGORIES_LANGUAGES_GET.items():
-        keyboard.button(text=category, callback_data=index)
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'get_language_cat_{cat.id}')
+    
     keyboard.adjust(3)
     return keyboard.as_markup()
