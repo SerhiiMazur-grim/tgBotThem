@@ -23,13 +23,23 @@ def user_keyboard(user_id):
 
 def admin_keyboard():
     keyboard = ReplyKeyboardBuilder()
-    keyboard.button(text=messages.BUTTON_ADD_THEME)
-    keyboard.button(text=messages.BUTTON_ADD_LANGUAGE)
+    keyboard.button(text=messages.BUTTON_ADMIN_THEME_CATALOG)
+    keyboard.button(text=messages.BUTTON_ADMIN_LANGUAGE_CATALOG)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
     keyboard.button(text=messages.BUTTON_BACKUP)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)
     keyboard.adjust(2, 2, 2)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def admin_theme_catalog_kb():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_ADMIN_THEME_CATEGORY)
+    keyboard.button(text=messages.BUTTON_ADD_THEME)
+    keyboard.button(text=messages.BUTTON_ADMIN)
+    keyboard.adjust(1)
     
     return keyboard.as_markup(resize_keyboard=True)
 

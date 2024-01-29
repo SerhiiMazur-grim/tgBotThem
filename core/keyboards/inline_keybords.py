@@ -118,12 +118,31 @@ def add_bot_to_chat_inl_keyboard():
     return keyboard.as_markup()
 
 
-def choice_category_ikb_keyboard():
+def admin_add_theme_category_ikb():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=messages.IKB_BUTTON_ADMIN_ADD_THEME_CATEGORY,
+                    callback_data='admin_add_theme_cat')
+    keyboard.button(text=messages.IKB_BUTTON_ADMIN_DEL_THEME_CATEGORY,
+                    callback_data='admin_del_theme_cat')
+    keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
+def admin_del_theme_category_ikb(categories):
+    keyboard = InlineKeyboardBuilder()
+    
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'del_theme_cat_{cat.id}')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def choice_category_ikb_keyboard(categories):
     keyboard = InlineKeyboardBuilder()
 
-    for category, index in CATEGORIES.items():
-        keyboard.button(text=category, callback_data=index)
-    keyboard.button(text=messages.BUTTON_ABORT_ADD_THEME, callback_data='abort_add_theme')
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'add_theme_cat_{cat.id}')
     
     keyboard.adjust(3)
     return keyboard.as_markup()
@@ -151,7 +170,7 @@ def choice_device_db_ikb_keyboard():
 def choice_device_db_get_ikb():
     keyboard = InlineKeyboardBuilder()
 
-    for device, value in DRVICES_GET.items():
+    for device, value in DRVICES.items():
         keyboard.button(text=device, callback_data=value)
     
     
@@ -159,11 +178,12 @@ def choice_device_db_get_ikb():
     return keyboard.as_markup()
 
 
-def choice_category_db_get_ikb():
+def choice_category_db_get_ikb(categories):
     keyboard = InlineKeyboardBuilder()
 
-    for category, index in CATEGORIES_GET.items():
-        keyboard.button(text=category, callback_data=index)
+    for cat in categories:
+        keyboard.button(text=cat.title, callback_data=f'get_theme_cat_{cat.id}')
+        
     keyboard.adjust(3)
     return keyboard.as_markup()
 

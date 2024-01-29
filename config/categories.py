@@ -83,7 +83,7 @@ CATEGORIES_LANGUAGES_GET = {
 # Нічого не міняти !!!
 DRVICES = {
     'Андроид': 'db-dev_android',
-    'Компьютер': 'db-dev_pc',
+    'Компьютер': 'db-dev_computer',
     'iPhone': 'db-dev_ios',
 }
 

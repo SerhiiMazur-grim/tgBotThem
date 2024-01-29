@@ -33,4 +33,14 @@ class AddPostState(StatesGroup):
     post = State()
     post_type = State()
     users_count = State()
-    
+
+
+class AddThemeCat(StatesGroup):
+    category = State()
+
+
+class ThemesCatalogState(StatesGroup):
+    catalog = State()
+    start = State()
+    end = State()
+ 

@@ -16,7 +16,7 @@ from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribe
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
-    AddLanguageState, GetLanguageCatalogState, AddPostState
+    AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat
 
 
 logger = logging.getLogger(__name__)
@@ -88,6 +88,14 @@ async def main():
     dp.callback_query.register(posts_handlers.send_post_to_group, F.data == 'post_send_group')
     
     # theme catalog handlers
+    dp.message.register(theme_catalog_handlers.admin_theme_catalog, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_THEME_CATALOG)
+    dp.message.register(theme_catalog_handlers.admin_theme_category, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_THEME_CATEGORY)
+    dp.callback_query.register(theme_catalog_handlers.admin_start_add_theme_category, IsAdminFilter(), F.data == 'admin_add_theme_cat')
+    dp.message.register(theme_catalog_handlers.admin_get_theme_category, AddThemeCat.category)
+    dp.callback_query.register(theme_catalog_handlers.admin_start_delete_theme_category, IsAdminFilter(), F.data == 'admin_del_theme_cat')
+    dp.callback_query.register(theme_catalog_handlers.admin_delete_theme_category, IsAdminFilter(), F.data.startswith('del_theme_cat_'))
+    
+    
     dp.message.register(theme_catalog_handlers.get_catalog_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_THEME_CATALOG)
     dp.message.register(theme_catalog_handlers.go_to_main_menu, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK)
     dp.message.register(theme_catalog_handlers.get_next_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_THEMES)
