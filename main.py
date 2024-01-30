@@ -11,7 +11,7 @@ import middlewares
 from config.api_keys import TOKEN_API, DATA_BASE_URL
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
-theme_catalog_handlers, fonts_handlers, posts_handlers, backup_handlers
+theme_catalog_handlers, fonts_handlers, posts_handlers
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import start_bot, sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
@@ -52,7 +52,7 @@ async def main():
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
     
     # backup handler
-    dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
+    # dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
     
     # language handlers
     dp.message.register(language_handlers.admin_language_catalog, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATALOG)

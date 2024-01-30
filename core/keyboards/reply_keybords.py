@@ -27,7 +27,7 @@ def admin_keyboard():
     keyboard.button(text=messages.BUTTON_ADMIN_LANGUAGE_CATALOG)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
-    keyboard.button(text=messages.BUTTON_BACKUP)
+    # keyboard.button(text=messages.BUTTON_BACKUP)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)
     keyboard.adjust(2, 2, 2)
     
