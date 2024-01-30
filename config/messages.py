@@ -198,3 +198,69 @@ MESSAGE_LANGUAGE_CAT_DELETE_ERR = 'Ошибка при удалении кате
 MESSAGE_ADD_LANGUAGE_TO_CATALOG_ERR = 'Ошибка при добавлении языка в каталог! Детали смотрите в логах!'
 
 MESSAGE_ADMIN_CATEGORY_MENU = 'Меню категории'
+
+BUTTON_STATISTIC_MENU = 'Статистика'
+MESSAGE_IS_STATISTIC_MENU = 'Меню статистики'
+BUTTON_ACTIVE_STATISTICA = 'Статистика активности'
+BUTTON_FULL_STATISTICA = 'Полная статистика'
+MESSAGE_PERIOD_OF_ACTIVE_CHOICE = 'Выберите за какой период активности пользователей показать статистику:'
+BUTTON_DAY_ACTIVITY = 'Активность за день'
+BUTTON_WEEK_ACTIVITY = 'Активность за неделю'
+BUTTON_MONTH_ACTIVITY = 'Активность за месяц'
+
+def active_users_per_day_message(users_count, chats_count, total_count):
+    message = f"""
+    ⌚️ Активные пользователи за последние 24 часа:
+    
+    🟢 Всего активных пользователей: {total_count}👤
+    
+    🟢 Персональные чаты: {users_count}👤
+    
+    🟢 Груповые чаты: {chats_count}👤
+    """
+    return message
+
+def active_users_per_week_message(users_count, chats_count, total_count):
+    message = f"""
+    ⌚️ Активные пользователи за последние 7 дней:
+    
+    🟢 Всего активных пользователей: {total_count}👤
+    
+    🟢 Персональные чаты: {users_count}👤
+    
+    🟢 Груповые чаты: {chats_count}👤
+    """
+    return message
+
+def active_users_per_month_message(users_count, chats_count, total_count):
+    message = f"""
+    ⌚️ Активные пользователи за последние 30 дней:
+    
+    🟢 Всего активных пользователей: {total_count}👤
+    
+    🟢 Персональные чаты: {users_count}👤
+    
+    🟢 Груповые чаты: {chats_count}👤
+    """
+    return message
+
+def full_statistica_caption(total_users, refer_users, active_users, not_active_users,
+                            total_priv_chats, active_priv_chats,
+                            total_group_chats, active_group_chats):
+    message = f"""
+    ⌚️ Статистика за всё время работы бота:
+    
+    🟢 Всего пользователей: {total_users}👤
+    🔗 Пользователи которые пришли по реферальной ссылке: {refer_users}👤
+    
+    🟢 Активные пользователи: {active_users}👤
+    🔴 Не активные пользователи: {not_active_users}👤
+    
+    🟢 Всего персональных чатов: {total_priv_chats}👤
+    🟢 Из них активные: {active_priv_chats}👤
+    
+    🟢 Всего груповых чатов: {total_group_chats}👤
+    🟢 Из них активные: {active_group_chats}👤
+       
+    """
+    return message

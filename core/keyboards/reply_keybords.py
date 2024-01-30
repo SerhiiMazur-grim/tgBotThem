@@ -27,6 +27,7 @@ def admin_keyboard():
     keyboard.button(text=messages.BUTTON_ADMIN_LANGUAGE_CATALOG)
     keyboard.button(text=messages.BUTTON_CREATE_MAILING)
     keyboard.button(text=messages.BUTTON_VIEW_MAILING)
+    keyboard.button(text=messages.BUTTON_STATISTIC_MENU)
     # keyboard.button(text=messages.BUTTON_BACKUP)
     keyboard.button(text=messages.BUTTON_BACK_TO_USER_KB)
     keyboard.adjust(2, 2, 2)
@@ -84,5 +85,15 @@ def nex_languages_keyboard():
     keyboard.button(text=messages.BUTTON_NEXT_LANGUAGES)
     keyboard.button(text=messages.BUTTON_BACK_FROM_LANG_CAT)
     keyboard.adjust(1)
+    
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def admin_statistic_menu_kb():
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text=messages.BUTTON_ACTIVE_STATISTICA)
+    keyboard.button(text=messages.BUTTON_FULL_STATISTICA)
+    keyboard.button(text=messages.BUTTON_ADMIN)
+    keyboard.adjust(2, 1)
     
     return keyboard.as_markup(resize_keyboard=True)

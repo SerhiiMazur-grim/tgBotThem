@@ -306,3 +306,14 @@ def choice_category_lang_db_get_ikb(categories):
     
     keyboard.adjust(3)
     return keyboard.as_markup()
+
+
+def active_statistic_menu_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_DAY_ACTIVITY, callback_data='day_activity')
+    keyboard.button(text=messages.BUTTON_WEEK_ACTIVITY, callback_data='week_activity')
+    keyboard.button(text=messages.BUTTON_MONTH_ACTIVITY, callback_data='month_activity')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
