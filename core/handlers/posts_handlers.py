@@ -10,11 +10,16 @@ from aiogram.types.input_media_audio import InputMediaAudio
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.types.input_media_video import InputMediaVideo
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy import and_, update
+
 from config import messages
 from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, \
     abort_sending_limited_post_ikb
-from core.database import get_chats_id_from_db, get_private_chats_id_from_db, get_group_chats_id_from_db
 from core.states import AddPostState
+from database.models.user import User
+from database.models.send_post import SendPost
 
 
 async def get_media_group_list(data: dict) -> list:
@@ -127,11 +132,61 @@ async def view_post(message: Message, state: FSMContext):
         await message.answer(text=messages.MESSAGE_IS_YOUR_POST, reply_markup=send_post_ikb())
 
 
-async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
+async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMContext, session: AsyncSession):
     await callback_query.answer()
     data = await state.get_data()
     await state.clear()
-    chats = await get_chats_id_from_db()
+    
+    chats = await session.scalars(select(User.id).where(User.active==True))
+    
+    post_type = data['post_type']
+    
+    if data:
+        await callback_query.message.delete()
+        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
+        for chat in chats:
+            if post_type == 'media':
+                await data['post'].send_copy(chat_id=chat)
+            else:
+                media = await get_media_group_list(data)
+                await bot.send_media_group(chat_id=chat, media=media)
+        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
+    else:
+        await callback_query.answer(text=messages.MESSAGE_NO_POST)
+
+
+async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: FSMContext, session: AsyncSession):
+    await callback_query.answer()
+    data = await state.get_data()
+    await state.clear()
+    chats = await session.scalars(select(User.id).where(and_(
+        User.active==True,
+        User.chat_type=='private'
+    )))
+    post_type = data['post_type']
+    
+    if data:
+        await callback_query.message.delete()
+        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
+        for chat in chats:
+            if post_type == 'media':
+                await data['post'].send_copy(chat_id=chat)
+            else:
+                media = await get_media_group_list(data)
+                await bot.send_media_group(chat_id=chat, media=media)
+        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
+    else:
+        await callback_query.answer(text=messages.MESSAGE_NO_POST)
+
+
+async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSMContext, session: AsyncSession):
+    await callback_query.answer()
+    data = await state.get_data()
+    await state.clear()
+    chats = await session.scalars(select(User.id).where(and_(
+        User.active==True,
+        User.chat_type!='private'
+    )))
     post_type = data['post_type']
     if data:
         await callback_query.message.delete()
@@ -142,57 +197,18 @@ async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMCo
             else:
                 media = await get_media_group_list(data)
                 await bot.send_media_group(chat_id=chat, media=media)
+        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
 
 
-async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
-    await callback_query.answer()
-    data = await state.get_data()
-    await state.clear()
-    chats = await get_private_chats_id_from_db()
-    post_type = data['post_type']
-    if data:
-        await callback_query.message.delete()
-        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
-        for chat in chats:
-            if post_type == 'media':
-                await data['post'].send_copy(chat_id=chat)
-            else:
-                media = await get_media_group_list(data)
-                await bot.send_media_group(chat_id=chat, media=media)
-    else:
-        await callback_query.answer(text=messages.MESSAGE_NO_POST)
-
-
-async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSMContext):
-    await callback_query.answer()
-    data = await state.get_data()
-    await state.clear()
-    chats = await get_group_chats_id_from_db()
-    post_type = data['post_type']
-    if data:
-        await callback_query.message.delete()
-        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
-        for chat in chats:
-            if post_type == 'media':
-                await data['post'].send_copy(chat_id=chat)
-            else:
-                media = await get_media_group_list(data)
-                await bot.send_media_group(chat_id=chat, media=media)
-    else:
-        await callback_query.answer(text=messages.MESSAGE_NO_POST)
-
-
-async def start_limited_post(callback_query: CallbackQuery, state: FSMContext):
+async def start_limited_post(callback_query: CallbackQuery, state: FSMContext, post_data: SendPost):
     await callback_query.answer()
     await callback_query.message.delete()
-    with open('SEND_POST.json', 'r') as file:
-        send_post = json.load(file)
-    if send_post['send_post']:
-        with open('POST_DATA.json', 'r') as file:
-            data = json.load(file)
-        await callback_query.message.answer(text=f'{messages.MESSAGE_PREV_POST_NOT_SENDED}{data["count"]}',
+    send_post = post_data.send_post
+    user_count = post_data.user_count
+    if send_post:
+        await callback_query.message.answer(text=f'{messages.MESSAGE_PREV_POST_NOT_SENDED}{user_count}',
                                             reply_markup=abort_sending_limited_post_ikb())
     else:            
         await state.set_state(AddPostState.users_count)
@@ -212,7 +228,7 @@ async def get_users_count(message: Message, state: FSMContext):
                          reply_markup=send_limited_post_ikb())
 
 
-async def send_limited_post(callback_query: CallbackQuery, state: FSMContext):
+async def send_limited_post(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback_query.answer()
     await callback_query.message.delete()
     data = await state.get_data()
@@ -224,8 +240,6 @@ async def send_limited_post(callback_query: CallbackQuery, state: FSMContext):
         "message": {},
         "group_message": [],
         "key": "",
-        "count": int(users_count),
-        "users": []
     }
     
     if post_type == 'media':
@@ -283,8 +297,14 @@ async def send_limited_post(callback_query: CallbackQuery, state: FSMContext):
     with open('POST_DATA.json', 'w') as file:
         json.dump(json_data, file, indent=4)
         
-    with open('SEND_POST.json', 'w') as file:
-        json.dump({"send_post": True}, file, indent=4)
+    post_db = await session.scalar(select(SendPost))
+    await session.execute(update(SendPost).where(SendPost.id==post_db.id)
+                          .values(
+                              send_post=True,
+                              user_count=int(users_count),
+                              user_list=[]
+                          ))
+    await session.commit()
     
     await callback_query.message.answer(text=messages.MESSAGE_LIMITED_POST_SEND)
     
@@ -309,25 +329,30 @@ async def abort_create_post(callback_query: CallbackQuery, state: FSMContext):
         await state.clear()
 
 
-async def abort_sending_limit_post(callback_query: CallbackQuery, state: FSMContext):
+async def abort_sending_limit_post(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback_query.answer()
     current_state = await state.get_state()
         
     if current_state is not None:
         await state.clear()
-        
-    with open('SEND_POST.json', 'w') as file:
-            data = {"send_post": False}
-            json.dump(data, file, indent=4)
+
     
     with open('POST_DATA.json', 'w') as file:
         data = {
                 "message": {},
                 "group_message": [],
-                "key": "",
-                "count": 0,
-                "users": []
+                "key": ""
             }   
         json.dump(data, file, indent=4)
+    
+    post_db = await session.scalar(select(SendPost))
+    await session.execute(update(SendPost).where(SendPost.id==post_db.id)
+                          .values(
+                              send_post=False,
+                              user_count=0,
+                              user_list=[]
+                          ))
+    await session.commit()
+    
     await callback_query.message.answer(text=messages.MESSAGE_SENDING_IS_STOP)
  

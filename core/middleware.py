@@ -11,10 +11,14 @@ from aiogram.types.input_media_audio import InputMediaAudio
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.types.input_media_video import InputMediaVideo
 
+from sqlalchemy import update
+from sqlalchemy.future import select
+
 from config.telegram_chats import CHANNEL_IDS
 from config.api_keys import ADMINS
 from core.keyboards.inline_keybords import subscribe_keyboard
 from config import messages
+from database.models.send_post import SendPost
 
 
 clean_time = None
@@ -54,6 +58,7 @@ class IsSubscribedMiddleware(BaseMiddleware):
             await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
                                     reply_markup=subscribe_keyboard(checked_channels))
 
+
 class PostSenderMiddleware(BaseMiddleware):
     def __init__(self, bot) -> None:
         self.bot = bot
@@ -65,22 +70,28 @@ class PostSenderMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         
-        with open('SEND_POST.json', 'r') as file:
-            send_post = json.load(file)
-        if send_post['send_post']:
+        session = data['session']
+        db_sender: SendPost = data['post_data']
+        send_post = db_sender.send_post
+        
+        if send_post:
             user = event.chat.id
             with open('POST_DATA.json', 'r') as file:
                 post_data = json.load(file)
                 
-            count = post_data['count']
+            count = db_sender.user_count
             if count <=0:
-                with open('SEND_POST.json', 'w') as file:
-                    send_post['send_post'] = False
-                    json.dump(send_post, file, indent=4)
+                await session.execute(update(SendPost).where(SendPost.id==db_sender.id)
+                                    .values(
+                                        send_post=False,
+                                        user_count=0,
+                                        user_list=[]
+                                    ))
+                await session.commit()
                     
                 return await handler(event, data)
             
-            users = post_data['users']
+            users = db_sender.user_list
             key = post_data['key']
             if user not in users and key:
                 if key == 'message':
@@ -165,10 +176,18 @@ class PostSenderMiddleware(BaseMiddleware):
                     
                     await event.answer_media_group(media=media)
             
-                post_data['users'].append(user)
-                post_data['count'] -= 1
-                with open('POST_DATA.json', 'w') as file:
-                    json.dump(post_data, file, indent=4)
+                user_list = list(db_sender.user_list)
+                user_list.append(user)
+                
+                await session.execute(update(SendPost).where(SendPost.id==db_sender.id)
+                                    .values(
+                                        user_count=db_sender.user_count-1,
+                                        user_list=user_list
+                                    ))
+                await session.commit()
+                
+                post_db = await session.scalar(select(SendPost))
+                data['post_data'] = post_db
                 
                 
         

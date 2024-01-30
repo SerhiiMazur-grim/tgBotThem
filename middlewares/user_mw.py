@@ -7,6 +7,7 @@ from sqlalchemy import update
 from sqlalchemy.future import select
 
 from database.models.user import User
+from database.models.send_post import SendPost
 
 
 class UserMiddleware(BaseMiddleware):
@@ -62,6 +63,16 @@ class UserMiddleware(BaseMiddleware):
                 await session.commit()
                 data["user"] = user
                 data["chat_type"] = event_chat.type
+            
+            post_db = await session.scalar(select(SendPost))
+            if not post_db:
+                db_instance = SendPost()
+                session.add(db_instance)
+                await session.commit()
+                post_db = await session.scalar(select(SendPost))
+                
+            data['post_data'] = post_db
+            
             data["session"] = session
             
             return await handler(event, data)
