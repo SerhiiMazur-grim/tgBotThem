@@ -1,42 +1,88 @@
-from datetime import datetime
-import logging
+from datetime import datetime, timedelta
 
-from aiogram.types import Message, CallbackQuery
-from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import and_
+from sqlalchemy import update
 
 from config import messages
-from core import inline_keybords, reply_keybords
 from database.models.user import User
+from database.models.referals import Referal
+
+
+async def check_not_active_users(session: AsyncSession):
+    current_time = datetime.utcnow()
+    inactive_period = current_time - timedelta(days=60)
+    
+    inactive_users = await session.scalars(select(User).where(User.last_active <= inactive_period))
+    
+    if inactive_users:
+        for user in inactive_users:
+            await session.execute(
+                update(User)
+                .where(User.id == user.id)
+                .values(active=False))
+            
+            if user.ref:
+                referal = await session.scalar(select(Referal).where(Referal.ref==user.ref))
+                
+                await session.execute(
+                    update(Referal)
+                    .where(Referal.id==referal.id)
+                    .values(active_users=referal.active_users-1)
+                )
+                
+        await session.commit()
+    
+    return 
 
 
 async def get_full_statistica(message: Message, session: AsyncSession):
     await message.delete()
     
+    await check_not_active_users(session)
+    
     users = await session.scalars(select(User))
-    total_users = len(list(users))
     
-    refer_users = None
-    active_users = None
-    not_active_users = None
-    total_priv_chats = None
-    active_priv_chats = None
-    total_group_chats = None
-    active_group_chats = None
+    total_users = 0
+    refer_users = 0
+    total_active_users = 0
+    total_priv_chats = 0
+    active_priv_chats = 0
+    total_group_chats = 0
+    active_group_chats = 0
     
-    await message.answer_photo(photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
-                               caption=messages.full_statistica_caption(
+    for user in users:
+        total_users += 1
+        if user.ref:
+            refer_users += 1
+        if user.active:
+            total_active_users += 1
+        if user.chat_type=='private':
+            total_priv_chats += 1
+        if user.chat_type=='private' and user.active:
+            active_priv_chats += 1
+        if user.chat_type!='private':
+            total_group_chats += 1
+        if user.chat_type!='private' and user.active:
+            active_group_chats += 1
+    
+    not_active_users = total_users - total_active_users
+    not_active_priv_chats = total_priv_chats - active_priv_chats
+    not_active_group_chats = total_group_chats - active_group_chats
+    
+    await message.answer(text=messages.full_statistica_caption(
                                    total_users=total_users,
                                    refer_users=refer_users,
-                                   active_users=active_users,
+                                   total_active_users=total_active_users,
                                    not_active_users=not_active_users,
                                    total_priv_chats=total_priv_chats,
                                    active_priv_chats=active_priv_chats,
+                                   not_active_priv_chats=not_active_priv_chats,
                                    total_group_chats=total_group_chats,
                                    active_group_chats=active_group_chats,
+                                   not_active_group_chats=not_active_group_chats
                                ))
-    
-    
+
+

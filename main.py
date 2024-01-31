@@ -13,11 +13,11 @@ from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
 theme_catalog_handlers, fonts_handlers, posts_handlers
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
-from core.utils import start_bot, sub_checker
+from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat
-from statistica import base_statistic_handler, user_activity_statistica, full_statistica
+from statistica import base_statistic_handler, user_activity_statistica, full_statistica, referal_statistica
 
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ async def main():
     dp.message.middleware.register(IsSubscribedMiddleware(bot))
         
     # basic handlers
-    dp.startup.register(start_bot)
+    # dp.startup.register(start_bot)
     dp.message.register(basic.command_start, Command('start'))
     dp.message.register(basic.command_admin_kb, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN)
     dp.message.register(basic.command_user_kb, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_TO_USER_KB)
@@ -51,17 +51,19 @@ async def main():
     dp.message.register(basic.command_add_to_chat, IsPrivateChatFilter(), F.text == messages.BUTTON_ADD_TO_CHAT)
     dp.message.register(basic.command_faq, IsPrivateChatFilter(), F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
-    
+
     # backup handler
     # dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
     
     # statistica handlers
     dp.message.register(base_statistic_handler.statistic_menu, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_STATISTIC_MENU)
     dp.message.register(base_statistic_handler.active_statistic_menu, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ACTIVE_STATISTICA)
+    dp.message.register(base_statistic_handler.referals_statistic_menu, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_REFERAL_STATISTICA)
     dp.callback_query.register(user_activity_statistica.user_activity_per_day, IsAdminFilter(), F.data=='day_activity')
     dp.callback_query.register(user_activity_statistica.user_activity_per_week, IsAdminFilter(), F.data=='week_activity')
     dp.callback_query.register(user_activity_statistica.user_activity_per_month, IsAdminFilter(), F.data=='month_activity')
     dp.message.register(full_statistica.get_full_statistica, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_FULL_STATISTICA)
+    dp.callback_query.register(referal_statistica.detail_referal_statistica, IsAdminFilter(), F.data.startswith('ref_title_'))
     
     # language handlers
     dp.message.register(language_handlers.admin_language_catalog, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATALOG)

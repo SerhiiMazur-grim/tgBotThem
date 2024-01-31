@@ -244,23 +244,41 @@ def active_users_per_month_message(users_count, chats_count, total_count):
     """
     return message
 
-def full_statistica_caption(total_users, refer_users, active_users, not_active_users,
-                            total_priv_chats, active_priv_chats,
-                            total_group_chats, active_group_chats):
+def full_statistica_caption(total_users, refer_users, total_active_users, not_active_users,
+                            total_priv_chats, active_priv_chats, not_active_priv_chats,
+                            total_group_chats, active_group_chats, not_active_group_chats):
     message = f"""
     ⌚️ Статистика за всё время работы бота:
     
     🟢 Всего пользователей: {total_users}👤
-    🔗 Пользователи которые пришли по реферальной ссылке: {refer_users}👤
+    🟢 Из них активные: {total_active_users}👤
+    🔴 Не активные: {not_active_users}👤
     
-    🟢 Активные пользователи: {active_users}👤
-    🔴 Не активные пользователи: {not_active_users}👤
+    🔗 Пользователи которые пришли по реферальной ссылке: {refer_users}👤
     
     🟢 Всего персональных чатов: {total_priv_chats}👤
     🟢 Из них активные: {active_priv_chats}👤
+    🔴 Не активные: {not_active_priv_chats}👤
     
     🟢 Всего груповых чатов: {total_group_chats}👤
     🟢 Из них активные: {active_group_chats}👤
+    🔴 Не активные: {not_active_group_chats}👤
        
+    """
+    return message
+
+BUTTON_REFERAL_STATISTICA = 'Статистика рефералов'
+MESSAGE_CHOICE_REFERAL = 'Выберите реферала:'
+MESSAGE_NO_REFERALS = 'Список рефералов пустой!'
+
+def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_users):
+    message = f"""
+    Статистика по рефералу:
+    
+    📎  Ссылка:  {ref_url}  # {ref_id}
+    ⌚️ Время создания:  {ref_join_date}
+
+    🚪 Переходы:  {ref_total_users}
+    🟢 Активные пользователи:  {ref_active_users}
     """
     return message

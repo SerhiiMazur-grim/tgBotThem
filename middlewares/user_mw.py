@@ -8,6 +8,7 @@ from sqlalchemy.future import select
 
 from database.models.user import User
 from database.models.send_post import SendPost
+from database.models.referals import Referal
 
 
 class UserMiddleware(BaseMiddleware):
@@ -44,6 +45,27 @@ class UserMiddleware(BaseMiddleware):
                             and not split_text[1].startswith("val_")
                         ):
                             ref = split_text[1]
+                            referal = await session.scalar(
+                                select(Referal).where(Referal.ref == ref)
+                            )
+                            if not referal:
+                                referal = Referal(
+                                    ref=ref,
+                                    total_users=1,
+                                    active_users=1,
+                                    join_date=datetime.utcnow()
+                                )
+                                session.add(referal)
+                                await session.commit()
+                                
+                            else:
+                                await session.execute(
+                                    update(Referal)
+                                    .where(Referal.ref==ref)
+                                    .values(total_users = referal.total_users+1,
+                                            active_users = referal.active_users+1)
+                                )
+                                await session.commit()
 
                     user = User(
                         id=event_chat.id,
@@ -57,7 +79,8 @@ class UserMiddleware(BaseMiddleware):
                     await session.execute(
                                     update(User)
                                     .where(User.id == user.id)
-                                    .values(last_active=datetime.utcnow())
+                                    .values(last_active=datetime.utcnow(),
+                                            active=True)
                                 )
                 
                 await session.commit()

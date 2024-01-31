@@ -317,3 +317,13 @@ def active_statistic_menu_ikb():
     
     keyboard.adjust(1)
     return keyboard.as_markup()
+
+
+def choice_referal_ikb(referals):
+    keyboard = InlineKeyboardBuilder()
+    
+    for referal in referals:
+        keyboard.button(text=referal, callback_data=f'ref_title_{referal}')
+    
+    keyboard.adjust(3)
+    return keyboard.as_markup()

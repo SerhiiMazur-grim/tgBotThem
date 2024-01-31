@@ -93,7 +93,8 @@ def admin_statistic_menu_kb():
     keyboard = ReplyKeyboardBuilder()
     keyboard.button(text=messages.BUTTON_ACTIVE_STATISTICA)
     keyboard.button(text=messages.BUTTON_FULL_STATISTICA)
+    keyboard.button(text=messages.BUTTON_REFERAL_STATISTICA)
     keyboard.button(text=messages.BUTTON_ADMIN)
-    keyboard.adjust(2, 1)
+    keyboard.adjust(2, 1, 1)
     
     return keyboard.as_markup(resize_keyboard=True)
