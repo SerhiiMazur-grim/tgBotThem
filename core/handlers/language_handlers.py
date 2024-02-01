@@ -106,9 +106,14 @@ async def add_language_device(poll: PollAnswer, bot: Bot, state: FSMContext, ses
     await state.update_data(device=device)
     await state.set_state(AddLanguageState.category)
     categories = await session.scalars(select(LanguageCategory))
-    await bot.send_message(chat_id=poll.user.id,
-                            text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
-                            reply_markup=inline_keybords.choice_category_lang_ikb(categories))
+    cat_list = list(categories)
+    if cat_list:
+        await bot.send_message(chat_id=poll.user.id,
+                                text=messages.MESSAGE_CHOICE_CATEGORY_FOR_LANGUAGE,
+                                reply_markup=inline_keybords.choice_category_lang_ikb(cat_list))
+    else:
+        await state.clear()
+        await bot.send_message(chat_id=poll.user.id, text=messages.MESSAGE_NO_CATEGORIES)
 
 
 async def add_language_category(callback_query: CallbackQuery, state: FSMContext):
@@ -171,15 +176,19 @@ async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSM
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetLanguageCatalogState.category)
-    categories = await session.scalars(select(LanguageCategory))
     
-    await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                            reply_markup=inline_keybords.choice_category_lang_db_get_ikb(categories))
+    categories = await session.scalars(select(LanguageCategory))
+    cat_list = list(categories)
+    if cat_list:
+        await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
+                                reply_markup=inline_keybords.choice_category_lang_db_get_ikb(cat_list))
+    else:
+        await state.clear()
+        await callback_query.message.answer(text=messages.MESSAGE_NO_CATEGORIES)
     
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback_query.answer()
-    # user_id = callback_query.from_user.id
     data = await state.get_data()
     device = data['device']
     category = callback_query.data.split('_')[-1]
@@ -206,7 +215,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                 LanguageInCatalog.ios==True
             )
         ))
-    catalog = [i for i in catalog]
+    catalog = list(catalog)
     await state.set_state(LanguagesCatalogState)
     await state.set_data({
         'catalog': catalog,

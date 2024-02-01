@@ -125,8 +125,13 @@ async def add_theme_file(message: Message, state: FSMContext, session: AsyncSess
         await state.update_data(file=file.file_id)
         await state.set_state(AddThemeState.category)
         categories = await session.scalars(select(ThemeCategory))
-        await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                                     reply_markup=inline_keybords.choice_category_ikb_keyboard(categories))
+        cat_list = list(categories)
+        if cat_list:
+            await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
+                                        reply_markup=inline_keybords.choice_category_ikb_keyboard(categories))
+        else:
+            await state.clear()
+            await message.answer(text=messages.MESSAGE_NO_CATEGORIES)
     else:
         await message.answer(text=messages.MESSAGE_IS_NOT_THEME)
       
@@ -176,8 +181,13 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
     await state.update_data(device=device)
     await state.set_state(GetThemesCatalogState.category)
     categories = await session.scalars(select(ThemeCategory))
-    await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                            reply_markup=inline_keybords.choice_category_db_get_ikb(categories))
+    cat_list = list(categories)
+    if cat_list:
+        await callback_query.message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
+                                reply_markup=inline_keybords.choice_category_db_get_ikb(cat_list))
+    else:
+        await state.clear()
+        await callback_query.message.answer(text=messages.MESSAGE_NO_CATEGORIES)
 
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
@@ -192,7 +202,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
             ThemeInCatalog.device==data['device']
         )
     ))
-    catalog = [i for i in catalog]
+    catalog = list(catalog)
     
     await state.set_state(ThemesCatalogState)
     await state.set_data({

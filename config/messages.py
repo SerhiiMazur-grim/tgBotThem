@@ -282,3 +282,5 @@ def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_u
     🟢 Активные пользователи:  {ref_active_users}
     """
     return message
+
+MESSAGE_NO_CATEGORIES = 'Категорий нет, кина не будет)))'
