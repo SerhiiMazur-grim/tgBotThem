@@ -23,6 +23,7 @@ async def active_statistic_menu(message: Message):
 async def referals_statistic_menu(message: Message, session: AsyncSession):
     await message.delete()
     referals = await session.scalars(select(Referal.ref))
+    referals = list(referals)
     if referals:    
         await message.answer(text=messages.MESSAGE_CHOICE_REFERAL,
                             reply_markup=inline_keybords.choice_referal_ikb(referals))
