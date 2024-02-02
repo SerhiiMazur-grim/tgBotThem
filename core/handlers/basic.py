@@ -1,9 +1,21 @@
+import logging
+from datetime import datetime
+
 from aiogram.types import Message
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramForbiddenError
+
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from config import messages
 from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard
 from core.keyboards.reply_keybords import user_keyboard, admin_keyboard
+from database.models.user import User
+
+
+logger = logging.getLogger(__name__)
 
 
 async def command_start(message: Message):
@@ -54,3 +66,16 @@ async def command_user_kb(message: Message):
     user_id = message.from_user.id
     await message.delete()
     await message.answer(text=messages.MESSAGE_ON_BACK_TO_USER_KB, reply_markup=user_keyboard(user_id))
+
+
+async def bot_is_blocked(error, session: AsyncSession, user_id):
+    if error.message == 'Forbidden: bot was blocked by the user':
+        await session.execute(update(User).where(User.id==user_id).values(
+            block_date=datetime.utcnow(),
+            active=False
+        ))
+        await session.commit()
+        
+        logger.info(f'User {user_id} blocked the bot !')
+    else:
+        logger.error(error.message)

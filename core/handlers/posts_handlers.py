@@ -17,6 +17,7 @@ from sqlalchemy import and_, update
 from config import messages
 from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb, send_limited_post_ikb, \
     abort_sending_limited_post_ikb
+from core.handlers.basic import bot_is_blocked
 from core.states import AddPostState
 from database.models.user import User
 from database.models.send_post import SendPost
@@ -146,10 +147,18 @@ async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMCo
         await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
         for chat in chats:
             if post_type == 'media':
-                await data['post'].send_copy(chat_id=chat)
+                try:
+                    await data['post'].send_copy(chat_id=chat)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
+                    
             else:
                 media = await get_media_group_list(data)
-                await bot.send_media_group(chat_id=chat, media=media)
+                try:
+                    await bot.send_media_group(chat_id=chat, media=media)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
+                    
         await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
@@ -170,10 +179,17 @@ async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: F
         await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
         for chat in chats:
             if post_type == 'media':
-                await data['post'].send_copy(chat_id=chat)
+                try:
+                    await data['post'].send_copy(chat_id=chat)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
             else:
                 media = await get_media_group_list(data)
-                await bot.send_media_group(chat_id=chat, media=media)
+                try:
+                    await bot.send_media_group(chat_id=chat, media=media)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
+                    
         await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
@@ -193,10 +209,17 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSM
         await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
         for chat in chats:
             if post_type == 'media':
-                await data['post'].send_copy(chat_id=chat)
+                try:
+                    await data['post'].send_copy(chat_id=chat)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
             else:
                 media = await get_media_group_list(data)
-                await bot.send_media_group(chat_id=chat, media=media)
+                try:
+                    await bot.send_media_group(chat_id=chat, media=media)
+                except Exception as err:
+                    await bot_is_blocked(err, session, chat)
+                    
         await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
