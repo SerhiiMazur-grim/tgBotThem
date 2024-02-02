@@ -1,8 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
-from config.categories import CATEGORIES, CATEGORIES_GET, DRVICES, DRVICES_GET, CATEGORIES_LANGUAGES, \
-    CATEGORIES_LANGUAGES_GET, DRVICES_LANGUAGES_GET
+from config.categories import DRVICES
 
 
 def subscribe_keyboard(checked_channels):

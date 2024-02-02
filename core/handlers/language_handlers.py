@@ -219,14 +219,14 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
     await state.set_state(LanguagesCatalogState)
     await state.set_data({
         'catalog': catalog,
-        'start': 2,
-        'end': 5,
+        'start': 5,
+        'end': 11,
     })
     
     if catalog:
         await callback_query.message.answer(text=messages.MESSAGE_OUR_LANGUAGES,
                                 reply_markup=reply_keybords.nex_languages_keyboard())
-        for language in catalog[:2]:
+        for language in catalog[:5]:
             send_data = []
             for prewiew in language.preview.split(', '):
                 if not send_data:
