@@ -6,6 +6,7 @@ from aiogram.types import Message, CallbackQuery, PollAnswer
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import AiogramError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -236,7 +237,10 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                     media=prewiew,
                     caption=caption
                 ))
-            await callback_query.message.answer_media_group(media=send_data)
+            try:
+                await callback_query.message.answer_media_group(media=send_data)
+            except AiogramError as er:
+                logger.error(er)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_LANGUAGES_IN_CATALOG)
 
@@ -258,7 +262,10 @@ async def get_next_languages(message: Message, state: FSMContext):
                     media=prewiew,
                     caption=caption
                 ))
-            await message.answer_media_group(media=send_data)
+            try:
+                await message.answer_media_group(media=send_data)
+            except AiogramError as er:
+                logger.error(er)
         
         await state.update_data(start=start+start)
         await state.update_data(end=end+end)

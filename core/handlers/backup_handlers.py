@@ -11,21 +11,23 @@
 
 
 # async def get_backup(message: Message):
-#     await message.delete()
-#     command = 'pg_dump -U bot_admin -h localhost -d theme_bot -W > backup.sql'
+#     # await message.delete()
+#     command = '''$env:PGPASSWORD="admin"
+#                 & pg_dump -U bot_admin -h localhost theme_bot > db_backup.sql
+#                 '''
 
-#     subprocess.run(command, shell=True, input='admin', text=True)
+#     subprocess.run(command, shell=True)
     
     
-#     with zipfile.ZipFile('BACKUPS_DB.zip', 'w') as zipf:
-#         zipf.write('backup.sql')
+#     # with zipfile.ZipFile('BACKUPS_DB.zip', 'w') as zipf:
+#     #     zipf.write('backup.sql')
     
-#     await message.answer_document(
-#         document=FSInputFile('BACKUPS_DB.zip'),
-#         caption=f'{messages.MESSAGE_BACKUP}{datetime.now().strftime("%d.%m.%Y %H:%M:%S")}'
-#     )
+#     # await message.answer_document(
+#     #     document=FSInputFile('db_backup.sql'),
+#     #     caption=f'{messages.MESSAGE_BACKUP}{datetime.now().strftime("%d.%m.%Y %H:%M:%S")}'
+#     # )
     
-#     os.remove('BACKUPS_DB.zip')
-#     os.remove('backup.sql')
+#     # os.remove('BACKUPS_DB.zip')
+#     # os.remove('db_backup.sql')
     
     

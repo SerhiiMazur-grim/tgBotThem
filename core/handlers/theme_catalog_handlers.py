@@ -3,6 +3,7 @@ import logging
 
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import AiogramError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import and_
@@ -215,8 +216,11 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
         await callback_query.message.answer(text=messages.MESSAGE_OUR_THEMES,
                                 reply_markup=nex_themes_keyboard())
         for theme in catalog[:5]:
-            await callback_query.message.answer_photo(photo=theme.preview)
-            await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+            try:    
+                await callback_query.message.answer_photo(photo=theme.preview)
+                await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+            except AiogramError as er:
+                logger.error(er)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_THEMES_IN_CATALOG)
 
@@ -229,9 +233,12 @@ async def get_next_themes(message: Message, state: FSMContext):
     
     if catalog[start:end]: 
         for theme in catalog[start:end]:
-            await message.answer_photo(photo=theme.preview)
-            await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
-        
+            try:
+                await message.answer_photo(photo=theme.preview)
+                await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+            except AiogramError as er:
+                logger.error(er)
+                
         await state.update_data(start=start+start)
         await state.update_data(end=end+end)
     else:
