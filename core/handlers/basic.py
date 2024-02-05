@@ -3,14 +3,13 @@ from datetime import datetime
 
 from aiogram.types import Message
 from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramForbiddenError
 
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
 from config import messages
-from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard
+from config.api_keys import ADMINS
+from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard, go_to_bot_ikb
 from core.keyboards.reply_keybords import user_keyboard, admin_keyboard
 from database.models.user import User
 
@@ -25,10 +24,16 @@ async def command_start(message: Message):
     if chat_type == 'private':
         await message.delete()
         await message.answer(text=messages.MESSAGE_ON_START_COMMAND, reply_markup=user_keyboard(user_id))
-    else:
+        
+    elif chat_type != 'private' and str(user_id) in ADMINS:
+        try:
+            await message.delete()
+        except Exception as e:
+            logger.error(e)
+            
         await message.answer_photo(photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
                                     caption=messages.MESSAGE_ON_START_IN_GROUP,
-                                    reply_markup=None)
+                                    reply_markup=go_to_bot_ikb())
 
 
 async def command_user_kb(message: Message):
@@ -69,13 +74,16 @@ async def command_user_kb(message: Message):
 
 
 async def bot_is_blocked(error, session: AsyncSession, user_id):
-    if error.message == 'Forbidden: bot was blocked by the user':
-        await session.execute(update(User).where(User.id==user_id).values(
-            block_date=datetime.utcnow(),
-            active=False
-        ))
-        await session.commit()
-        
-        logger.info(f'User {user_id} blocked the bot !')
-    else:
-        logger.error(error.message)
+    try:
+        if error.message == 'Forbidden: bot was blocked by the user':
+            await session.execute(update(User).where(User.id==user_id).values(
+                block_date=datetime.utcnow(),
+                active=False
+            ))
+            await session.commit()
+            
+            logger.info(f'User {user_id} blocked the bot !')
+        else:
+            logger.error(error.message)
+    except:
+        logger.error(error)

@@ -2,6 +2,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
 from config.categories import DRVICES
+from config.api_keys import NAME
 
 
 def subscribe_keyboard(checked_channels):
@@ -13,6 +14,14 @@ def subscribe_keyboard(checked_channels):
         counter += 1
     keyboard.button(text=messages.MESSAGE_CHECK_SUBSCRIBE, callback_data='sub_check')
     keyboard.adjust(2, 2, 1)
+    return keyboard.as_markup()
+
+
+def go_to_bot_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_GO_TO_BOT, url=f'https://t.me/{NAME[1:]}')
+    
     return keyboard.as_markup()
 
 
@@ -111,7 +120,7 @@ def choose_alfa_background_color_keyboard():
 def add_bot_to_chat_inl_keyboard():
     keyboard = InlineKeyboardBuilder()
     
-    keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url='t.me/Grimm_Python_Test_Bot?startgroup&admin=post_messages')
+    keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url='t.me/Grimm_Python_Test_Bot?startgroup&admin=post_messages+delete_messages')
     keyboard.adjust(1)
     
     return keyboard.as_markup()

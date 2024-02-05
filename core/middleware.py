@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, time
 import os
+import logging
 from typing import Callable, Awaitable, Dict, Any
 import json
 
 from aiogram import BaseMiddleware, Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from aiogram.types.input_media_animation import InputMediaAnimation
 from aiogram.types.input_media_document import InputMediaDocument
 from aiogram.types.input_media_audio import InputMediaAudio
@@ -22,10 +23,11 @@ from database.models.send_post import SendPost
 
 
 clean_time = None
+logger = logging.getLogger(__name__)
 
 
 class IsSubscribedMiddleware(BaseMiddleware):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
     
     async def __call__(
@@ -34,17 +36,20 @@ class IsSubscribedMiddleware(BaseMiddleware):
         event: Message,
         data: Dict[str, Any]
     ) -> Any:
-        
+
         user_id = event.from_user.id
-        if str(user_id) in ADMINS or event.text == '/start':
+        if str(user_id) in ADMINS or event.text.startswith('/start'):
+            
             return await handler(event, data)
         
         checked_channels = []
         for channel_id in CHANNEL_IDS:
-            member = await Bot.get_chat_member(self=self.bot, chat_id=channel_id, user_id=user_id)
+            try:
+                member = await self.bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+            except Exception as e:
+                logger.error(e)
 
-            # Перевірка, чи користувач є учасником каналу та має статус "member" або "creator"
-            if member.status == 'member' or member.status == 'creator':
+            if member.status in ['member', 'creator', 'administrator']:
                 continue
             
             else:
@@ -54,7 +59,6 @@ class IsSubscribedMiddleware(BaseMiddleware):
             return await handler(event, data)
         
         else:
-            # Якщо користувач не підписаний ні на один з каналів, створимо і покажемо інлайнову клавіатуру
             await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
                                     reply_markup=subscribe_keyboard(checked_channels))
 
