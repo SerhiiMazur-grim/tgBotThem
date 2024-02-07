@@ -30,11 +30,19 @@ async def admin_language_catalog(message: Message):
                          )
 
 
-async def admin_language_category(message: Message):
+async def admin_language_category(message: Message, session: AsyncSession):
+    categories = await session.scalars(select(LanguageCategory.title))
+    cat_list = '\n'.join(list(categories))
+    
     await message.delete()
-    await message.answer(text=messages.MESSAGE_ADMIN_CATEGORY_MENU,
-                         reply_markup=inline_keybords.admin_add_language_category_ikb()
-                         )
+    if cat_list:
+        await message.answer(text=f'Список категорий языков:\n{cat_list}',
+                            reply_markup=inline_keybords.admin_add_language_category_ikb()
+                            )
+    else:
+        await message.answer(text='Список категорий языков:\nПусто...Пока что категорий нет, создайте категорию.',
+                            reply_markup=inline_keybords.admin_add_language_category_ikb()
+                            )
 
 
 async def admin_start_add_language_category(callback_query: CallbackQuery, state: FSMContext):
@@ -128,6 +136,7 @@ async def add_language_category(callback_query: CallbackQuery, state: FSMContext
 async def add_previev_and_desc_for_language(message: Message, state: FSMContext, session: AsyncSession):
     preview = message.photo[-1].file_id
     caption = message.caption
+    
     data = await state.get_data()
     preview_list = data.get('preview')
     
@@ -235,7 +244,8 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                 else: caption = None
                 send_data.append(InputMediaPhoto(
                     media=prewiew,
-                    caption=caption
+                    caption=caption,
+                    parse_mode=ParseMode.HTML
                 ))
             try:
                 await callback_query.message.answer_media_group(media=send_data)
@@ -260,7 +270,8 @@ async def get_next_languages(message: Message, state: FSMContext):
                 else: caption = None
                 send_data.append(InputMediaPhoto(
                     media=prewiew,
-                    caption=caption
+                    caption=caption,
+                    parse_mode=ParseMode.HTML
                 ))
             try:
                 await message.answer_media_group(media=send_data)

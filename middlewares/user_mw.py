@@ -27,6 +27,16 @@ class UserMiddleware(BaseMiddleware):
 
             if event.chat_join_request:
                 return
+            
+            message = event.message
+            if event_chat.type != 'private' and message:
+                
+                if message.text:
+                    if not message.text.startswith('/start'):
+                        return
+                elif message.photo:
+                    if message.caption!='/theme':
+                        return
 
             if event_chat:
                 user = await session.scalar(

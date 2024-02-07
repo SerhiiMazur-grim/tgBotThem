@@ -20,7 +20,7 @@ def subscribe_keyboard(checked_channels):
 def go_to_bot_ikb():
     keyboard = InlineKeyboardBuilder()
     
-    keyboard.button(text=messages.BUTTON_GO_TO_BOT, url=f'https://t.me/{NAME[1:]}')
+    keyboard.button(text=messages.BUTTON_GO_TO_BOT, url=f'https://t.me/{NAME[1:]}?start=from_group_chat')
     
     return keyboard.as_markup()
 

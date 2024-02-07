@@ -20,6 +20,7 @@ class User(Base):
     active = Column(Boolean, default=True)
     
     chat_type = Column(String)
+    sub = Column(Boolean, default=False)
     
     ref = Column(String)
     

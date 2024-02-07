@@ -2,11 +2,15 @@ import os
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
 
-from config.telegram_chats import CHANNEL_IDS
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
+
+from config.api_keys import CHANNEL_IDS
 from config.api_keys import ADMINS
 from config.fonts import FONTS
 from config import messages
 from core.keyboards.inline_keybords import subscribe_keyboard
+from database.models.user import User
 # from core.database import start_db
 # from core.commands import set_commands
 
@@ -16,7 +20,7 @@ from core.keyboards.inline_keybords import subscribe_keyboard
     # await set_commands(bot)
 
 
-async def is_user_subscribed(message, bot: Bot):
+async def is_user_subscribed(message, bot: Bot, session: AsyncSession):
 
     # Перевірка підписки користувача на кожен канал зі списку channel_ids
     checked_channels = []
@@ -36,7 +40,10 @@ async def is_user_subscribed(message, bot: Bot):
     if not checked_channels:
         return True
     else:
-        # Якщо користувач не підписаний ні на один з каналів, створимо і покажемо інлайнову клавіатуру
+        
+        await session.execute(update(User).where(User.id==user_id).values(sub=False))
+        await session.commit()
+        
         if type(message) == Message:
             await message.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
                                  reply_markup=subscribe_keyboard(checked_channels))
@@ -46,10 +53,14 @@ async def is_user_subscribed(message, bot: Bot):
         return False
 
 
-async def sub_checker(callback_query: CallbackQuery, bot: Bot):
-    if await is_user_subscribed(callback_query, bot):
+async def sub_checker(callback_query: CallbackQuery, bot: Bot, session: AsyncSession):
+    user_id = callback_query.from_user.id
+    await callback_query.message.delete()
+    
+    if await is_user_subscribed(callback_query, bot, session):
         await callback_query.message.answer(text=messages.SUBSCRIBE_CHECKED)
-        await callback_query.answer()
+        await session.execute(update(User).where(User.id==user_id).values(sub=True))
+        await session.commit()
 
 
 async def dell_data(user_data, chat_id):

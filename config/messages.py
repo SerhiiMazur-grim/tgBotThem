@@ -3,7 +3,7 @@ from config.api_keys import NAME
 
 PREVIEW_WATER_MARK = f'Theme created in {NAME}'
 START_COMMAND_DESCRIPTION = 'Начать работу с ботом.'
-MESSAGE_ON_START_COMMAND = 'Бот готов к работе!\nОтправьте картинку чтобы сделать из него темку!'
+MESSAGE_ON_START_COMMAND = 'Привет '
 MESSAGE_ON_CREATE_THEME = 'Отправьте мне картинку и я сделаю из нее тему для Telegram'
 MESSAGE_ON_ADD_TO_CHAT = 'Нажмите кнопку добавить бота в группу, выберите группу в которую нужно добавить бота и нажмите Сохранить'
 MESSAGE_ON_FAQ = """
@@ -19,6 +19,8 @@ BUTTON_GO_TO_BOT = 'Бот с темками👉'
 MESSAGE_WITH_CHAT = 'Чат: '
 MESSAGE_CHECK_SUBSCRIBE = 'Проверить подписку'
 MESSAGE_YOU_NOT_SUBSCRIBE = 'Вы не подписаны на наши чаты🧐, для пользования ботом подпишитесь на наши чаты😊:'
+MESSAGE_YOU_NOT_SUBSCRIBE_GROUP = ' ты не подписаны на наши чаты и бот🧐, перейди в бот и зарегистрируйся для начала😊'
+
 SUBSCRIBE_CHECKED = 'Бот готов к работе, отправьте ему картинку.'
 WAIT_MESSAGE = 'Провожу анализ изображения ⏳'
 NOT_IMAGE = 'ОЙ, кажется это не картинка 🤨🧐\nПроверьте файл, который вы отправили!'
@@ -272,7 +274,7 @@ BUTTON_REFERAL_STATISTICA = 'Статистика рефералов'
 MESSAGE_CHOICE_REFERAL = 'Выберите реферала:'
 MESSAGE_NO_REFERALS = 'Список рефералов пустой!'
 
-def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_users):
+def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_users, ref_block_users, ref_sub_users):
     message = f"""
     Статистика по рефералу:
     
@@ -281,6 +283,8 @@ def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_u
 
     🚪 Переходы:  {ref_total_users}
     🟢 Активные пользователи:  {ref_active_users}
+    🔴 Не активные: {ref_block_users}
+    🤝 Прошли ОП: {ref_sub_users}
     """
     return message
 

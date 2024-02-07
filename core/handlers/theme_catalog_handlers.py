@@ -27,11 +27,19 @@ async def admin_theme_catalog(message: Message):
                          )
 
 
-async def admin_theme_category(message: Message):
+async def admin_theme_category(message: Message, session: AsyncSession):
+    categories = await session.scalars(select(ThemeCategory.title))
+    cat_list = '\n'.join(list(categories))
+    
     await message.delete()
-    await message.answer(text=messages.MESSAGE_ADMIN_CATEGORY_MENU,
-                         reply_markup=admin_add_theme_category_ikb()
-                         )
+    if cat_list:
+        await message.answer(text=f'Список категорий тем:\n{cat_list}',
+                            reply_markup=admin_add_theme_category_ikb()
+                            )
+    else:
+        await message.answer(text='Список категорий тем:\nПусто...Пока что категорий нет, создайте категорию.',
+                            reply_markup=admin_add_theme_category_ikb()
+                            )
 
 
 async def admin_start_add_theme_category(callback_query: CallbackQuery, state: FSMContext):
@@ -129,7 +137,7 @@ async def add_theme_file(message: Message, state: FSMContext, session: AsyncSess
         cat_list = list(categories)
         if cat_list:
             await message.answer(text=messages.MESSAGE_CHOICE_CATEGORY,
-                                        reply_markup=inline_keybords.choice_category_ikb_keyboard(categories))
+                                        reply_markup=inline_keybords.choice_category_ikb_keyboard(cat_list))
         else:
             await state.clear()
             await message.answer(text=messages.MESSAGE_NO_CATEGORIES)

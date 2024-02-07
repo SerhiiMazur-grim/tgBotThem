@@ -15,9 +15,9 @@ from aiogram.types.input_media_video import InputMediaVideo
 from sqlalchemy import update
 from sqlalchemy.future import select
 
-from config.telegram_chats import CHANNEL_IDS
+from config.api_keys import CHANNEL_IDS
 from config.api_keys import ADMINS
-from core.keyboards.inline_keybords import subscribe_keyboard
+from core.keyboards.inline_keybords import subscribe_keyboard, go_to_bot_ikb
 from config import messages
 from database.models.send_post import SendPost
 
@@ -38,9 +38,20 @@ class IsSubscribedMiddleware(BaseMiddleware):
     ) -> Any:
 
         user_id = event.from_user.id
-        if str(user_id) in ADMINS or event.text.startswith('/start'):
-            
+        chat_type = event.chat.type
+        user_name = event.from_user.full_name
+        
+        if str(user_id) in ADMINS:
             return await handler(event, data)
+        
+        if event.text:
+            if event.text.startswith('/start'):
+                return await handler(event, data)
+        
+        if chat_type != 'private' and event.photo:
+            if event.caption!='/theme':
+                return
+                    
         
         checked_channels = []
         for channel_id in CHANNEL_IDS:
@@ -59,8 +70,12 @@ class IsSubscribedMiddleware(BaseMiddleware):
             return await handler(event, data)
         
         else:
-            await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
-                                    reply_markup=subscribe_keyboard(checked_channels))
+            if chat_type == 'private':
+                await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
+                                        reply_markup=subscribe_keyboard(checked_channels))
+            else:
+                await event.answer(text=f'{user_name}{messages.MESSAGE_YOU_NOT_SUBSCRIBE_GROUP}',
+                                   reply_markup=go_to_bot_ikb())
 
 
 class PostSenderMiddleware(BaseMiddleware):

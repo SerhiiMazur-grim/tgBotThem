@@ -10,7 +10,8 @@ from sqlalchemy import (
     DateTime,
     Text,
     Boolean,
-    ForeignKey
+    ForeignKey,
+    ARRAY
 )
 
 if TYPE_CHECKING:

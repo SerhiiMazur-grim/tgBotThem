@@ -2,4 +2,5 @@
 # Назва чату має починатися з @ та має бути записана в середині одинарних '' або подвійних "" лапок, ось так: "@Chat" чи так '@Chat'.
 # Чати записуються в середині квадратних дужок [] через кому, ось так: ['@Chat1', '@Chat2', '@Chat3'] 
 # Якщо чат більше не потрібний його можна видалити.
-CHANNEL_IDS = ['@sia_kitsune', '@temp_test_bot_on_my_py', '@sia_groupp']
+# CHANNEL_IDS = ['@sia_kitsune', '@temp_test_bot_on_my_py', '@sia_groupp', '@Sia_chanel']
+# CHANNEL_IDS = ['@sia_kitsune', '@temp_test_bot_on_my_py', '@sia_groupp']

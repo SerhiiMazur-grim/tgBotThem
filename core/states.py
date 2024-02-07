@@ -13,6 +13,7 @@ class AddLanguageState(StatesGroup):
     category = State()
     preview = State()
     caption = State()
+    
 
 
 class GetThemesCatalogState(StatesGroup):
