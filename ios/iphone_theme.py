@@ -78,7 +78,7 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
             ))
 
             wallpaper_slug = wallpaper.slug
-            name = f'{status_bar}_{bg}'
+            name = f'{NAME}_{status_bar}_{bg}'
             file_name = f'{NAME}_{bg}{primary_txt}{not_primary_txt}.tgios-theme'
 
             path = os.path.join('ios', 'theme', str(chat_id))

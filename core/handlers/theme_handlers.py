@@ -50,6 +50,7 @@ async def handle_photo(message: Message, bot: Bot):
     user_id = message.from_user.id
     key = f'{chat_id}{user_id}'
     if message.chat.type == 'private':
+        
         if message.document:
             photo = message.document
             if photo.mime_type != 'image/jpeg':

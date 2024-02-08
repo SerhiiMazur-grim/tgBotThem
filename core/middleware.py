@@ -54,28 +54,31 @@ class IsSubscribedMiddleware(BaseMiddleware):
                     
         
         checked_channels = []
-        for channel_id in CHANNEL_IDS:
-            try:
-                member = await self.bot.get_chat_member(chat_id=channel_id, user_id=user_id)
-            except Exception as e:
-                logger.error(e)
+        if CHANNEL_IDS:
+            for channel_id in CHANNEL_IDS:
+                try:
+                    member = await self.bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+                except Exception as e:
+                    logger.error(e)
 
-            if member.status in ['member', 'creator', 'administrator']:
-                continue
+                if member.status in ['member', 'creator', 'administrator']:
+                    continue
+                
+                else:
+                    checked_channels.append(channel_id)
+
+            if not checked_channels:
+                return await handler(event, data)
             
             else:
-                checked_channels.append(channel_id)
-
-        if not checked_channels:
-            return await handler(event, data)
-        
+                if chat_type == 'private':
+                    await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
+                                            reply_markup=subscribe_keyboard(checked_channels))
+                else:
+                    await event.answer(text=f'{user_name}{messages.MESSAGE_YOU_NOT_SUBSCRIBE_GROUP}',
+                                    reply_markup=go_to_bot_ikb())
         else:
-            if chat_type == 'private':
-                await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
-                                        reply_markup=subscribe_keyboard(checked_channels))
-            else:
-                await event.answer(text=f'{user_name}{messages.MESSAGE_YOU_NOT_SUBSCRIBE_GROUP}',
-                                   reply_markup=go_to_bot_ikb())
+            return await handler(event, data)
 
 
 class PostSenderMiddleware(BaseMiddleware):

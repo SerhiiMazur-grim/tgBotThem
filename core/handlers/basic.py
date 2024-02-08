@@ -39,7 +39,7 @@ async def command_start(message: Message, bot: Bot, session: AsyncSession):
             except Exception as e:
                 logger.error(e)
                 
-            await message.answer_photo(photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
+            await message.answer_photo(photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
                                         caption=messages.MESSAGE_ON_START_IN_GROUP,
                                         reply_markup=go_to_bot_ikb())
 
@@ -60,7 +60,7 @@ async def command_create_theme(message: Message, bot: Bot):
 async def command_add_to_chat(message: Message):
     await message.delete()
     await message.answer_photo(
-        photo='AgACAgIAAxkBAAIK1mV8QsjPPraAQ84AAeXm60eD5VhfnQAC1NIxG4mb4EtoJSNVJfQRiAEAAwIAA3gAAzME',
+        photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
         caption=messages.MESSAGE_ON_ADD_TO_CHAT,
         reply_markup=add_bot_to_chat_inl_keyboard()
     )
