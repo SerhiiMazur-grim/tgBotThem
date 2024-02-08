@@ -26,9 +26,9 @@ logger = logging.getLogger(__name__)
 
 async def main():
     await check_and_delete_files()
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                        stream=sys.stdout)
+    logging.basicConfig(filename='theme_bot_logs.log',
+                        level=logging.INFO,
+                        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     logger.info("Starting bot...")
     
     storage = MemoryStorage()
