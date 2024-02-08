@@ -38,7 +38,7 @@ async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     dp = Dispatcher(storage=storage, events_isolation=SimpleEventIsolation())
     middlewares.setup(dp, sessionmaker)
-    
+
     await set_commands(bot)
 
     dp.message.middleware.register(CleanupMiddleware())

@@ -52,6 +52,8 @@ async def get_full_statistica(message: Message, session: AsyncSession):
     active_priv_chats = 0
     total_group_chats = 0
     active_group_chats = 0
+    total_prem_users = 0
+    active_prem_users = 0
     
     for user in users:
         total_users += 1
@@ -67,6 +69,10 @@ async def get_full_statistica(message: Message, session: AsyncSession):
             total_group_chats += 1
         if user.chat_type!='private' and user.active:
             active_group_chats += 1
+        if user.premium:
+            total_prem_users += 1
+        if user.premium and user.active:
+            active_prem_users += 1
     
     not_active_users = total_users - total_active_users
     not_active_priv_chats = total_priv_chats - active_priv_chats
@@ -82,7 +88,9 @@ async def get_full_statistica(message: Message, session: AsyncSession):
                                    not_active_priv_chats=not_active_priv_chats,
                                    total_group_chats=total_group_chats,
                                    active_group_chats=active_group_chats,
-                                   not_active_group_chats=not_active_group_chats
+                                   not_active_group_chats=not_active_group_chats,
+                                   total_prem_users=total_prem_users,
+                                   active_prem_users=active_prem_users
                                ))
 
 

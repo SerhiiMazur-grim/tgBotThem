@@ -211,7 +211,7 @@ BUTTON_DAY_ACTIVITY = 'Активность за день'
 BUTTON_WEEK_ACTIVITY = 'Активность за неделю'
 BUTTON_MONTH_ACTIVITY = 'Активность за месяц'
 
-def active_users_per_day_message(users_count, chats_count, total_count):
+def active_users_per_day_message(users_count, chats_count, total_count, prem_users_count):
     message = f"""
     ⌚️ Активные пользователи за последние 24 часа:
     
@@ -220,10 +220,12 @@ def active_users_per_day_message(users_count, chats_count, total_count):
     🟢 Персональные чаты: {users_count}👤
     
     🟢 Груповые чаты: {chats_count}👤
+    
+    🔮 Пользователи с перм-акаунтом: {prem_users_count}👤
     """
     return message
 
-def active_users_per_week_message(users_count, chats_count, total_count):
+def active_users_per_week_message(users_count, chats_count, total_count, prem_users_count):
     message = f"""
     ⌚️ Активные пользователи за последние 7 дней:
     
@@ -232,10 +234,12 @@ def active_users_per_week_message(users_count, chats_count, total_count):
     🟢 Персональные чаты: {users_count}👤
     
     🟢 Груповые чаты: {chats_count}👤
+    
+    🔮 Пользователи с перм-акаунтом: {prem_users_count}👤
     """
     return message
 
-def active_users_per_month_message(users_count, chats_count, total_count):
+def active_users_per_month_message(users_count, chats_count, total_count, prem_users_count):
     message = f"""
     ⌚️ Активные пользователи за последние 30 дней:
     
@@ -244,12 +248,15 @@ def active_users_per_month_message(users_count, chats_count, total_count):
     🟢 Персональные чаты: {users_count}👤
     
     🟢 Груповые чаты: {chats_count}👤
+    
+    🔮 Пользователи с перм-акаунтом: {prem_users_count}👤
     """
     return message
 
 def full_statistica_caption(total_users, refer_users, total_active_users, not_active_users,
                             total_priv_chats, active_priv_chats, not_active_priv_chats,
-                            total_group_chats, active_group_chats, not_active_group_chats):
+                            total_group_chats, active_group_chats, not_active_group_chats,
+                            total_prem_users, active_prem_users):
     message = f"""
     ⌚️ Статистика за всё время работы бота:
     
@@ -266,6 +273,9 @@ def full_statistica_caption(total_users, refer_users, total_active_users, not_ac
     🟢 Всего груповых чатов: {total_group_chats}👤
     🟢 Из них активные: {active_group_chats}👤
     🔴 Не активные: {not_active_group_chats}👤
+    
+    🔮 Пользователи с перм-акаунтом: {total_prem_users}👤
+    🟢 Из них активные: {active_prem_users}👤
        
     """
     return message
@@ -274,7 +284,8 @@ BUTTON_REFERAL_STATISTICA = 'Статистика рефералов'
 MESSAGE_CHOICE_REFERAL = 'Выберите реферала:'
 MESSAGE_NO_REFERALS = 'Список рефералов пустой!'
 
-def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_users, ref_block_users, ref_sub_users):
+def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_users,
+                   ref_block_users, ref_sub_users, ref_prem_users):
     message = f"""
     Статистика по рефералу:
     
@@ -282,9 +293,10 @@ def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_u
     ⌚️ Время создания:  {ref_join_date}
 
     🚪 Переходы:  {ref_total_users}
-    🟢 Активные пользователи:  {ref_active_users}
-    🔴 Не активные: {ref_block_users}
-    🤝 Прошли ОП: {ref_sub_users}
+    🟢 Активные пользователи:  {ref_active_users}👤
+    🔴 Не активные: {ref_block_users}👤
+    🤝 Прошли ОП: {ref_sub_users}👤
+    🔮 Пользователи с перм-акаунтом: {ref_prem_users}👤
     """
     return message
 

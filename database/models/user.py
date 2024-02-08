@@ -21,6 +21,7 @@ class User(Base):
     
     chat_type = Column(String)
     sub = Column(Boolean, default=False)
+    premium = Column(Boolean, default=False)
     
     ref = Column(String)
     

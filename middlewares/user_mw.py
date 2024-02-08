@@ -24,6 +24,7 @@ class UserMiddleware(BaseMiddleware):
 
         async with self.sessionmaker() as session:
             event_chat = data.get("event_chat")
+            event_from_user = data.get("event_from_user")
 
             if event.chat_join_request:
                 return
@@ -43,6 +44,9 @@ class UserMiddleware(BaseMiddleware):
                 user = await session.scalar(
                     select(User).where(User.id == event_chat.id)
                 )
+                premium = False
+                if event_chat.type == 'private':
+                    premium = event_from_user.is_premium if event_from_user.is_premium != None else False
 
                 if not user:
                     ref = None
@@ -83,6 +87,7 @@ class UserMiddleware(BaseMiddleware):
                         chat_type=event_chat.type,
                         join_date=datetime.utcnow(),
                         last_active=datetime.utcnow(),
+                        premium=premium,
                         ref=ref,
                     )
                     session.add(user)
@@ -91,7 +96,8 @@ class UserMiddleware(BaseMiddleware):
                                     update(User)
                                     .where(User.id == user.id)
                                     .values(last_active=datetime.utcnow(),
-                                            active=True)
+                                            active=True,
+                                            premium=premium)
                                 )
                 
                 await session.commit()
