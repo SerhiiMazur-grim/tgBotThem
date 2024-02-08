@@ -95,8 +95,9 @@ async def dell_data(user_data, chat_id):
 
 
 async def ch_text_font(text, font):
-    converted_text = ''.join(FONTS[font].get(c, c) for c in text)
-    return converted_text
+    if text:
+        converted_text = ''.join(FONTS[font].get(c, c) for c in text)
+        return converted_text
 
 
 async def hex_to_rgba_v2(hex_colors):
