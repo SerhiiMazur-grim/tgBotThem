@@ -17,7 +17,7 @@ from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat
-from statistica import base_statistic_handler, user_activity_statistica, full_statistica, referal_statistica
+from statistica import base_statistic_handler, user_activity_statistica, full_statistica, referal_statistica, users_to_txt
 from core.commands import set_commands
 
 
@@ -67,6 +67,9 @@ async def main():
     dp.callback_query.register(user_activity_statistica.user_activity_per_month, IsAdminFilter(), F.data=='month_activity')
     dp.message.register(full_statistica.get_full_statistica, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_FULL_STATISTICA)
     dp.callback_query.register(referal_statistica.detail_referal_statistica, IsAdminFilter(), F.data.startswith('ref_title_'))
+    dp.message.register(base_statistic_handler.extract_users_menu, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_EXTRACT_USERS)
+    dp.callback_query.register(users_to_txt.all_users_to_txt, IsAdminFilter(), F.data=='ext_all_users')
+    dp.callback_query.register(users_to_txt.all_active_users_to_txt, IsAdminFilter(), F.data=='ext_all_active_users')
     
     # language handlers
     dp.message.register(language_handlers.admin_language_catalog, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATALOG)

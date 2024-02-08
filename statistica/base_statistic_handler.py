@@ -29,3 +29,9 @@ async def referals_statistic_menu(message: Message, session: AsyncSession):
                             reply_markup=inline_keybords.choice_referal_ikb(referals))
     else:
         await message.answer(text=messages.MESSAGE_NO_REFERALS)
+
+
+async def extract_users_menu(message: Message):
+    await message.delete()
+    await message.answer(text=messages.MESSAGE_EXTRACT_USERS,
+                         reply_markup=inline_keybords.extract_users_ikb())

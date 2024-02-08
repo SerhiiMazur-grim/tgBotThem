@@ -353,3 +353,13 @@ def delete_theme_ikb(theme_id):
     
     keyboard.adjust(1)
     return keyboard.as_markup()
+
+
+def extract_users_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_ALL_USERS, callback_data='ext_all_users')
+    keyboard.button(text=messages.BUTTON_ALL_ACTIVE_USERS, callback_data='ext_all_active_users')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()

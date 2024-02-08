@@ -309,3 +309,8 @@ MESSAGE_LANGUAGE_IS_DELETE_ERR = 'Ошибка удаления языка! См
 MESSAGE_DELETE_THEME = '⬆️ Удалить тему выше? ⬆️'
 MESSAGE_THEME_IS_DELETE = 'Тема была удалена'
 MESSAGE_THEME_IS_DELETE_ERR = 'Ошибка удаления темы! Смотрите логи.'
+
+BUTTON_EXTRACT_USERS = 'Выгрузить пользователей'
+MESSAGE_EXTRACT_USERS = 'Каких пользователей вигрузить в файл?'
+BUTTON_ALL_USERS = 'Всех пользователей'
+BUTTON_ALL_ACTIVE_USERS = 'Только активных'
