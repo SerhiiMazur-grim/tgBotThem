@@ -13,6 +13,7 @@ from sqlalchemy.future import select
 from sqlalchemy import and_
 
 from config import messages
+from config.api_keys import ADMINS
 from core import inline_keybords, reply_keybords
 from core.states import AddLanguageState, GetLanguageCatalogState, AddLanguageCat, LanguagesCatalogState
 from database.models.language_catalog import LanguageInCatalog
@@ -199,6 +200,7 @@ async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSM
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback_query.answer()
+    user_id = callback_query.from_user.id
     data = await state.get_data()
     device = data['device']
     category = callback_query.data.split('_')[-1]
@@ -225,6 +227,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                 LanguageInCatalog.ios==True
             )
         ))
+        
     catalog = list(catalog)
     await state.set_state(LanguagesCatalogState)
     await state.set_data({
@@ -237,6 +240,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
         await callback_query.message.answer(text=messages.MESSAGE_OUR_LANGUAGES,
                                 reply_markup=reply_keybords.nex_languages_keyboard())
         for language in catalog[:5]:
+            lang_id = language.id
             send_data = []
             for prewiew in language.preview.split(', '):
                 if not send_data:
@@ -249,6 +253,10 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
                 ))
             try:
                 await callback_query.message.answer_media_group(media=send_data)
+                if str(user_id) in ADMINS:
+                    await callback_query.message.answer(text=messages.MESSAGE_DELETE_LANGUAGE,
+                                                    reply_markup=inline_keybords.delete_language_ikb(lang_id))
+                    
             except AiogramError as er:
                 logger.error(er)
     else:
@@ -257,12 +265,14 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
 
 async def get_next_languages(message: Message, state: FSMContext):
     data = await state.get_data()
+    user_id = message.from_user.id
     catalog = data['catalog']
     start = data['start']
     end = data['end']
     
     if catalog[start:end]: 
         for language in catalog[start:end]:
+            lang_id = language.id
             send_data = []
             for prewiew in language.preview.split(', '):
                 if not send_data:
@@ -275,6 +285,9 @@ async def get_next_languages(message: Message, state: FSMContext):
                 ))
             try:
                 await message.answer_media_group(media=send_data)
+                if str(user_id) in ADMINS:
+                    await message.answer(text=messages.MESSAGE_DELETE_LANGUAGE,
+                                                    reply_markup=inline_keybords.delete_language_ikb(lang_id))
             except AiogramError as er:
                 logger.error(er)
         
@@ -283,6 +296,21 @@ async def get_next_languages(message: Message, state: FSMContext):
     else:
         await message.delete()
         await message.answer(text=messages.MESSAGE_NO_MORE_LANGUAGES)
+
+
+async def admin_delete_language(callback_query: CallbackQuery, session: AsyncSession):
+    await callback_query.message.delete()
+    lang_id = callback_query.data.split('_')[-1]
+    try:
+        language = await session.scalar(select(LanguageInCatalog).where(LanguageInCatalog.id==int(lang_id)))
+        await session.delete(language)
+        await session.commit()
+        await callback_query.message.answer(text=messages.MESSAGE_LANGUAGE_IS_DELETE)
+    
+    except Exception as e:
+        await callback_query.message.answer(text=messages.MESSAGE_LANGUAGE_IS_DELETE_ERR)
+        logger.error(e)
+    
 
 
 async def go_to_main_menu_from_lang_catalog(message: Message, state: FSMContext):

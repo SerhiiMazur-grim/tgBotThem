@@ -9,7 +9,8 @@ from sqlalchemy.future import select
 from sqlalchemy import and_
 
 from config import messages
-from core.keyboards import inline_keybords, reply_keybords
+from config.api_keys import ADMINS
+from core import inline_keybords, reply_keybords
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard, admin_theme_catalog_kb
 from core.keyboards.inline_keybords import admin_add_theme_category_ikb, admin_del_theme_category_ikb
 from core.states import AddThemeState, GetThemesCatalogState, AddThemeCat, ThemesCatalogState
@@ -201,6 +202,7 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback_query.message.delete()
+    user_id = callback_query.from_user.id
     category = callback_query.data.split('_')[-1]
     data = await state.get_data()
     await state.clear()
@@ -224,9 +226,14 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
         await callback_query.message.answer(text=messages.MESSAGE_OUR_THEMES,
                                 reply_markup=nex_themes_keyboard())
         for theme in catalog[:5]:
+            theme_id = theme.id
             try:    
                 await callback_query.message.answer_photo(photo=theme.preview)
                 await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+                if str(user_id) in ADMINS:
+                    await callback_query.message.answer(text=messages.MESSAGE_DELETE_THEME,
+                                                    reply_markup=inline_keybords.delete_theme_ikb(theme_id))
+                    
             except AiogramError as er:
                 logger.error(er)
     else:
@@ -234,6 +241,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
 
 
 async def get_next_themes(message: Message, state: FSMContext):
+    user_id = message.from_user.id
     data = await state.get_data()
     catalog = data['catalog']
     start = data['start']
@@ -241,9 +249,13 @@ async def get_next_themes(message: Message, state: FSMContext):
     
     if catalog[start:end]: 
         for theme in catalog[start:end]:
+            theme_id = theme.id
             try:
                 await message.answer_photo(photo=theme.preview)
                 await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+                if str(user_id) in ADMINS:
+                    await message.answer(text=messages.MESSAGE_DELETE_THEME,
+                                                    reply_markup=inline_keybords.delete_theme_ikb(theme_id))
             except AiogramError as er:
                 logger.error(er)
                 
@@ -253,6 +265,20 @@ async def get_next_themes(message: Message, state: FSMContext):
         await message.delete()
         await message.answer(text=messages.MESSAGE_NO_MORE_THEMES)
         
+
+async def admin_delete_theme(callback_query: CallbackQuery, session: AsyncSession):
+    await callback_query.message.delete()
+    theme_id = callback_query.data.split('_')[-1]
+    try:
+        language = await session.scalar(select(ThemeInCatalog).where(ThemeInCatalog.id==int(theme_id)))
+        await session.delete(language)
+        await session.commit()
+        await callback_query.message.answer(text=messages.MESSAGE_THEME_IS_DELETE)
+    
+    except Exception as e:
+        await callback_query.message.answer(text=messages.MESSAGE_THEME_IS_DELETE_ERR)
+        logger.error(e)
+
 
 async def go_to_main_menu(message: Message, state: FSMContext):
     user_id = message.from_user.id

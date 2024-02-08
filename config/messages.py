@@ -301,3 +301,11 @@ def referal_detail(ref_id, ref_url, ref_join_date, ref_total_users, ref_active_u
     return message
 
 MESSAGE_NO_CATEGORIES = 'Категорий нет, кина не будет)))'
+MESSAGE_DELETE_LANGUAGE = '⬆️ Удалить язык выше? ⬆️'
+BUTTON_DEL = 'DELETE'
+MESSAGE_LANGUAGE_IS_DELETE = 'Язык был удален'
+MESSAGE_LANGUAGE_IS_DELETE_ERR = 'Ошибка удаления языка! Смотрите логи.'
+
+MESSAGE_DELETE_THEME = '⬆️ Удалить тему выше? ⬆️'
+MESSAGE_THEME_IS_DELETE = 'Тема была удалена'
+MESSAGE_THEME_IS_DELETE_ERR = 'Ошибка удаления темы! Смотрите логи.'

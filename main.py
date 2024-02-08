@@ -75,6 +75,7 @@ async def main():
     dp.message.register(language_handlers.admin_get_language_category, AddLanguageCat.category)
     dp.callback_query.register(language_handlers.admin_start_delete_language_category, IsAdminFilter(), F.data == 'admin_del_language_cat')
     dp.callback_query.register(language_handlers.admin_delete_language_category, IsAdminFilter(), F.data.startswith('del_language_cat_'))
+    dp.callback_query.register(language_handlers.admin_delete_language, IsAdminFilter(), F.data.startswith('delete_language_'))
     
     #--------------------------------------------------------------------------------------------------
     
@@ -123,6 +124,8 @@ async def main():
     dp.message.register(theme_catalog_handlers.get_next_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_THEMES)
     dp.callback_query.register(theme_catalog_handlers.get_device_catalog_themes, GetThemesCatalogState.device)
     dp.callback_query.register(theme_catalog_handlers.get_category_catalog_themes, GetThemesCatalogState.category)
+    dp.callback_query.register(theme_catalog_handlers.admin_delete_theme, IsAdminFilter(), F.data.startswith('delete_theme_'))
+    
     #----------------------------------------------------------------------------------------------------------------
     dp.message.register(theme_catalog_handlers.start_add_theme, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADD_THEME)
     dp.callback_query.register(theme_catalog_handlers.abort_add_theme, F.data == 'abort_add_theme')

@@ -286,13 +286,13 @@ def fonts_ikb():
     return keyboard.as_markup()
 
 
-def language_categories_ikb():
-    keyboard = InlineKeyboardBuilder()
+# def language_categories_ikb():
+#     keyboard = InlineKeyboardBuilder()
     
-    for category, index in CATEGORIES_LANGUAGES.items():
-        keyboard.button(text=category, callback_data=index)
-    keyboard.adjust(3)
-    return keyboard.as_markup()
+#     for category, index in CATEGORIES_LANGUAGES.items():
+#         keyboard.button(text=category, callback_data=index)
+#     keyboard.adjust(3)
+#     return keyboard.as_markup()
 
 
 def choice_device_lang_get_ikb():
@@ -334,4 +334,22 @@ def choice_referal_ikb(referals):
         keyboard.button(text=referal, callback_data=f'ref_title_{referal}')
     
     keyboard.adjust(3)
+    return keyboard.as_markup()
+
+
+def delete_language_ikb(lang_id):
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_DEL, callback_data=f'delete_language_{lang_id}')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def delete_theme_ikb(theme_id):
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_DEL, callback_data=f'delete_theme_{theme_id}')
+    
+    keyboard.adjust(1)
     return keyboard.as_markup()
