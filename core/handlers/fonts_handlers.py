@@ -33,8 +33,8 @@ async def change_font_in_text(callback_query: CallbackQuery, state: FSMContext):
     font = callback_query.data
     data = await state.get_data()
     await state.clear()
-        
-    if data:
-        if type(data) is str:
+    
+    if data['text']:
+        if type(data['text']) is str:
             new_text = await ch_text_font(data['text'], font)
             await callback_query.message.answer(text=new_text)

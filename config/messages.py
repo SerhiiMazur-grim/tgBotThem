@@ -9,8 +9,8 @@ MESSAGE_ON_ADD_TO_CHAT = 'Нажмите кнопку добавить бота 
 MESSAGE_ON_FAQ = """
 Часто возникающие вопросы:
 
-<a href="https://telegra.ph/Test-title-12-14-6">Питання 1</a>
-<a href="https://telegra.ph/Test-title-2-12-14">Питання 2</a>
+<a href="https://telegra.ph/Test-title-12-14-6">Вопрос 1</a>
+<a href="https://telegra.ph/Test-title-2-12-14">Вопрос 2</a>
 
 По другим вопросам к <a href="https://t.me/mrlucker">администратору</a>.
 """
