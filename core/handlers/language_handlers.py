@@ -183,7 +183,7 @@ async def get_catalog_languages(message: Message, state: FSMContext):
 
 
 async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    await callback_query.answer()
+    await callback_query.message.delete()
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetLanguageCatalogState.category)
@@ -199,31 +199,37 @@ async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSM
     
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    await callback_query.answer()
+    await callback_query.message.delete()
     user_id = callback_query.from_user.id
     data = await state.get_data()
     device = data['device']
     category = callback_query.data.split('_')[-1]
+    try:
+        category = int(category)
+    except Exception as e:
+        logger.error(e)
+        return
+    
     await state.clear()
 
     if device=='android':
         catalog = await session.scalars(select(LanguageInCatalog).where(
             and_(
-                LanguageInCatalog.category_id==int(category),
+                LanguageInCatalog.category_id==category,
                 LanguageInCatalog.android==True
             )
         ))
     elif device=='computer':
         catalog = await session.scalars(select(LanguageInCatalog).where(
             and_(
-                LanguageInCatalog.category_id==int(category),
+                LanguageInCatalog.category_id==category,
                 LanguageInCatalog.computer==True
             )
         ))
     else:
         catalog = await session.scalars(select(LanguageInCatalog).where(
             and_(
-                LanguageInCatalog.category_id==int(category),
+                LanguageInCatalog.category_id==category,
                 LanguageInCatalog.ios==True
             )
         ))

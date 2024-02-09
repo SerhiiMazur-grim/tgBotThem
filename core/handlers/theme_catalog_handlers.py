@@ -207,12 +207,18 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
     await callback_query.message.delete()
     user_id = callback_query.from_user.id
     category = callback_query.data.split('_')[-1]
+    try:
+        category = int(category)
+    except Exception as e:
+        logger.error(e)
+        return
+    
     data = await state.get_data()
     await state.clear()
     
     catalog = await session.scalars(select(ThemeInCatalog).where(
         and_(
-            ThemeInCatalog.category_id==int(category),
+            ThemeInCatalog.category_id==category,
             ThemeInCatalog.device==data['device']
         )
     ))
