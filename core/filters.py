@@ -14,7 +14,9 @@ class IsAdminFilter(BaseFilter):
 
 class IsPrivateChatFilter(BaseFilter):
     async def __call__(self, message: Message) -> bool:
-        
-        chat_type = message.chat.type
-        
+        try:
+            chat_type = message.chat.type
+        except:
+            chat_type = message.message.chat.type
+            
         return chat_type == 'private'
