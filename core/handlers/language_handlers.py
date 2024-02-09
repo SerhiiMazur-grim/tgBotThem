@@ -199,7 +199,11 @@ async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSM
     
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    await callback_query.message.delete()
+    try:
+        await callback_query.message.delete()
+    except Exception as e:
+        logger.error(e)
+    
     user_id = callback_query.from_user.id
     data = await state.get_data()
     device = data['device']

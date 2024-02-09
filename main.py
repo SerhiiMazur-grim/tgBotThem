@@ -89,7 +89,7 @@ async def main():
     dp.message.register(language_handlers.go_to_main_menu_from_lang_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_FROM_LANG_CAT)
     dp.message.register(language_handlers.start_add_language, IsPrivateChatFilter(), IsAdminFilter(),
                         F.text == messages.BUTTON_ADD_LANGUAGE)
-    dp.poll_answer.register(language_handlers.add_language_device, IsPrivateChatFilter(), AddLanguageState.device)
+    dp.poll_answer.register(language_handlers.add_language_device, AddLanguageState.device)
     dp.callback_query.register(language_handlers.add_language_category, IsPrivateChatFilter(), AddLanguageState.category)
     dp.message.register(language_handlers.add_previev_and_desc_for_language, IsPrivateChatFilter(), IsAdminFilter(),
                         AddLanguageState.preview)

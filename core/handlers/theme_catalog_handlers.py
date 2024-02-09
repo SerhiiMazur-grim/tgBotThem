@@ -204,7 +204,11 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
 
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    await callback_query.message.delete()
+    try:
+        await callback_query.message.delete()
+    except Exception as e:
+        logger.error(e)
+    
     user_id = callback_query.from_user.id
     category = callback_query.data.split('_')[-1]
     try:
