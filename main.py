@@ -75,7 +75,7 @@ async def main():
     dp.message.register(language_handlers.admin_language_catalog, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATALOG)
     dp.message.register(language_handlers.admin_language_category, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN_LANGUAGE_CATEGORY)
     dp.callback_query.register(language_handlers.admin_start_add_language_category, IsAdminFilter(), F.data == 'admin_add_language_cat')
-    dp.message.register(language_handlers.admin_get_language_category, AddLanguageCat.category)
+    dp.message.register(language_handlers.admin_get_language_category, IsAdminFilter(), AddLanguageCat.category)
     dp.callback_query.register(language_handlers.admin_start_delete_language_category, IsAdminFilter(), F.data == 'admin_del_language_cat')
     dp.callback_query.register(language_handlers.admin_delete_language_category, IsAdminFilter(), F.data.startswith('del_language_cat_'))
     dp.callback_query.register(language_handlers.admin_delete_language, IsAdminFilter(), F.data.startswith('delete_language_'))
@@ -83,21 +83,21 @@ async def main():
     #--------------------------------------------------------------------------------------------------
     
     dp.message.register(language_handlers.get_catalog_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_LANGUAGE_CATALOG)
-    dp.callback_query.register(language_handlers.get_device_catalog_languages, GetLanguageCatalogState.device)
-    dp.callback_query.register(language_handlers.get_category_catalog_themes, GetLanguageCatalogState.category)
+    dp.callback_query.register(language_handlers.get_device_catalog_languages, IsPrivateChatFilter(), GetLanguageCatalogState.device)
+    dp.callback_query.register(language_handlers.get_category_catalog_themes, IsPrivateChatFilter(), GetLanguageCatalogState.category)
     dp.message.register(language_handlers.get_next_languages, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_LANGUAGES)
     dp.message.register(language_handlers.go_to_main_menu_from_lang_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK_FROM_LANG_CAT)
     dp.message.register(language_handlers.start_add_language, IsPrivateChatFilter(), IsAdminFilter(),
                         F.text == messages.BUTTON_ADD_LANGUAGE)
-    dp.poll_answer.register(language_handlers.add_language_device, AddLanguageState.device)
-    dp.callback_query.register(language_handlers.add_language_category, AddLanguageState.category)
+    dp.poll_answer.register(language_handlers.add_language_device, IsPrivateChatFilter(), AddLanguageState.device)
+    dp.callback_query.register(language_handlers.add_language_category, IsPrivateChatFilter(), AddLanguageState.category)
     dp.message.register(language_handlers.add_previev_and_desc_for_language, IsPrivateChatFilter(), IsAdminFilter(),
                         AddLanguageState.preview)
     
     # fonts handlers
     dp.message.register(fonts_handlers.font_catalog, IsPrivateChatFilter(), F.text == messages.BUTTON_FONTS_CATALOG)
     dp.message.register(fonts_handlers.get_text_from_user, IsPrivateChatFilter(), GetFontTextState.text)
-    dp.callback_query.register(fonts_handlers.change_font_in_text, F.data.startswith('font_')) 
+    dp.callback_query.register(fonts_handlers.change_font_in_text, IsPrivateChatFilter(), F.data.startswith('font_')) 
     
     # mailing handlers
     dp.message.register(posts_handlers.create_mailing, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_CREATE_MAILING)
@@ -117,7 +117,7 @@ async def main():
     dp.message.register(theme_catalog_handlers.admin_theme_catalog, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN_THEME_CATALOG)
     dp.message.register(theme_catalog_handlers.admin_theme_category, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN_THEME_CATEGORY)
     dp.callback_query.register(theme_catalog_handlers.admin_start_add_theme_category, IsAdminFilter(), F.data == 'admin_add_theme_cat')
-    dp.message.register(theme_catalog_handlers.admin_get_theme_category, AddThemeCat.category)
+    dp.message.register(theme_catalog_handlers.admin_get_theme_category, IsPrivateChatFilter(), AddThemeCat.category)
     dp.callback_query.register(theme_catalog_handlers.admin_start_delete_theme_category, IsAdminFilter(), F.data == 'admin_del_theme_cat')
     dp.callback_query.register(theme_catalog_handlers.admin_delete_theme_category, IsAdminFilter(), F.data.startswith('del_theme_cat_'))
     
@@ -125,17 +125,17 @@ async def main():
     dp.message.register(theme_catalog_handlers.get_catalog_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_THEME_CATALOG)
     dp.message.register(theme_catalog_handlers.go_to_main_menu, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK)
     dp.message.register(theme_catalog_handlers.get_next_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_THEMES)
-    dp.callback_query.register(theme_catalog_handlers.get_device_catalog_themes, GetThemesCatalogState.device)
-    dp.callback_query.register(theme_catalog_handlers.get_category_catalog_themes, GetThemesCatalogState.category)
+    dp.callback_query.register(theme_catalog_handlers.get_device_catalog_themes, IsPrivateChatFilter(), GetThemesCatalogState.device)
+    dp.callback_query.register(theme_catalog_handlers.get_category_catalog_themes, IsPrivateChatFilter(), GetThemesCatalogState.category)
     dp.callback_query.register(theme_catalog_handlers.admin_delete_theme, IsAdminFilter(), F.data.startswith('delete_theme_'))
     
     #----------------------------------------------------------------------------------------------------------------
     dp.message.register(theme_catalog_handlers.start_add_theme, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADD_THEME)
-    dp.callback_query.register(theme_catalog_handlers.abort_add_theme, F.data == 'abort_add_theme')
-    dp.callback_query.register(theme_catalog_handlers.add_theme_device, AddThemeState.device)
+    dp.callback_query.register(theme_catalog_handlers.abort_add_theme, IsPrivateChatFilter(), F.data == 'abort_add_theme')
+    dp.callback_query.register(theme_catalog_handlers.add_theme_device, IsPrivateChatFilter(), AddThemeState.device)
     dp.message.register(theme_catalog_handlers.add_theme_preview, IsPrivateChatFilter(), AddThemeState.preview)
     dp.message.register(theme_catalog_handlers.add_theme_file, IsPrivateChatFilter(), AddThemeState.file)
-    dp.callback_query.register(theme_catalog_handlers.add_theme_category,  AddThemeState.category)
+    dp.callback_query.register(theme_catalog_handlers.add_theme_category,  IsPrivateChatFilter(), AddThemeState.category)
       
     # theme handlers
     dp.message.register(theme_handlers.handle_photo, F.photo | F.document)

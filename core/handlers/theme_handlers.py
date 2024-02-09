@@ -16,7 +16,7 @@ USER_DATA = {}
 
 async def theme_ikb_error(callback_query, bot):
     if callback_query.message.chat.type == 'private':
-            await callback_query.message.delete()
+            # await callback_query.message.delete()
             await callback_query.message.answer(text=messages.MESSAGE_SOME_ERROR)
     else:
         await bot.answer_callback_query(
