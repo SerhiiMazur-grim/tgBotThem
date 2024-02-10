@@ -183,7 +183,12 @@ async def get_catalog_languages(message: Message, state: FSMContext):
 
 
 async def get_device_catalog_languages(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    await callback_query.message.delete()
+    try:
+        await callback_query.message.delete()
+    except Exception as e:
+        logger.error(e)
+        return
+    
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetLanguageCatalogState.category)
@@ -203,6 +208,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
         await callback_query.message.delete()
     except Exception as e:
         logger.error(e)
+        return
     
     user_id = callback_query.from_user.id
     data = await state.get_data()
@@ -276,36 +282,38 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
 async def get_next_languages(message: Message, state: FSMContext):
     data = await state.get_data()
     user_id = message.from_user.id
-    catalog = data['catalog']
-    start = data['start']
-    end = data['end']
+    catalog = data.get('catalog')
     
-    if catalog[start:end]: 
-        for language in catalog[start:end]:
-            lang_id = language.id
-            send_data = []
-            for prewiew in language.preview.split(', '):
-                if not send_data:
-                    caption = language.text
-                else: caption = None
-                send_data.append(InputMediaPhoto(
-                    media=prewiew,
-                    caption=caption,
-                    parse_mode=ParseMode.HTML
-                ))
-            try:
-                await message.answer_media_group(media=send_data)
-                if str(user_id) in ADMINS:
-                    await message.answer(text=messages.MESSAGE_DELETE_LANGUAGE,
-                                                    reply_markup=inline_keybords.delete_language_ikb(lang_id))
-            except AiogramError as er:
-                logger.error(er)
+    if catalog:
+        start = data['start']
+        end = data['end']
         
-        await state.update_data(start=start+start)
-        await state.update_data(end=end+end)
-    else:
-        await message.delete()
-        await message.answer(text=messages.MESSAGE_NO_MORE_LANGUAGES)
+        if catalog[start:end]: 
+            for language in catalog[start:end]:
+                lang_id = language.id
+                send_data = []
+                for prewiew in language.preview.split(', '):
+                    if not send_data:
+                        caption = language.text
+                    else: caption = None
+                    send_data.append(InputMediaPhoto(
+                        media=prewiew,
+                        caption=caption,
+                        parse_mode=ParseMode.HTML
+                    ))
+                try:
+                    await message.answer_media_group(media=send_data)
+                    if str(user_id) in ADMINS:
+                        await message.answer(text=messages.MESSAGE_DELETE_LANGUAGE,
+                                                        reply_markup=inline_keybords.delete_language_ikb(lang_id))
+                except AiogramError as er:
+                    logger.error(er)
+            
+            await state.update_data(start=start+start)
+            await state.update_data(end=end+end)
+        else:
+            await message.delete()
+            await message.answer(text=messages.MESSAGE_NO_MORE_LANGUAGES)
 
 
 async def admin_delete_language(callback_query: CallbackQuery, session: AsyncSession):

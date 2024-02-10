@@ -190,6 +190,8 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
         await callback_query.message.delete()
     except Exception as e:
         logger.error(e)
+        return
+    
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
     await state.set_state(GetThemesCatalogState.category)
@@ -208,6 +210,7 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
         await callback_query.message.delete()
     except Exception as e:
         logger.error(e)
+        return
     
     user_id = callback_query.from_user.id
     category = callback_query.data.split('_')[-1]
@@ -256,27 +259,29 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
 async def get_next_themes(message: Message, state: FSMContext):
     user_id = message.from_user.id
     data = await state.get_data()
-    catalog = data['catalog']
-    start = data['start']
-    end = data['end']
+    catalog = data.get('catalog')
     
-    if catalog[start:end]: 
-        for theme in catalog[start:end]:
-            theme_id = theme.id
-            try:
-                await message.answer_photo(photo=theme.preview)
-                await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
-                if str(user_id) in ADMINS:
-                    await message.answer(text=messages.MESSAGE_DELETE_THEME,
-                                                    reply_markup=inline_keybords.delete_theme_ikb(theme_id))
-            except AiogramError as er:
-                logger.error(er)
-                
-        await state.update_data(start=start+start)
-        await state.update_data(end=end+end)
-    else:
-        await message.delete()
-        await message.answer(text=messages.MESSAGE_NO_MORE_THEMES)
+    if catalog:
+        start = data['start']
+        end = data['end']
+        
+        if catalog[start:end]: 
+            for theme in catalog[start:end]:
+                theme_id = theme.id
+                try:
+                    await message.answer_photo(photo=theme.preview)
+                    await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+                    if str(user_id) in ADMINS:
+                        await message.answer(text=messages.MESSAGE_DELETE_THEME,
+                                                        reply_markup=inline_keybords.delete_theme_ikb(theme_id))
+                except AiogramError as er:
+                    logger.error(er)
+                    
+            await state.update_data(start=start+start)
+            await state.update_data(end=end+end)
+        else:
+            await message.delete()
+            await message.answer(text=messages.MESSAGE_NO_MORE_THEMES)
         
 
 async def admin_delete_theme(callback_query: CallbackQuery, session: AsyncSession):
