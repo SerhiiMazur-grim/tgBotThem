@@ -4,6 +4,7 @@ from datetime import datetime
 from aiogram import Bot
 from aiogram.types import Message
 from aiogram.enums import ParseMode
+from aiogram.fsm.context import FSMContext
 
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,9 +19,12 @@ from database.models.user import User
 logger = logging.getLogger(__name__)
 
 
-async def command_start(message: Message, bot: Bot, session: AsyncSession):
+async def command_start(message: Message, bot: Bot, state: FSMContext, session: AsyncSession):
     user_id = message.from_user.id
     chat_type = message.chat.type
+    current_state = await state.get_state()
+    if current_state is not None:
+        await state.clear()
     
     if chat_type == 'private':
         await message.delete()

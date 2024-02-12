@@ -1,8 +1,12 @@
 import os
+import logging
 
 from android.atdroid_theme import create_android_theme
 from desktop.desktop_theme import create_pc_theme
 from ios.iphone_theme import create_iphone_theme
+
+
+logger = logging.getLogger(__name__)
 
 
 async def is_dark_color(hex_color):
@@ -36,25 +40,49 @@ async def create_theme(user_data, chat_id):
 
     elif device == 'iphone':
 
-        is_dark = await is_dark_color(user_data['background_color'])
+        try:
+            is_dark = await is_dark_color(user_data['background_color'])
 
-        if is_dark:
-            dark = 'true'
-            status_bar = 'black'
-        else:
-            dark = 'false'
-            status_bar = 'white'
+            if is_dark:
+                dark = 'true'
+                status_bar = 'black'
+            else:
+                dark = 'false'
+                status_bar = 'white'
 
-        iphone_theme = await create_iphone_theme(
-                            chat_id=chat_id,
-                            image_path=image_path,
-                            bg=user_data['background_color'],
-                            dark=dark,
-                            status_bar=status_bar,
-                            primary_txt=user_data['primary_text_color'],
-                            not_primary_txt=user_data['secondary_text_color'],
-        )
-        return iphone_theme
+            iphone_theme = await create_iphone_theme(
+                                chat_id=chat_id,
+                                image_path=image_path,
+                                bg=user_data['background_color'],
+                                dark=dark,
+                                status_bar=status_bar,
+                                primary_txt=user_data['primary_text_color'],
+                                not_primary_txt=user_data['secondary_text_color'],
+            )
+            return iphone_theme
+        except Exception as e:
+            logger.error(e)
+            
+            is_dark = await is_dark_color(user_data['background_color'])
+
+            if is_dark:
+                dark = 'true'
+                status_bar = 'black'
+            else:
+                dark = 'false'
+                status_bar = 'white'
+
+            iphone_theme = await create_iphone_theme(
+                                chat_id=chat_id,
+                                image_path=image_path,
+                                bg=user_data['background_color'],
+                                dark=dark,
+                                status_bar=status_bar,
+                                primary_txt=user_data['primary_text_color'],
+                                not_primary_txt=user_data['secondary_text_color'],
+            )
+            logger.warning('The error has been processed')
+            return iphone_theme
 
     else:
         pc_theme = await create_pc_theme(
