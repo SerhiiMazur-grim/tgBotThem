@@ -4,6 +4,8 @@ import logging
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import AiogramError
+from aiogram.enums import ParseMode
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import and_
@@ -245,7 +247,8 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
             theme_id = theme.id
             try:    
                 await callback_query.message.answer_photo(photo=theme.preview)
-                await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+                await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG,
+                                                             parse_mode=ParseMode.HTML)
                 if str(user_id) in ADMINS:
                     await callback_query.message.answer(text=messages.MESSAGE_DELETE_THEME,
                                                     reply_markup=inline_keybords.delete_theme_ikb(theme_id))
@@ -270,7 +273,8 @@ async def get_next_themes(message: Message, state: FSMContext):
                 theme_id = theme.id
                 try:
                     await message.answer_photo(photo=theme.preview)
-                    await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG)
+                    await message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG,
+                                                  parse_mode=ParseMode.HTML)
                     if str(user_id) in ADMINS:
                         await message.answer(text=messages.MESSAGE_DELETE_THEME,
                                                         reply_markup=inline_keybords.delete_theme_ikb(theme_id))

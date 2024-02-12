@@ -99,7 +99,7 @@ MESSAGE_EQUAL_COLOR_1 = 'Цвет фона не должен быть одина
 MESSAGE_EQUAL_COLOR_2 = 'Цвет фона не должен быть одинаковым с второстепенным цветом текста!'
 
 MESSAGE_CREATING_THEME = 'Создаю тему ⏳'
-MESSAGE_THEME_DONE = f'Тема сделана в {NAME} 😉 '
+MESSAGE_THEME_DONE = f'Тема создана в <a href="https://t.me/{NAME[1:]}?start=from_theme">{NAME}</a> 😉 '
 
 MESSAGE_ADDED_TO_DB = 'Тема добавлена в каталог'
 
@@ -111,7 +111,7 @@ MESSAGE_IS_NOT_THEME = 'Это не файл темы!'
 MESSAGE_NO_PREVIEW_IN_THEME = 'У темы нет превью! Сбросьте превью на тему!'
 
 MESSAGE_OUR_THEMES = 'Вот темы, что у нас есть'
-CAPTION_TO_THEME_IN_CATALOG = f'Тема создана в {NAME}'
+CAPTION_TO_THEME_IN_CATALOG = f'Тема создана в <a href="https://t.me/{NAME[1:]}?start=from_theme">{NAME}</a> 😉 '
 MESSAGE_ON_BACK = 'Главное меню'
 
 MESSAGE_NO_MORE_THEMES = 'Ой! кажется темы закончились!'

@@ -2,6 +2,7 @@ import os
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.enums import ParseMode
 
 from config import messages
 from core.image.gener_image import create_image
@@ -248,7 +249,8 @@ async def handler_secondary_text_color(callback_query: CallbackQuery, bot: Bot):
                 await wait_message.delete()
                 await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
                 await callback_query.message.answer_document(document=FSInputFile(path=theme),
-                                                                        caption=messages.MESSAGE_THEME_DONE)
+                                                                        caption=messages.MESSAGE_THEME_DONE,
+                                                                        parse_mode=ParseMode.HTML)
                 await dell_data(user_data=USER_DATA, chat_id=key)
                 USER_DATA[key] = {}
     except:
@@ -291,7 +293,8 @@ async def handler_alfa_background_color(callback_query: CallbackQuery, bot: Bot)
                 await wait_message.delete()
                 await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
                 await callback_query.message.answer_document(document=FSInputFile(path=theme),
-                                                                        caption=messages.MESSAGE_THEME_DONE)
+                                                                        caption=messages.MESSAGE_THEME_DONE,
+                                                                        parse_mode=ParseMode.HTML)
                 
                 await dell_data(user_data=USER_DATA, chat_id=key)
                 USER_DATA[key] = {}
@@ -321,7 +324,8 @@ async def handler_auto_theme(callback_query: CallbackQuery, bot: Bot):
                 await wait_message.delete()
                 await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
                 await callback_query.message.answer_document(document=FSInputFile(path=theme),
-                                                                        caption=messages.MESSAGE_THEME_DONE)
+                                                                        caption=messages.MESSAGE_THEME_DONE,
+                                                                        parse_mode=ParseMode.HTML)
                 
 
             elif USER_DATA[key]['device'] == 'iphone':
@@ -337,7 +341,8 @@ async def handler_auto_theme(callback_query: CallbackQuery, bot: Bot):
                 await wait_message.delete()
                 await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
                 await callback_query.message.answer_document(document=FSInputFile(path=theme),
-                                                                        caption=messages.MESSAGE_THEME_DONE)
+                                                                        caption=messages.MESSAGE_THEME_DONE,
+                                                                        parse_mode=ParseMode.HTML)
 
             elif USER_DATA[key]['device'] == 'desktop':
 
@@ -352,7 +357,8 @@ async def handler_auto_theme(callback_query: CallbackQuery, bot: Bot):
                 await wait_message.delete()
                 await callback_query.message.answer_photo(photo=FSInputFile(path=preview))
                 await callback_query.message.answer_document(document=FSInputFile(path=theme),
-                                                                        caption=messages.MESSAGE_THEME_DONE)
+                                                                        caption=messages.MESSAGE_THEME_DONE,
+                                                                        parse_mode=ParseMode.HTML)
                 
             await dell_data(user_data=USER_DATA, chat_id=key)
             USER_DATA[key] = {}
