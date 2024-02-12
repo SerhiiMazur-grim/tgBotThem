@@ -486,4 +486,4 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
                 chat_id, image_path, preview_bg, hex_bg, hex_primary_txt, hex_not_primary_txt, hex_darker_bg
             )
 
-    return theme, preview
+        return theme, preview
