@@ -14,9 +14,10 @@ from database.models.referals import Referal
 async def detail_referal_statistica(callback_query: CallbackQuery, session: AsyncSession):
     await callback_query.message.delete()
     
-    ref = callback_query.data.split('_')[-1]
+    ref = callback_query.data[10:]
     
     referal = await session.scalar(select(Referal).where(Referal.ref==ref))
+    
     blocked_ref = await session.scalars(select(User.id).where(and_(
         User.ref==ref,
         User.active==False
