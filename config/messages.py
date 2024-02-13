@@ -7,10 +7,9 @@ MESSAGE_ON_START_COMMAND = 'Привет '
 MESSAGE_ON_CREATE_THEME = 'Отправьте мне картинку и я сделаю из нее тему для Telegram'
 MESSAGE_ON_ADD_TO_CHAT = 'Нажмите кнопку добавить бота в группу, выберите группу в которую нужно добавить бота и нажмите Сохранить'
 MESSAGE_ON_FAQ = """
-Часто возникающие вопросы:
+Возникли вопросы?
 
-<a href="https://telegra.ph/Test-title-12-14-6">Вопрос 1</a>
-<a href="https://telegra.ph/Test-title-2-12-14">Вопрос 2</a>
+<a href="https://telegra.ph/Test-title-12-14-6">Тебе сюда</a>
 
 По другим вопросам к <a href="https://t.me/mrlucker">администратору</a>.
 """
