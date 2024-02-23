@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
+from aiogram import Bot
 from aiogram.types import Message
+from aiogram.exceptions import TelegramForbiddenError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -38,8 +40,9 @@ async def check_not_active_users(session: AsyncSession):
     return 
 
 
-async def get_full_statistica(message: Message, session: AsyncSession):
+async def get_full_statistica(message: Message, session: AsyncSession, bot: Bot):
     await message.delete()
+    m = await message.answer(text='Провожу сбор данных, подождите...')
     
     await check_not_active_users(session)
     
@@ -52,6 +55,8 @@ async def get_full_statistica(message: Message, session: AsyncSession):
     active_priv_chats = 0
     total_group_chats = 0
     active_group_chats = 0
+    not_active_group_chats = 0
+    total_users_in_active_groups = 0
     total_prem_users = 0
     active_prem_users = 0
     
@@ -59,16 +64,24 @@ async def get_full_statistica(message: Message, session: AsyncSession):
         total_users += 1
         if user.ref:
             refer_users += 1
-        if user.active:
-            total_active_users += 1
         if user.chat_type=='private':
             total_priv_chats += 1
-        if user.chat_type=='private' and user.active:
+        if user.chat_type=='private' and user.active==True:
             active_priv_chats += 1
+            total_active_users += 1
         if user.chat_type!='private':
             total_group_chats += 1
-        if user.chat_type!='private' and user.active:
-            active_group_chats += 1
+        if user.chat_type!='private' and user.active==True:
+            try:
+                count = await bot.get_chat_member_count(chat_id=user.id)
+                active_group_chats += 1
+                total_active_users += 1
+                total_users_in_active_groups += count
+            except:
+                await session.execute(update(User)
+                                      .where(User.id == user.id)
+                                      .values(active=False))
+                await session.commit()
         if user.premium:
             total_prem_users += 1
         if user.premium and user.active:
@@ -78,6 +91,7 @@ async def get_full_statistica(message: Message, session: AsyncSession):
     not_active_priv_chats = total_priv_chats - active_priv_chats
     not_active_group_chats = total_group_chats - active_group_chats
     
+    await m.delete()
     await message.answer(text=messages.full_statistica_caption(
                                    total_users=total_users,
                                    refer_users=refer_users,
@@ -90,7 +104,8 @@ async def get_full_statistica(message: Message, session: AsyncSession):
                                    active_group_chats=active_group_chats,
                                    not_active_group_chats=not_active_group_chats,
                                    total_prem_users=total_prem_users,
-                                   active_prem_users=active_prem_users
+                                   active_prem_users=active_prem_users,
+                                   total_users_in_active_groups=total_users_in_active_groups
                                ))
 
 

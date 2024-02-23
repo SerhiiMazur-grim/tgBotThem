@@ -17,7 +17,8 @@ from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat
-from statistica import base_statistic_handler, user_activity_statistica, full_statistica, referal_statistica, users_to_txt
+from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
+    referal_statistica, users_to_txt
 from core.commands import set_commands
 
 

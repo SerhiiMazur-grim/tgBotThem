@@ -169,7 +169,7 @@ MESSAGE_CHOICE_FONT = 'Выберите шрифт'
 
 BUTTON_BACKUP = 'BACKUP DB'
 MESSAGE_BACKUP = f'Ваш архив с бекапом за: '
-MESSAGE_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попробуй создать тему сначала 🥹'
+MESSAGE_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попробуй создать тему сначала 🥹 или попробуй позже'
 
 BUTTON_ADMIN_THEME_CATALOG = 'Каталог тем Admin'
 MESSAGE_ADMIN_THEME_CATALOG = 'Редактирование каталога тем.'
@@ -255,7 +255,7 @@ def active_users_per_month_message(users_count, chats_count, total_count, prem_u
 def full_statistica_caption(total_users, refer_users, total_active_users, not_active_users,
                             total_priv_chats, active_priv_chats, not_active_priv_chats,
                             total_group_chats, active_group_chats, not_active_group_chats,
-                            total_prem_users, active_prem_users):
+                            total_prem_users, active_prem_users, total_users_in_active_groups):
     message = f"""
     ⌚️ Статистика за всё время работы бота:
     
@@ -272,6 +272,7 @@ def full_statistica_caption(total_users, refer_users, total_active_users, not_ac
     🟢 Всего груповых чатов: {total_group_chats}👤
     🟢 Из них активные: {active_group_chats}👤
     🔴 Не активные: {not_active_group_chats}👤
+    🟢 Пользователей в активных чатах: {total_users_in_active_groups}👤
     
     🔮 Пользователи с перм-акаунтом: {total_prem_users}👤
     🟢 Из них активные: {active_prem_users}👤
