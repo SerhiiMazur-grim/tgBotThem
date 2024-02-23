@@ -1,8 +1,10 @@
+import logging
+import asyncio
 from datetime import datetime, timedelta
 
 from aiogram import Bot
 from aiogram.types import Message
-from aiogram.exceptions import TelegramForbiddenError
+from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest, TelegramRetryAfter
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -11,6 +13,9 @@ from sqlalchemy import update
 from config import messages
 from database.models.user import User
 from database.models.referals import Referal
+
+
+logger = logging.getLogger(__name__)
 
 
 async def check_not_active_users(session: AsyncSession):
@@ -60,7 +65,9 @@ async def get_full_statistica(message: Message, session: AsyncSession, bot: Bot)
     total_prem_users = 0
     active_prem_users = 0
     
-    for user in users:
+    counter = 0
+    
+    for user in users:            
         total_users += 1
         if user.ref:
             refer_users += 1
@@ -72,20 +79,48 @@ async def get_full_statistica(message: Message, session: AsyncSession, bot: Bot)
         if user.chat_type!='private':
             total_group_chats += 1
         if user.chat_type!='private' and user.active==True:
-            try:
-                count = await bot.get_chat_member_count(chat_id=user.id)
-                active_group_chats += 1
-                total_active_users += 1
-                total_users_in_active_groups += count
-            except:
-                await session.execute(update(User)
-                                      .where(User.id == user.id)
-                                      .values(active=False))
-                await session.commit()
+            active_group_chats += 1
+            total_active_users += 1
+            # if counter >= 15:
+            #     counter = 0
+            #     await asyncio.sleep(1)
+                
+            # try:
+            #     count = await bot.get_chat_member_count(chat_id=user.id)
+            #     total_active_users += 1
+            #     total_users_in_active_groups += count
+                
+            # except TelegramForbiddenError:
+            #     await session.execute(update(User)
+            #                           .where(User.id == user.id)
+            #                           .values(active=False))
+            #     await session.commit()
+                
+            # except TelegramRetryAfter as er:
+            #     await asyncio.sleep(er.retry_after)
+                
+            #     try:
+            #         count = await bot.get_chat_member_count(chat_id=user.id)
+            #         total_active_users += 1
+            #         total_users_in_active_groups += count
+                    
+            #     except TelegramForbiddenError:
+            #         await session.execute(update(User)
+            #                             .where(User.id == user.id)
+            #                             .values(active=False))
+            #         await session.commit()
+                    
+            #     except Exception as er:
+            #         logger.error(er)
+                    
+            # except Exception as e:
+            #     logger.error(e)
+            # counter += 1
         if user.premium:
             total_prem_users += 1
         if user.premium and user.active:
             active_prem_users += 1
+        
     
     not_active_users = total_users - total_active_users
     not_active_priv_chats = total_priv_chats - active_priv_chats
