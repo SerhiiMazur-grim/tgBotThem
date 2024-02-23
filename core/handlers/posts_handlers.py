@@ -19,6 +19,7 @@ from core.keyboards.inline_keybords import send_post_ikb, start_create_post_ikb,
     abort_sending_limited_post_ikb
 from core.handlers.basic import bot_is_blocked
 from core.states import AddPostState
+from core.mailer import MessageMailer, GroupMessageMailer
 from database.models.user import User
 from database.models.send_post import SendPost
 
@@ -107,7 +108,7 @@ async def get_post(message: Message, state: FSMContext):
         await state.update_data(post=message)
         await state.update_data(post_type='media')
         data = await state.get_data()
-        await data['post'].send_copy(chat_id=message.chat.id)
+        await data['post'].send_copy(chat_id=message.chat.id, reply_markup=data['post'].reply_markup)
         
         await message.answer(text=messages.MESSAGE_IS_YOUR_POST, reply_markup=send_post_ikb())
 
@@ -123,7 +124,7 @@ async def view_post(message: Message, state: FSMContext):
     post_type = data['post_type']
     
     if post_type == 'media':
-        await data['post'].send_copy(chat_id=message.chat.id)
+        await data['post'].send_copy(chat_id=message.chat.id, reply_markup=data['post'].reply_markup)
         await message.answer(text=messages.MESSAGE_IS_YOUR_POST, reply_markup=send_post_ikb())
         
     else:
@@ -138,28 +139,35 @@ async def send_post_to_all(callback_query: CallbackQuery, bot: Bot, state: FSMCo
     data = await state.get_data()
     await state.clear()
     
-    chats = await session.scalars(select(User.id).where(User.active==True))
+    chats = (await session.scalars(select(User.id).where(User.active==True))).all()
     
     post_type = data['post_type']
     
     if data:
         await callback_query.message.delete()
-        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
-        for chat in chats:
-            if post_type == 'media':
-                try:
-                    await data['post'].send_copy(chat_id=chat)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
+        m = await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
+        
+        if post_type == 'media':
+            await MessageMailer.start_mailing(data['post'], chats, session)
+        else:
+            media = await get_media_group_list(data)
+            await GroupMessageMailer.start_mailing(m, bot, media, chats, session)
+        
+    #     for chat in chats:
+    #         if post_type == 'media':
+    #             try:
+    #                 await data['post'].send_copy(chat_id=chat)
+    #             except Exception as err:
+    #                 await bot_is_blocked(err, session, chat)
                     
-            else:
-                media = await get_media_group_list(data)
-                try:
-                    await bot.send_media_group(chat_id=chat, media=media)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
+    #         else:
+    #             media = await get_media_group_list(data)
+    #             try:
+    #                 await bot.send_media_group(chat_id=chat, media=media)
+    #             except Exception as err:
+    #                 await bot_is_blocked(err, session, chat)
                     
-        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
+    #     await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
 
@@ -168,29 +176,36 @@ async def send_post_to_private(callback_query: CallbackQuery, bot: Bot, state: F
     await callback_query.answer()
     data = await state.get_data()
     await state.clear()
-    chats = await session.scalars(select(User.id).where(and_(
+    chats = (await session.scalars(select(User.id).where(and_(
         User.active==True,
         User.chat_type=='private'
-    )))
+    )))).all()
     post_type = data['post_type']
     
     if data:
         await callback_query.message.delete()
-        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
-        for chat in chats:
-            if post_type == 'media':
-                try:
-                    await data['post'].send_copy(chat_id=chat)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
-            else:
-                media = await get_media_group_list(data)
-                try:
-                    await bot.send_media_group(chat_id=chat, media=media)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
+        m = await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
+        
+        if post_type == 'media':
+            await MessageMailer.start_mailing(data['post'], chats, session)
+        else:
+            media = await get_media_group_list(data)
+            await GroupMessageMailer.start_mailing(m, bot, media, chats, session)
+        
+        # for chat in chats:
+        #     if post_type == 'media':
+        #         try:
+        #             await data['post'].send_copy(chat_id=chat)
+        #         except Exception as err:
+        #             await bot_is_blocked(err, session, chat)
+        #     else:
+        #         media = await get_media_group_list(data)
+        #         try:
+        #             await bot.send_media_group(chat_id=chat, media=media)
+        #         except Exception as err:
+        #             await bot_is_blocked(err, session, chat)
                     
-        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
+        # await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
 
@@ -199,28 +214,35 @@ async def send_post_to_group(callback_query: CallbackQuery, bot: Bot, state: FSM
     await callback_query.answer()
     data = await state.get_data()
     await state.clear()
-    chats = await session.scalars(select(User.id).where(and_(
+    chats = (await session.scalars(select(User.id).where(and_(
         User.active==True,
         User.chat_type!='private'
-    )))
+    )))).all()
     post_type = data['post_type']
     if data:
         await callback_query.message.delete()
-        await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
-        for chat in chats:
-            if post_type == 'media':
-                try:
-                    await data['post'].send_copy(chat_id=chat)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
-            else:
-                media = await get_media_group_list(data)
-                try:
-                    await bot.send_media_group(chat_id=chat, media=media)
-                except Exception as err:
-                    await bot_is_blocked(err, session, chat)
+        m = await callback_query.message.answer(text=messages.MESSAGE_POST_IS_SEND)
+        
+        if post_type == 'media':
+            await MessageMailer.start_mailing(data['post'], chats, session)
+        else:
+            media = await get_media_group_list(data)
+            await GroupMessageMailer.start_mailing(m, bot, media, chats, session)
+        
+        # for chat in chats:
+        #     if post_type == 'media':
+        #         try:
+        #             await data['post'].send_copy(chat_id=chat)
+        #         except Exception as err:
+        #             await bot_is_blocked(err, session, chat)
+        #     else:
+        #         media = await get_media_group_list(data)
+        #         try:
+        #             await bot.send_media_group(chat_id=chat, media=media)
+        #         except Exception as err:
+        #             await bot_is_blocked(err, session, chat)
                     
-        await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
+        # await callback_query.message.answer(text=messages.MESSAGE_POST_SEND_COMPLITE)
     else:
         await callback_query.answer(text=messages.MESSAGE_NO_POST)
 
@@ -274,42 +296,57 @@ async def send_limited_post(callback_query: CallbackQuery, state: FSMContext, se
         group_message = []
         for media in data['post']:
             if media.animation:
+                if media.caption_entities:
+                    cap = [i.model_dump_json() for i in media.caption_entities]
+                else: cap = media.caption_entities
                 dump_data = {'animation': {
                     'file_id': media.animation.file_id,
                     'caption': media.caption,
-                    'caption_entities': media.caption_entities
+                    'caption_entities': cap
                 }}
                 group_message.append(dump_data)
                 continue
             elif media.photo:
+                if media.caption_entities:
+                    cap = [i.model_dump_json() for i in media.caption_entities]
+                else: cap = media.caption_entities
                 dump_data = {'photo': {
                     'file_id': media.photo[-1].file_id,
                     'caption': media.caption,
-                    'caption_entities': media.caption_entities
+                    'caption_entities': cap
                 }}
                 group_message.append(dump_data)
                 continue
             elif media.video:
+                if media.caption_entities:
+                    cap = [i.model_dump_json() for i in media.caption_entities]
+                else: cap = media.caption_entities
                 dump_data = {'video': {
                     'file_id': media.video.file_id,
                     'caption': media.caption,
-                    'caption_entities': media.caption_entities
+                    'caption_entities': cap
                 }}
                 group_message.append(dump_data)
                 continue
             elif media.audio:
+                if media.caption_entities:
+                    cap = [i.model_dump_json() for i in media.caption_entities]
+                else: cap = media.caption_entities
                 dump_data = {'audio': {
                     'file_id': media.audio.file_id,
                     'caption': media.caption,
-                    'caption_entities': media.caption_entities
+                    'caption_entities': cap
                 }}
                 group_message.append(dump_data)
                 continue
             elif media.document:
+                if media.caption_entities:
+                    cap = [i.model_dump_json() for i in media.caption_entities]
+                else: cap = media.caption_entities
                 dump_data = {'document': {
                     'file_id': media.document.file_id,
                     'caption': media.caption,
-                    'caption_entities': media.caption_entities
+                    'caption_entities': cap
                 }}
                 group_message.append(dump_data)
                 continue

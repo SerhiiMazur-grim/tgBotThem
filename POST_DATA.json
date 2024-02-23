@@ -1,5 +1,37 @@
 {
     "message": {},
-    "group_message": [],
-    "key": ""
+    "group_message": [
+        {
+            "photo": {
+                "file_id": "AgACAgQAAxkBAAIvKGXYnI5JAk4AAZhHBfHven8AAQiQD4YAAsq_MRtCJ8BSbNSwjxtFzWsBAAMCAAN5AAM0BA",
+                "caption": "\u0412\u0438\u0439\u0448\u043e\u0432 \u041f\u041a \u043c\u0456\u0441\u044f\u0446\u044f (\u043b\u044e\u0442\u0438\u0439 2024) \u0432\u0456\u0434 \u0432\u0438\u0434\u0430\u043d\u043d\u044f  Mezha.media\n\n\ud83e\udee1 \u0411\u0430\u0437\u043e\u0432\u0438\u0439 \u0456\u0433\u0440\u043e\u0432\u0438\u0439 \u041f\u041a:\n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 Intel - $675 \n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 AMD - $660\n\u0411\u0430\u0437\u043e\u0432\u0438\u0439 \u043c\u043e\u043d\u0456\u0442\u043e\u0440 - MSI G2712\n\n\ud83d\udc4d \u041e\u043f\u0442\u0438\u043c\u0430\u043b\u044c\u043d\u0438\u0439 \u0456\u0433\u0440\u043e\u0432\u0438\u0439 \u041f\u041a:\n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 Intel - $1360\n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 AMD - $1315\n\u041e\u043f\u0442\u0438\u043c\u0430\u043b\u044c\u043d\u0438\u0439 \u043c\u043e\u043d\u0456\u0442\u043e\u0440 - MSI G272QPF\n\n\ud83e\udd29 \u041f\u0440\u043e\u0433\u0440\u0435\u0441\u0438\u0432\u043d\u0438\u0439 \u0456\u0433\u0440\u043e\u0432\u0438\u0439 \u041f\u041a:\n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 Intel - $2080\n\u041d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456 AMD - $2185\n\u041f\u0440\u043e\u0433\u0440\u0435\u0441\u0438\u0432\u043d\u0438\u0439 \u043c\u043e\u043d\u0456\u0442\u043e\u0440 - MSI MAG321QR-QD\n\n\u0414\u0435\u0442\u0430\u043b\u044c\u043d\u0456\u0448\u0435 \u043f\u0440\u043e \u043a\u043e\u043c\u043f\u043e\u043d\u0435\u043d\u0442\u0438 \u0442\u0430 \u0457\u0445 \u0432\u0438\u0431\u0456\u0440 \u0442\u0443\u0442 \ud83d\udc49 https://msi.gm/S964F9FB",
+                "caption_entities": [
+                    "{\"type\":\"bold\",\"offset\":0,\"length\":43,\"url\":null,\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"text_link\",\"offset\":43,\"length\":11,\"url\":\"https://msi.gm/S964F9FB\",\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"bold\",\"offset\":59,\"length\":19,\"url\":null,\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"text_link\",\"offset\":148,\"length\":9,\"url\":\"https://msi.gm/S7E1A695\",\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"bold\",\"offset\":162,\"length\":22,\"url\":null,\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"text_link\",\"offset\":260,\"length\":11,\"url\":\"https://msi.gm/S458EE32\",\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"bold\",\"offset\":276,\"length\":24,\"url\":null,\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"text_link\",\"offset\":376,\"length\":15,\"url\":\"https://msi.gm/S4DD1FC8\",\"user\":null,\"language\":null,\"custom_emoji_id\":null}",
+                    "{\"type\":\"url\",\"offset\":438,\"length\":23,\"url\":null,\"user\":null,\"language\":null,\"custom_emoji_id\":null}"
+                ]
+            }
+        },
+        {
+            "photo": {
+                "file_id": "AgACAgQAAxkBAAIvKWXYnI4AAY1i6TNZvxLGORpp_ICIOgACy78xG0InwFIJ0NM8CyETRgEAAwIAA3kAAzQE",
+                "caption": null,
+                "caption_entities": null
+            }
+        },
+        {
+            "photo": {
+                "file_id": "AgACAgQAAxkBAAIvKmXYnI6_gmugj3kNnG6wuh8JNLCzAALMvzEbQifAUlUxnAqe5Zw6AQADAgADeQADNAQ",
+                "caption": null,
+                "caption_entities": null
+            }
+        }
+    ],
+    "key": "group_message"
 }

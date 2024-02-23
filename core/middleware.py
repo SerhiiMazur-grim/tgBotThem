@@ -6,6 +6,7 @@ import json
 
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import Message
+from aiogram.types.message_entity import MessageEntity
 from aiogram.types.input_media_animation import InputMediaAnimation
 from aiogram.types.input_media_document import InputMediaDocument
 from aiogram.types.input_media_audio import InputMediaAudio
@@ -123,15 +124,18 @@ class PostSenderMiddleware(BaseMiddleware):
                         caption = load_message.caption
                     else:
                         caption = load_message.caption
-                        
-                    await self.bot.copy_message(
-                        chat_id=user,
-                        from_chat_id=load_message.chat.id,
-                        message_id=load_message.message_id,
-                        caption=caption,
-                        caption_entities=load_message.caption_entities,
-                        reply_markup=load_message.reply_markup
-                    )
+                    
+                    try:    
+                        await self.bot.copy_message(
+                            chat_id=user,
+                            from_chat_id=load_message.chat.id,
+                            message_id=load_message.message_id,
+                            caption=caption,
+                            caption_entities=load_message.caption_entities,
+                            reply_markup=load_message.reply_markup
+                        )
+                    except:
+                        pass
                 else:
                     data_list = post_data[key]
                     media = []
@@ -141,62 +145,99 @@ class PostSenderMiddleware(BaseMiddleware):
                                 caption = i['photo']['caption']
                             else:
                                 caption = i['photo']['caption']
+                                
+                            if i['photo']['caption_entities']:
+                                cap = [MessageEntity.model_validate_json(c) for c in i['photo']['caption_entities']]
+                            else:
+                                cap = i['photo']['caption_entities']
+                                
                             post_part = InputMediaPhoto(
                                 media=i['photo']['file_id'],
                                 caption=caption,
-                                caption_entities=i['photo']['caption_entities'],
+                                caption_entities=cap,
                             )
                             media.append(post_part)
                             continue
+                        
                         elif 'video' in i.keys():
                             if i['video']['caption']:
                                 caption = i['video']['caption']
                             else:
                                 caption = i['video']['caption']
+                            
+                            if i['video']['caption_entities']:
+                                cap = [MessageEntity.model_validate_json(c) for c in i['video']['caption_entities']]
+                            else:
+                                cap = i['video']['caption_entities']
+                                
                             post_part = InputMediaVideo(
                                 media=i['video']['file_id'],
                                 caption=caption,
-                                caption_entities=i['video']['caption_entities'],
+                                caption_entities=cap,
                             )
                             media.append(post_part)
                             continue
+                        
                         elif 'audio' in i.keys():
                             if i['audio']['caption']:
                                 caption = i['audio']['caption']
                             else:
                                 caption = i['audio']['caption']
+                            
+                            if i['audio']['caption_entities']:
+                                cap = [MessageEntity.model_validate_json(c) for c in i['audio']['caption_entities']]
+                            else:
+                                cap = i['audio']['caption_entities']
+                            
                             post_part = InputMediaAudio(
                                 media=i['audio']['file_id'],
                                 caption=caption,
-                                caption_entities=i['audio']['caption_entities'],
+                                caption_entities=cap,
                             )
                             media.append(post_part)
                             continue
+                        
                         elif 'animation' in i.keys():
                             if i['animation']['caption']:
                                 caption = i['animation']['caption']
                             else:
                                 caption = i['animation']['caption']
+                            
+                            if i['animation']['caption_entities']:
+                                cap = [MessageEntity.model_validate_json(c) for c in i['animation']['caption_entities']]
+                            else:
+                                cap = i['animation']['caption_entities']
+                            
                             post_part = InputMediaAnimation(
                                 media=i['animation']['file_id'],
                                 caption=caption,
-                                caption_entities=i['animation']['caption_entities'],
+                                caption_entities=cap,
                             )
                             media.append(post_part)
                             continue
+                        
                         elif 'document' in i.keys():
                             if i['document']['caption']:
                                 caption = i['document']['caption']
                             else:
                                 caption = i['document']['caption']
+                            
+                            if i['document']['caption_entities']:
+                                cap = [MessageEntity.model_validate_json(c) for c in i['document']['caption_entities']]
+                            else:
+                                cap = i['document']['caption_entities']
+                            
                             post_part = InputMediaDocument(
                                 media=i['document']['file_id'],
                                 caption=caption,
-                                caption_entities=i['document']['caption_entities'],
+                                caption_entities=cap,
                             )
                             media.append(post_part)
                     
-                    await event.answer_media_group(media=media)
+                    try:
+                        await event.answer_media_group(media=media)
+                    except:
+                        pass
             
                 user_list = list(db_sender.user_list)
                 user_list.append(user)
