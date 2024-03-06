@@ -363,3 +363,40 @@ def extract_users_ikb():
     
     keyboard.adjust(1)
     return keyboard.as_markup()
+
+
+def choose_device_for_random_theme_kb():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=messages.ANDROID, callback_data='random_theme_android')
+    keyboard.button(text=messages.IPHONE, callback_data='random_theme_iphone')
+    keyboard.button(text=messages.PC, callback_data='random_theme_desktop')
+    
+    keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
+def choose_device_for_random_language_kb():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=messages.ANDROID, callback_data='random_language_android')
+    keyboard.button(text=messages.IPHONE, callback_data='random_language_iphone')
+    keyboard.button(text=messages.PC, callback_data='random_language_desktop')
+    
+    keyboard.adjust(2)
+    return keyboard.as_markup()
+
+
+def send_random_theme(file_id):
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.BUTTON_INSTALL_THEME, callback_data=f'get-install_{file_id}')
+    
+    keyboard.adjust(1)
+    return keyboard.as_markup()
+
+
+def abort_set_wallpaper_ikb():
+    keyboard = InlineKeyboardBuilder()
+    
+    keyboard.button(text=messages.ABORT, callback_data='wallp_set_abort')
+    
+    return keyboard.as_markup()

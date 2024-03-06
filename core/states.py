@@ -54,4 +54,16 @@ class LanguagesCatalogState(StatesGroup):
     catalog = State()
     start = State()
     end = State()
- 
+
+
+class RandomThemeState(StatesGroup):
+    device = State()
+
+
+class RandomLanguageState(StatesGroup):
+    device = State()
+
+
+class SetWallpaperState(StatesGroup):
+    theme_path = State()
+    image_path = State()

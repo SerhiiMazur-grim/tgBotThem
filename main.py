@@ -11,16 +11,17 @@ import middlewares
 from config.api_keys import TOKEN_API, DATA_BASE_URL
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
-theme_catalog_handlers, fonts_handlers, posts_handlers
+    theme_catalog_handlers, fonts_handlers, posts_handlers, group_commands_handler, \
+    set_wallpaper_command
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
-    AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat
+    AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat, \
+    RandomThemeState, RandomLanguageState, SetWallpaperState
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
     referal_statistica, users_to_txt
 from core.commands import set_commands
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ async def main():
     middlewares.setup(dp, sessionmaker)
 
     await set_commands(bot)
+    # await set_group_commands(bot)
 
     dp.message.middleware.register(CleanupMiddleware())
     dp.message.middleware.register(PostSenderMiddleware(bot))
@@ -55,6 +57,18 @@ async def main():
     dp.message.register(basic.command_add_to_chat, IsPrivateChatFilter(), F.text == messages.BUTTON_ADD_TO_CHAT)
     dp.message.register(basic.command_faq, IsPrivateChatFilter(), F.text == messages.BUTTON_FAQ)
     dp.callback_query.register(sub_checker, F.data == 'sub_check')
+    
+    dp.message.register(group_commands_handler.random_theme_command, Command('randomtheme'))
+    dp.callback_query.register(group_commands_handler.send_random_theme, RandomThemeState.device)
+    dp.message.register(group_commands_handler.random_language_command, Command('randomlanguage'))
+    dp.callback_query.register(group_commands_handler.send_random_language, RandomLanguageState.device)
+    dp.callback_query.register(group_commands_handler.get_random_err, F.data.startswith('random'))
+    dp.callback_query.register(group_commands_handler.send_theme_file_to_group, F.data.startswith('get-install'))
+    
+    dp.message.register(set_wallpaper_command.start_set_wallpaper, Command('set_wallpaper'))
+    dp.message.register(set_wallpaper_command.get_android_theme_file, SetWallpaperState.theme_path)
+    dp.message.register(set_wallpaper_command.get_android_theme_wallpaper, SetWallpaperState.image_path)
+    dp.callback_query.register(set_wallpaper_command.abort_insert_wallaper, F.data=='wallp_set_abort')
 
     # backup handler
     # dp.message.register(backup_handlers.get_backup, IsAdminFilter(), IsPrivateChatFilter(), F.text == messages.BUTTON_BACKUP)
@@ -153,7 +167,7 @@ async def main():
     dp.callback_query.register(theme_handlers.handler_back_to_background_color_choose, F.data == 'back_to_background_choose')
     dp.callback_query.register(theme_handlers.handler_back_to_primary_text_color_choose, F.data == 'back_to_primary_text_choose')
     dp.callback_query.register(theme_handlers.handler_back_to_secondary_text_color_choose, F.data == 'back_to_secondary_text_choose')
-    
+
     
     try:
         await dp.start_polling(bot)

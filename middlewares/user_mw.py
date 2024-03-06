@@ -34,7 +34,7 @@ class UserMiddleware(BaseMiddleware):
                 if event_chat.type != 'private' and message:
                     
                     if message.text:
-                        if not message.text.startswith('/start'):
+                        if not message.text[:6] in ('/start', '/rando'):
                             return
                     elif message.photo:
                         if message.caption!='/theme':

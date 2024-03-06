@@ -10,6 +10,8 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import messages
+from config.api_keys import ADMINS
+from core.commands import set_chat_commands
 from core.utils import is_user_subscribed
 from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard, go_to_bot_ikb
 from core.keyboards.reply_keybords import user_keyboard, admin_keyboard
@@ -28,6 +30,10 @@ async def command_start(message: Message, bot: Bot, state: FSMContext, session: 
     
     if chat_type == 'private':
         await message.delete()
+
+        if str(user_id) in ADMINS:
+            await set_chat_commands(bot, user_id)
+            
         await message.answer(text=f'{messages.MESSAGE_ON_START_COMMAND}{message.from_user.full_name}',
                             reply_markup=user_keyboard(user_id))
         await is_user_subscribed(message, bot, session)
@@ -46,6 +52,10 @@ async def command_start(message: Message, bot: Bot, state: FSMContext, session: 
             await message.answer_photo(photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
                                         caption=messages.MESSAGE_ON_START_IN_GROUP,
                                         reply_markup=go_to_bot_ikb())
+            # await message.answer(text=messages.MESSAGE_ON_START_IN_GROUP, # ON DELETE !!!
+            #                             reply_markup=go_to_bot_ikb())
+            await message.answer(text=messages.SECON_MESSAGE_ON_START_IN_GROUP,
+                                 reply_markup=add_bot_to_chat_inl_keyboard())
 
 
 async def command_user_kb(message: Message):
@@ -68,7 +78,10 @@ async def command_add_to_chat(message: Message):
         caption=messages.MESSAGE_ON_ADD_TO_CHAT,
         reply_markup=add_bot_to_chat_inl_keyboard()
     )
-        
+    # await message.answer(
+        # text=messages.MESSAGE_ON_ADD_TO_CHAT, # ON DELETE !!!
+    #     reply_markup=add_bot_to_chat_inl_keyboard()
+    # ) 
 
 async def command_faq(message: Message):
     await message.delete()
