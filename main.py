@@ -22,6 +22,7 @@ from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, 
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
     referal_statistica, users_to_txt
 from core.commands import set_commands
+from core.handlers.admin.restart_command import restart_bot
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,8 @@ async def main():
     dp.message.middleware.register(CleanupMiddleware())
     dp.message.middleware.register(PostSenderMiddleware(bot))
     dp.message.middleware.register(IsSubscribedMiddleware(bot))
+    
+    dp.message.register(restart_bot, IsAdminFilter(), Command('restart_theme_bot'))
         
     # basic handlers
     # dp.startup.register(start_bot)

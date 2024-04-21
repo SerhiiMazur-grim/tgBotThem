@@ -15,6 +15,10 @@ async def set_chat_commands(bot: Bot, chat_id) -> None:
         BotCommand(
             command='set_wallpaper',
             description=messages.COMMAND_DESCRIPTION_SET_WALLPAPER
+        ),
+        BotCommand(
+            command='restart_theme_bot',
+            description=messages.COMMAND_DESCRIPTION_RESTART_BOT
         )
     ]
     await bot.set_my_commands(commands=commands,

@@ -4,12 +4,14 @@ from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.enums import ParseMode
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import messages
 from core.states import WallpState
 from core.keyboards.inline_keybords import abort_create_wallpaper_ikb
 from core.keyboards.reply_keybords import user_keyboard
 from ios.iphone_theme import create_iphone_wallpaper
+from core.handlers.basic import command_start
 
 
 async def start_create_wallpaper(message: Message, state: FSMContext):
@@ -22,9 +24,14 @@ async def start_create_wallpaper(message: Message, state: FSMContext):
                           'message_2': my_message_2})
 
 
-async def create_wallpaper(message: Message, bot: Bot, state: FSMContext):
+async def create_wallpaper(message: Message, bot: Bot, state: FSMContext, session: AsyncSession):
+    if message.text == '/start':
+        await command_start(message, bot, state, session)
+        return None
+    
     if not message.photo:
         return message.answer(text=messages.NOT_IMAGE)
+    
     data = await state.get_data()
     my_message_1 = data.get('message_1')
     my_message_2 = data.get('message_2')

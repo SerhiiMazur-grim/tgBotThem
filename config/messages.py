@@ -332,6 +332,7 @@ MESSAGE_IS_NOT_YOUR_GET_RANDOM = f'''
 Или переходи к боту: {NAME}
 '''
 COMMAND_DESCRIPTION_SET_WALLPAPER = 'Установить обои в андроид тему'
+COMMAND_DESCRIPTION_RESTART_BOT = 'Рестарт бота'
 SECON_MESSAGE_ON_START_IN_GROUP = '''
 У меня есть команды которые ты можешь использовать здесь 😋
 
