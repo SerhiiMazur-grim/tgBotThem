@@ -18,8 +18,8 @@ from core.states import RandomThemeState, RandomLanguageState
 
 DEVICE_DICT = {
     'android': messages.ANDROID,
-    'iphone': messages.IPHONE,
-    'desktop': messages.FOR_PC
+    'ios': messages.IPHONE,
+    'computer': messages.FOR_PC
 }
 
 
@@ -36,7 +36,7 @@ async def send_random_theme(callback_query: CallbackQuery, state: FSMContext, se
 
     device = callback_query.data.split('_')[-1]
 
-    if device in ('android', 'iphone', 'desktop'):
+    if device in ('android', 'ios', 'computer'):
         themes = (await session.scalars(select(ThemeInCatalog).where(ThemeInCatalog.device == device))).all()
         
         if themes:

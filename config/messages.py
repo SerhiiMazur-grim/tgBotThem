@@ -13,7 +13,8 @@ MESSAGE_ON_FAQ = """
 
 По другим вопросам к <a href="https://t.me/mrlucker">администратору</a>.
 """
-MESSAGE_ON_START_IN_GROUP = 'Отправь в чат картинку с подписью "/theme" и я сделаю из нее тему для твоего Telegram или переходи в бот, там много интересного😉'
+
+MESSAGE_ON_START_IN_GROUP = 'Отправь в чат картинку с подписью "/bg" и я сделаю из нее фон для твоего Telegram или переходи в бот, там много интересного😉'
 BUTTON_GO_TO_BOT = 'Бот с темками👉'
 MESSAGE_WITH_CHAT = 'Чат: '
 MESSAGE_CHECK_SUBSCRIBE = 'Проверить подписку'
@@ -25,9 +26,9 @@ WAIT_MESSAGE = 'Провожу анализ изображения ⏳'
 NOT_IMAGE = 'ОЙ, кажется это не картинка 🤨🧐\nПроверьте файл, который вы отправили!'
 
 BUTTON_CREATE_THEME = 'Создать тему'
-BUTTON_ADD_TO_CHAT = 'Добавить бота в чат'
-BUTTON_THEME_CATALOG = 'Каталог тем'
-BUTTON_FONTS_CATALOG = 'Изменить шрифт'
+BUTTON_ADD_TO_CHAT = '💭Добавить бота в чат'
+BUTTON_THEME_CATALOG = '🌄Каталог тем'
+BUTTON_FONTS_CATALOG = '🈸Изменить шрифт'
 BUTTON_FAQ = '❓ F.A.Q'
 BUTTON_ADMIN = 'Админка'
 MESSAGE_ON_ADMIN = 'Права админа подтверждены!'
@@ -47,7 +48,7 @@ MESSAGE_LANGUAGE_IS_SAVE = 'Язык сохранен в базе'
 MESSAGE_NO_DATA_TO_SAVE_LANGUAGE = 'Нет данных для сохранения'
 
 MESSAGE_CHOICE_DEVICE_FOR_LANG = 'Для какого девайса язык?'
-BUTTON_LANGUAGE_CATALOG = 'Каталог языков'
+BUTTON_LANGUAGE_CATALOG = '🌆Каталог языков'
 BUTTON_NEXT_LANGUAGES = 'Следующие 5 языков'
 BUTTON_BACK_FROM_LANG_CAT = '👈 Главное меню'
 MESSAGE_OUR_LANGUAGES = 'Вот языки что у меня есть'
@@ -66,7 +67,7 @@ CHOOSE_DEVICE_TEXT = '1️⃣ Выберите устройство: 📱'
 ANDROID = 'Android'
 IPHONE = 'IPhone'
 PC = "Компьютер [Windows/Linux]"
-FOR_PC = "Компьютер [Windows/Linux]"
+FOR_PC = "Компьютера [Windows/Linux]"
 ABORT = 'Отменить'
 
 CHOOSE_BACKGROUND_COLOR_TEXT = '2️⃣ Выберите цвет для фона:'
@@ -171,6 +172,7 @@ MESSAGE_CHOICE_FONT = 'Выберите шрифт'
 BUTTON_BACKUP = 'BACKUP DB'
 MESSAGE_BACKUP = f'Ваш архив с бекапом за: '
 MESSAGE_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попробуй создать тему сначала 🥹 или попробуй позже'
+MESSAGE_WALLPAPER_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попробуй создать обои сначала 🥹 или попробуй позже'
 
 BUTTON_ADMIN_THEME_CATALOG = 'Каталог тем Admin'
 MESSAGE_ADMIN_THEME_CATALOG = 'Редактирование каталога тем.'
@@ -331,7 +333,7 @@ MESSAGE_IS_NOT_YOUR_GET_RANDOM = f'''
 '''
 COMMAND_DESCRIPTION_SET_WALLPAPER = 'Установить обои в андроид тему'
 SECON_MESSAGE_ON_START_IN_GROUP = '''
-А также у меня есть команды которые ты можешь использовать здесь 😋
+У меня есть команды которые ты можешь использовать здесь 😋
 
 Мои команды:
 /randomtheme - 🔖 Рандомная тема
@@ -351,3 +353,13 @@ ERROR_MESSAGE_SEND_ANDROID_THEME_FILE = '❗️Это не файл с темо�
 ERROR_MESSAGE_SEND_WALLPAPER = '❗️Это не картинка❗️\n\nОтправьте мне картинку⤵️'
 ERROR_MESSAGE_INSERT_WALLPAPER = '❗️Что-то пошло не так❗️\n\nПроверьте картинку, может не подходит формат или битый файл темы и попробуйте снова'
 ABORT_INSERT_WALLPAPER = 'Вставка обоев отменена❕'
+
+BUTTON_START_CREATE_WALLPAPER = '🏞Создать фон для тг'
+MESSAGE_FILLER = 'Ну что ж, давай приступим'
+MESSAGE_WALLP_START = 'Отправьте мне картинку и я сделаю из нее фон для Telegram'
+def wallpaper_message(wallpaper):
+    message = f"""
+    Вот твои <a href="https://t.me/bg/{wallpaper}">обои</a> для Telegram
+Фон создан в <a href="https://t.me/{NAME[1:]}?start=from_wallpaper">{NAME}</a> 😉
+    """
+    return message

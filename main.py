@@ -12,13 +12,13 @@ from config.api_keys import TOKEN_API, DATA_BASE_URL
 from config import messages
 from core.handlers import basic, theme_handlers, language_handlers, \
     theme_catalog_handlers, fonts_handlers, posts_handlers, group_commands_handler, \
-    set_wallpaper_command
+    set_wallpaper_command, wallpaper
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import sub_checker
-from core.filters import IsAdminFilter, IsPrivateChatFilter
+from core.filters import IsAdminFilter, IsPrivateChatFilter, IsGroupChatFilter
 from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat, \
-    RandomThemeState, RandomLanguageState, SetWallpaperState
+    RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
     referal_statistica, users_to_txt
 from core.commands import set_commands
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 async def main():
     await check_and_delete_files()
     logging.basicConfig(filename='theme_bot_logs.log',
-                        level=logging.INFO,
+                        level=logging.WARNING,
                         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     logger.info("Starting bot...")
     
@@ -50,6 +50,11 @@ async def main():
         
     # basic handlers
     # dp.startup.register(start_bot)
+    # dp.message.register(wallpaper.group_create_wallpaper, (F.photo) & (F.caption=='/bg'))
+    dp.message.register(wallpaper.start_create_wallpaper, F.text==messages.BUTTON_START_CREATE_WALLPAPER)
+    dp.message.register(wallpaper.create_wallpaper, WallpState.photo)
+    dp.callback_query.register(wallpaper.abort_create_wallpaper, F.data=='wallp_create_abort')
+    
     dp.message.register(basic.command_start, Command('start'))
     dp.message.register(basic.command_admin_kb, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN)
     dp.message.register(basic.command_user_kb, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_BACK_TO_USER_KB)
@@ -153,7 +158,7 @@ async def main():
     dp.callback_query.register(theme_catalog_handlers.add_theme_category,  IsPrivateChatFilter(), AddThemeState.category)
       
     # theme handlers
-    dp.message.register(theme_handlers.handle_photo, F.photo | F.document)
+    dp.message.register(theme_handlers.handle_photo, IsAdminFilter(), F.photo | F.document)
     dp.callback_query.register(theme_handlers.handler_abort, F.data == 'abort')
     dp.callback_query.register(theme_handlers.handler_device, F.data.startswith('device_'))
         

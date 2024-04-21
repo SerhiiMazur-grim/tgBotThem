@@ -6,7 +6,7 @@ from config.api_keys import ADMINS
 
 def user_keyboard(user_id):
     keyboard = ReplyKeyboardBuilder()
-    keyboard.button(text=messages.BUTTON_CREATE_THEME)
+    keyboard.button(text=messages.BUTTON_START_CREATE_WALLPAPER)
     keyboard.button(text=messages.BUTTON_ADD_TO_CHAT)
     keyboard.button(text=messages.BUTTON_THEME_CATALOG)
     keyboard.button(text=messages.BUTTON_LANGUAGE_CATALOG)

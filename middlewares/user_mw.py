@@ -37,7 +37,8 @@ class UserMiddleware(BaseMiddleware):
                         if not message.text[:6] in ('/start', '/rando'):
                             return
                     elif message.photo:
-                        if message.caption!='/theme':
+                        # if message.caption!='/theme':
+                        if message.caption!='/bg':
                             return
 
             if event_chat:

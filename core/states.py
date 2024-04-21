@@ -67,3 +67,8 @@ class RandomLanguageState(StatesGroup):
 class SetWallpaperState(StatesGroup):
     theme_path = State()
     image_path = State()
+
+
+class WallpState(StatesGroup):
+    message = State()
+    photo = State()

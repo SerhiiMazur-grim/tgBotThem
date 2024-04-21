@@ -2,7 +2,7 @@ import os
 
 from telethon.sync import TelegramClient
 from telethon.tl.functions.account import UploadWallPaperRequest
-from telethon.tl.types import InputFile, WallPaperSettings
+from telethon.tl.types import InputFile, WallPaperSettings, WallPaper
 
 from config.api_keys import API_ID, API_HASH, NAME
 from core.image.theme_preview_ios import create_ios_preview
@@ -487,3 +487,27 @@ async def create_iphone_theme(chat_id, image_path, bg, dark, status_bar, primary
             )
 
         return theme, preview
+
+
+async def create_iphone_wallpaper(image_path):
+    async with TelegramClient('wallp', api_id, api_hash) as client:
+        
+        result = await client.upload_file(image_path)
+
+        if result:
+            input_file = InputFile(
+                id=result.id,
+                parts=result.parts,
+                name=result.name,
+                md5_checksum=result.md5_checksum
+            )
+
+            wallpaper: WallPaper = await client(UploadWallPaperRequest(
+                file=input_file,
+                mime_type='image/jpeg',
+                settings=WallPaperSettings()
+            ))
+            return wallpaper.slug
+        return None
+
+            
