@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from aiogram import Bot
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 
@@ -112,3 +112,7 @@ async def bot_is_blocked(error, session: AsyncSession, user_id):
             logger.error(error.message)
     except:
         logger.error(error)
+
+
+async def call_answer(call: CallbackQuery):
+    await call.answer()

@@ -2,7 +2,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import messages
 from config.categories import DRVICES
-from config.api_keys import NAME
+from config.api_keys import NAME, ADMINS
 
 
 def subscribe_keyboard(checked_channels):
@@ -407,4 +407,20 @@ def abort_create_wallpaper_ikb():
     
     keyboard.button(text=messages.ABORT, callback_data='wallp_create_abort')
     
+    return keyboard.as_markup()
+
+
+def theme_catalog_ikb(page, pages, user_id, theme_id):
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.button(text=messages.BUTTON_GET_THEME, callback_data=f'show_them_{page-1}')
+    keyboard.button(text=messages.BUTTON_PREV, callback_data='prev_page_theme_cat')
+    keyboard.button(text=f'{page}/{pages}', callback_data='NONE')
+    keyboard.button(text=messages.BUTTON_NEXT, callback_data='next_page_theme_cat')
+    keyboard.button(text=messages.BUTTON_ADD_BOT_TO_CHAT, url=f't.me/{NAME[1:]}?startgroup&admin=post_messages+delete_messages')
+    
+    if str(user_id) in ADMINS:
+        keyboard.button(text=messages.MESSAGE_DELETE_THEME, callback_data=f'del_theme_id_{theme_id}')
+    
+    keyboard.adjust(1, 3, 1)
     return keyboard.as_markup()

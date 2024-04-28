@@ -16,7 +16,7 @@ from core.handlers import basic, theme_handlers, language_handlers, \
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
 from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter, IsGroupChatFilter
-from core.states import AddThemeState, GetThemesCatalogState, GetFontTextState, \
+from core.states import AddThemeState, ThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat, \
     RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
@@ -32,7 +32,7 @@ async def main():
     logging.basicConfig(filename='theme_bot_logs.log',
                         level=logging.WARNING,
                         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    logger.info("Starting bot...")
+    logger.warning("Starting bot...")
     
     storage = MemoryStorage()
     sessionmaker = await create_sessionmaker(DATA_BASE_URL)
@@ -147,9 +147,9 @@ async def main():
     
     dp.message.register(theme_catalog_handlers.get_catalog_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_THEME_CATALOG)
     dp.message.register(theme_catalog_handlers.go_to_main_menu, IsPrivateChatFilter(), F.text == messages.BUTTON_BACK)
-    dp.message.register(theme_catalog_handlers.get_next_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_THEMES)
-    dp.callback_query.register(theme_catalog_handlers.get_device_catalog_themes, IsPrivateChatFilter(), GetThemesCatalogState.device)
-    dp.callback_query.register(theme_catalog_handlers.get_category_catalog_themes, IsPrivateChatFilter(), GetThemesCatalogState.category)
+    # dp.message.register(theme_catalog_handlers.get_next_themes, IsPrivateChatFilter(), F.text == messages.BUTTON_NEXT_THEMES)
+    dp.callback_query.register(theme_catalog_handlers.get_device_catalog_themes, IsPrivateChatFilter(), ThemesCatalogState.device)
+    dp.callback_query.register(theme_catalog_handlers.get_category_catalog_themes, IsPrivateChatFilter(), ThemesCatalogState.category)
     dp.callback_query.register(theme_catalog_handlers.admin_delete_theme, IsAdminFilter(), F.data.startswith('delete_theme_'))
     
     #----------------------------------------------------------------------------------------------------------------
@@ -175,6 +175,8 @@ async def main():
     dp.callback_query.register(theme_handlers.handler_back_to_background_color_choose, F.data == 'back_to_background_choose')
     dp.callback_query.register(theme_handlers.handler_back_to_primary_text_color_choose, F.data == 'back_to_primary_text_choose')
     dp.callback_query.register(theme_handlers.handler_back_to_secondary_text_color_choose, F.data == 'back_to_secondary_text_choose')
+    
+    dp.callback_query.register(basic.call_answer)
 
     
     try:

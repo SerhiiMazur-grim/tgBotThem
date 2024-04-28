@@ -112,7 +112,7 @@ MESSAGE_IS_NOT_THEME = 'Это не файл темы!'
 MESSAGE_NO_PREVIEW_IN_THEME = 'У темы нет превью! Сбросьте превью на тему!'
 
 MESSAGE_OUR_THEMES = 'Вот темы, что у нас есть'
-CAPTION_TO_THEME_IN_CATALOG = f'Тема создана в <a href="https://t.me/{NAME[1:]}?start=from_theme">{NAME}</a> 😉 '
+CAPTION_TO_THEME_IN_CATALOG = f'Нажми для установки!\n\nТема создана в <a href="https://t.me/{NAME[1:]}?start=from_theme">{NAME}</a> 😉 '
 MESSAGE_ON_BACK = 'Главное меню'
 
 MESSAGE_NO_MORE_THEMES = 'Ой! кажется темы закончились!'
@@ -364,3 +364,7 @@ def wallpaper_message(wallpaper):
 Фон создан в <a href="https://t.me/{NAME[1:]}?start=from_wallpaper">{NAME}</a> 😉
     """
     return message
+
+BUTTON_GET_THEME = '💾Установить'
+BUTTON_PREV = '⬅️'
+BUTTON_NEXT = '➡️'

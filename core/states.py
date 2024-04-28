@@ -45,9 +45,11 @@ class AddLanguageCat(StatesGroup):
 
 
 class ThemesCatalogState(StatesGroup):
+    device = State()
+    category = State()
     catalog = State()
-    start = State()
-    end = State()
+    page = State()
+    pages = State()
  
  
 class LanguagesCatalogState(StatesGroup):

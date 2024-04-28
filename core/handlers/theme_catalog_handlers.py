@@ -16,6 +16,7 @@ from core import inline_keybords, reply_keybords
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard, admin_theme_catalog_kb
 from core.keyboards.inline_keybords import admin_add_theme_category_ikb, admin_del_theme_category_ikb
 from core.states import AddThemeState, GetThemesCatalogState, AddThemeCat, ThemesCatalogState
+from core.dialogs import ThemeCatalogDialog
 
 from database.models.theme_category import ThemeCategory, ThemeInCatalog
 
@@ -180,7 +181,7 @@ async def add_theme_category(callback_query: CallbackQuery, state: FSMContext, s
 
 async def get_catalog_themes(message: Message, state: FSMContext):
     await message.delete()
-    await state.set_state(GetThemesCatalogState.device)
+    await state.set_state(ThemesCatalogState.device)
     await message.answer(text=messages.BUTTON_THEME_CATALOG,
                          reply_markup=reply_keybords.catalog_theme_keyboard())
     await message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
@@ -196,7 +197,7 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
     
     device = callback_query.data.split('_')[-1]
     await state.update_data(device=device)
-    await state.set_state(GetThemesCatalogState.category)
+    await state.set_state(ThemesCatalogState.category)
     categories = await session.scalars(select(ThemeCategory))
     cat_list = list(categories)
     if cat_list:
@@ -208,55 +209,61 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
 
 
 async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMContext, session: AsyncSession):
-    try:
-        await callback_query.message.delete()
-    except Exception as e:
-        logger.error(e)
-        return
-    
-    user_id = callback_query.from_user.id
-    category = callback_query.data.split('_')[-1]
-    try:
-        category = int(category)
-    except Exception as e:
-        logger.error(e)
-        return
-    
     data = await state.get_data()
-    await state.clear()
+    catalog = data.get('catalog')
     
-    catalog = await session.scalars(select(ThemeInCatalog).where(
-        and_(
-            ThemeInCatalog.category_id==category,
-            ThemeInCatalog.device==data['device']
-        )
-    ))
-    catalog = list(catalog)
+    if not catalog:
+        try:
+            await callback_query.message.delete()
+        except Exception as e:
+            logger.error(e)
+            return
+        
+        category = callback_query.data.split('_')[-1]
+        try:
+            category = int(category)
+        except Exception as e:
+            logger.error(e)
+            return
+        
+        await state.update_data(category=category)
     
-    await state.set_state(ThemesCatalogState)
-    await state.set_data({
-        'catalog': catalog,
-        'start': 5,
-        'end': 11,
-    })
+        catalog = await session.scalars(select(ThemeInCatalog).where(
+            and_(
+                ThemeInCatalog.category_id==category,
+                ThemeInCatalog.device==data['device']
+            )
+        ))
+        catalog = list(catalog)
+        
+        await state.update_data({
+            'catalog': catalog,
+            'page': 1,
+            'pages': len(catalog),
+        })
     
     if catalog:
-        await callback_query.message.answer(text=messages.MESSAGE_OUR_THEMES,
-                                reply_markup=nex_themes_keyboard())
-        for theme in catalog[:5]:
-            theme_id = theme.id
-            try:    
-                await callback_query.message.answer_photo(photo=theme.preview)
-                await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG,
-                                                             parse_mode=ParseMode.HTML)
-                if str(user_id) in ADMINS:
-                    await callback_query.message.answer(text=messages.MESSAGE_DELETE_THEME,
-                                                    reply_markup=inline_keybords.delete_theme_ikb(theme_id))
+        dialog = ThemeCatalogDialog(callback_query, state, session)
+        await dialog.dialog_window()
+        # await callback_query.message.answer(text=messages.MESSAGE_OUR_THEMES,
+        #                         reply_markup=nex_themes_keyboard())
+        # for theme in catalog[:5]:
+        #     theme_id = theme.id
+        #     try:    
+        #         await callback_query.message.answer_photo(photo=theme.preview)
+        #         await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG,
+        #                                                      parse_mode=ParseMode.HTML)
+        #         if str(user_id) in ADMINS:
+        #             await callback_query.message.answer(text=messages.MESSAGE_DELETE_THEME,
+        #                                             reply_markup=inline_keybords.delete_theme_ikb(theme_id))
                     
-            except AiogramError as er:
-                logger.error(er)
+        #     except AiogramError as er:
+        #         logger.error(er)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_THEMES_IN_CATALOG)
+        await state.set_state(ThemesCatalogState.device)
+        await callback_query.message.answer(text=messages.MESSAGE_CHOICE_DEVICE,
+                            reply_markup=inline_keybords.choice_device_db_get_ikb())
 
 
 async def get_next_themes(message: Message, state: FSMContext):
