@@ -1,4 +1,5 @@
 import os
+import logging
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
@@ -10,8 +11,12 @@ from config import messages
 from core.states import WallpState
 from core.keyboards.inline_keybords import abort_create_wallpaper_ikb
 from core.keyboards.reply_keybords import user_keyboard
-from ios.iphone_theme import create_iphone_wallpaper
+# from ios.iphone_theme import create_iphone_wallpaper
 from core.handlers.basic import command_start
+from core.wallpaper_slug import get_wallpaper_slug
+
+
+logger = logging.getLogger(__name__)
 
 
 async def start_create_wallpaper(message: Message, state: FSMContext):
@@ -49,15 +54,22 @@ async def create_wallpaper(message: Message, bot: Bot, state: FSMContext, sessio
     download_to = os.path.join('wallpaper', user_id, file_name)
     await bot.download_file(file_path=photo_data.file_path,
                             destination=download_to)
+    
     try:
-        wallpaper = await create_iphone_wallpaper(download_to)
-    except:
+        # wallpaper = await create_iphone_wallpaper(download_to)
+        wallpaper = await get_wallpaper_slug(download_to)
+    except Exception as e:
+        logger.error(e)
         await wait_message.delete()
-        return message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR)
+        await state.clear()
+        return message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR,
+                              reply_markup=user_keyboard(user_id))
         
     await wait_message.delete()
-    await my_message_1.delete()
-    await my_message_2.delete()
+    if my_message_1:
+        await my_message_1.delete()
+    if my_message_2:
+        await my_message_2.delete()
     
     await message.answer(text=messages.wallpaper_message(wallpaper),
                                  reply_markup=user_keyboard(user_id),
@@ -82,8 +94,10 @@ async def group_create_wallpaper(message: Message, bot: Bot):
     await bot.download_file(file_path=photo_data.file_path,
                             destination=download_to)
     try:
-        wallpaper = await create_iphone_wallpaper(download_to)
-    except:
+        # wallpaper = await create_iphone_wallpaper(download_to)
+        wallpaper = await get_wallpaper_slug(download_to)
+    except Exception as e:
+        logger.error(e)
         await wait_message.delete()
         return message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR)
         

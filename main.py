@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 async def main():
     await check_and_delete_files()
     logging.basicConfig(filename='theme_bot_logs.log',
-                        level=logging.WARNING,
+                        level=logging.INFO,
                         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     logger.warning("Starting bot...")
     
