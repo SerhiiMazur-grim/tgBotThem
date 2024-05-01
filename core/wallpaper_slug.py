@@ -8,8 +8,8 @@ api_id = API_ID
 api_hash = API_HASH
 
             
-async def get_wallpaper_slug(image_path):
-    async with Client("my_account", api_id, api_hash) as app:
+async def get_wallpaper_slug(session_name, image_path):
+    async with Client(session_name, api_id, api_hash) as app:
         file = await app.save_file(path=image_path)
         wallp: WallPaper = await app.invoke(UploadWallPaper(
             file=file,

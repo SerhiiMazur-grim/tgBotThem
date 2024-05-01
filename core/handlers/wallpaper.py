@@ -1,5 +1,7 @@
 import os
 import logging
+import subprocess
+import asyncio
 
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
@@ -15,6 +17,8 @@ from core.keyboards.reply_keybords import user_keyboard
 from core.handlers.basic import command_start
 from core.wallpaper_slug import get_wallpaper_slug
 
+SESSIONS = ["my_account", "my_account_2", "my_account_3", "my_account_4", "my_account_5"]
+free_sessions = SESSIONS.copy()
 
 logger = logging.getLogger(__name__)
 
@@ -56,21 +60,39 @@ async def create_wallpaper(message: Message, bot: Bot, state: FSMContext, sessio
                             destination=download_to)
     
     try:
+        pending = True
+        while pending:
+            if free_sessions:
+                session_name = free_sessions.pop()
+                pending = False
+            else:
+                await asyncio.sleep(1)
+                
         # wallpaper = await create_iphone_wallpaper(download_to)
-        wallpaper = await get_wallpaper_slug(download_to)
+        logger.info(session_name)
+        wallpaper = await get_wallpaper_slug(session_name, download_to)
     except Exception as e:
         logger.error(e)
+        await bot.send_message(chat_id=869406474,
+                               text=str(e.with_traceback))
         await wait_message.delete()
         await state.clear()
-        return message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR,
+        free_sessions.append(session_name)
+        await message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR,
                               reply_markup=user_keyboard(user_id))
+        
+        if str(e) == 'database is locked':
+            command = "sudo systemctl restart theme_bot"
+            subprocess.run(command, shell=True)
+            
+        return None
         
     await wait_message.delete()
     if my_message_1:
         await my_message_1.delete()
     if my_message_2:
         await my_message_2.delete()
-    
+    free_sessions.append(session_name)
     await message.answer(text=messages.wallpaper_message(wallpaper),
                                  reply_markup=user_keyboard(user_id),
                                  parse_mode=ParseMode.HTML)

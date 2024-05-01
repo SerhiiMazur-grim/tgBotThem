@@ -131,8 +131,14 @@ class ThemeCatalogDialog():
         media = InputMediaPhoto(media=theme.preview,
                                 caption=self.call.message.caption,
                                 parse_mode=ParseMode.HTML)
-        return await self.call.message.edit_media(media=media,
-                                                  reply_markup=theme_catalog_ikb(next_page, pages, self.user_id, theme.id))
+        try:
+            return await self.call.message.edit_media(media=media,
+                                                      reply_markup=theme_catalog_ikb(next_page, 
+                                                                                     pages, 
+                                                                                     self.user_id, 
+                                                                                     theme.id))
+        except:
+            return None
     
     
     async def _prev_step(self, data, page):

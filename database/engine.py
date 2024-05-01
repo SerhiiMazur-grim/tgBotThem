@@ -3,7 +3,7 @@ from database.models.settings import Settings
 
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker  
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 
 class Database:
@@ -13,7 +13,7 @@ class Database:
         self.engine = create_async_engine(
             database_url, future=True, pool_pre_ping=True
         )
-        self.sessionmaker = sessionmaker(
+        self.sessionmaker = async_sessionmaker(
             self.engine, expire_on_commit=False, class_=AsyncSession
         )
 
@@ -44,7 +44,7 @@ class Database:
         return instance
 
 
-async def create_sessionmaker(database_url: str) -> sessionmaker:
+async def create_sessionmaker(database_url: str) -> async_sessionmaker:
 
     database = await Database.init(database_url)
 
