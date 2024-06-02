@@ -49,7 +49,7 @@ async def get_full_statistica(message: Message, session: AsyncSession, bot: Bot)
     await message.delete()
     m = await message.answer(text='Провожу сбор данных, подождите...')
     
-    await check_not_active_users(session)
+    # await check_not_active_users(session)
     
     users = await session.scalars(select(User))
     

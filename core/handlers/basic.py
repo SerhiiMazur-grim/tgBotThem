@@ -49,11 +49,12 @@ async def command_start(message: Message, bot: Bot, state: FSMContext, session: 
             except Exception as e:
                 logger.error(e)
                 
-            # await message.answer_photo(photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
-            #                             caption=messages.MESSAGE_ON_START_IN_GROUP,
-            #                             reply_markup=go_to_bot_ikb())
+            await message.answer_photo(photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
+                                        caption=messages.MESSAGE_ON_START_IN_GROUP,
+                                        reply_markup=go_to_bot_ikb())
             # await message.answer(text=messages.MESSAGE_ON_START_IN_GROUP,
             #                             reply_markup=go_to_bot_ikb())
+            
             await message.answer(text=messages.SECON_MESSAGE_ON_START_IN_GROUP,
                                  reply_markup=add_bot_to_chat_inl_keyboard())
 

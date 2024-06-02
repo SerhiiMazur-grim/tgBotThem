@@ -101,6 +101,9 @@ async def create_wallpaper(message: Message, bot: Bot, state: FSMContext, sessio
     
     
 async def group_create_wallpaper(message: Message, bot: Bot):
+    if not message.photo:
+        return message.answer(text=messages.NOT_IMAGE)
+    
     wait_message = await message.answer(text=messages.WAIT_MESSAGE)
     user_id = message.from_user.id
     user_id = str(user_id)
@@ -115,18 +118,36 @@ async def group_create_wallpaper(message: Message, bot: Bot):
     download_to = os.path.join('wallpaper', user_id, file_name)
     await bot.download_file(file_path=photo_data.file_path,
                             destination=download_to)
+    
     try:
+        pending = True
+        while pending:
+            if free_sessions:
+                session_name = free_sessions.pop()
+                pending = False
+            else:
+                await asyncio.sleep(1)
+                
         # wallpaper = await create_iphone_wallpaper(download_to)
-        wallpaper = await get_wallpaper_slug(download_to)
+        logger.info(session_name)
+        wallpaper = await get_wallpaper_slug(session_name, download_to)
     except Exception as e:
         logger.error(e)
+        await bot.send_message(chat_id=869406474,
+                               text=str(e.with_traceback))
         await wait_message.delete()
-        return message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR)
+        free_sessions.append(session_name)
+        await message.answer(text=messages.MESSAGE_WALLPAPER_SOME_ERROR)
         
+        if str(e) == 'database is locked':
+            command = "sudo systemctl restart theme_bot"
+            subprocess.run(command, shell=True)
+            
+        return None
+
+    free_sessions.append(session_name)
     await wait_message.delete()
-    
-    await message.answer(text=messages.wallpaper_message(wallpaper),
-                                #  reply_markup=user_keyboard(user_id),
+    await message.reply(text=messages.wallpaper_message(wallpaper),
                                  parse_mode=ParseMode.HTML)
     os.remove(download_to)
 

@@ -50,7 +50,7 @@ class IsSubscribedMiddleware(BaseMiddleware):
                 return await handler(event, data)
         
         if chat_type != 'private' and event.photo:
-            if event.caption!='/theme':
+            if event.caption!='/bg':
                 return
                     
         

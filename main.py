@@ -3,6 +3,7 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.enums.chat_type import ChatType
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage, SimpleEventIsolation
 
@@ -53,7 +54,7 @@ async def main():
         
     # basic handlers
     # dp.startup.register(start_bot)
-    # dp.message.register(wallpaper.group_create_wallpaper, (F.photo) & (F.caption=='/bg'))
+    dp.message.register(wallpaper.group_create_wallpaper, (F.chat.type != ChatType.PRIVATE) & F.caption=='/bg')
     dp.message.register(wallpaper.start_create_wallpaper, F.text==messages.BUTTON_START_CREATE_WALLPAPER)
     dp.message.register(wallpaper.create_wallpaper, WallpState.photo)
     dp.callback_query.register(wallpaper.abort_create_wallpaper, F.data=='wallp_create_abort')
