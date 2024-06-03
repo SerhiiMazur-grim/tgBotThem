@@ -11,7 +11,12 @@ class Database:
     def __init__(self, database_url: str):
 
         self.engine = create_async_engine(
-            database_url, future=True, pool_pre_ping=True
+            database_url,
+            pool_size=10,
+            max_overflow=20,
+            pool_timeout=60,
+            future=True,
+            pool_pre_ping=True
         )
         self.sessionmaker = async_sessionmaker(
             self.engine, expire_on_commit=False, class_=AsyncSession
