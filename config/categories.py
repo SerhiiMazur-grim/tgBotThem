@@ -82,9 +82,9 @@
 
 # Нічого не міняти !!!
 DRVICES = {
-    'Андроид': 'db-dev_android',
-    'Компьютер': 'db-dev_computer',
-    'iPhone': 'db-dev_ios',
+    'Андроид': 'android',
+    'Компьютер': 'computer',
+    'iPhone': 'ios',
 }
 
 # # Нічого не міняти !!!

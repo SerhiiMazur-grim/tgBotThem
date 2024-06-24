@@ -57,7 +57,7 @@ async def main():
     dp.message.register(wallpaper.group_create_wallpaper, (F.chat.type != ChatType.PRIVATE) & F.caption=='/bg')
     dp.message.register(wallpaper.start_create_wallpaper, F.text==messages.BUTTON_START_CREATE_WALLPAPER)
     dp.message.register(wallpaper.create_wallpaper, WallpState.photo)
-    dp.callback_query.register(wallpaper.abort_create_wallpaper, F.data=='wallp_create_abort')
+    # dp.callback_query.register(wallpaper.abort_create_wallpaper, F.data=='wallp_create_abort')
     
     dp.message.register(basic.command_start, Command('start'))
     dp.message.register(basic.command_admin_kb, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN)

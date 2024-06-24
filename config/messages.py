@@ -175,6 +175,7 @@ MESSAGE_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попр
 MESSAGE_WALLPAPER_SOME_ERROR = 'Хмм...🧐 Что-то пошло не так, попробуй создать обои сначала 🥹 или попробуй позже'
 
 BUTTON_ADMIN_THEME_CATALOG = 'Каталог тем Admin'
+MESSAGE_GET_DEVAICE_ERROR = 'Кажется что-то пошло не так, попробуй снова еще раз, или начни с начала'
 MESSAGE_ADMIN_THEME_CATALOG = 'Редактирование каталога тем.'
 BUTTON_ADMIN_THEME_CATEGORY = 'Категории тем'
 IKB_BUTTON_ADMIN_ADD_THEME_CATEGORY = 'Добавить категорию'

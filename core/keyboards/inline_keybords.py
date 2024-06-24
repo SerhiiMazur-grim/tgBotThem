@@ -220,7 +220,7 @@ def choice_category_db_get_ikb(categories):
     keyboard = InlineKeyboardBuilder()
 
     for cat in categories:
-        keyboard.button(text=cat.title, callback_data=f'get_theme_cat_{cat.id}')
+        keyboard.button(text=cat.title, callback_data=str(cat.id))
         
     keyboard.adjust(3)
     return keyboard.as_markup()

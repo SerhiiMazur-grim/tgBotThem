@@ -11,6 +11,7 @@ from sqlalchemy.future import select
 from sqlalchemy import and_
 
 from config import messages
+from config.categories import DRVICES
 from config.api_keys import ADMINS
 from core import inline_keybords, reply_keybords
 from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard, admin_theme_catalog_kb
@@ -195,7 +196,12 @@ async def get_device_catalog_themes(callback_query: CallbackQuery, state: FSMCon
         logger.error(e)
         return
     
-    device = callback_query.data.split('_')[-1]
+    device = callback_query.data
+    devices = DRVICES.values()
+    if not device in devices:
+        return await callback_query.message.answer(text=messages.MESSAGE_GET_DEVAICE_ERROR,
+                                                   reply_markup=inline_keybords.choice_device_db_get_ikb())
+    
     await state.update_data(device=device)
     await state.set_state(ThemesCatalogState.category)
     categories = await session.scalars(select(ThemeCategory))
@@ -219,7 +225,14 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
             logger.error(e)
             return
         
-        category = callback_query.data.split('_')[-1]
+        category = callback_query.data
+        categories = await session.scalars(select(ThemeCategory))
+        categories = list(categories)
+        categories_id = [str(cat.id) for cat in categories]
+        if not category in categories_id:
+            return await callback_query.message.answer(text=messages.MESSAGE_GET_DEVAICE_ERROR,
+                                                   reply_markup=inline_keybords.choice_category_db_get_ikb(categories))
+        
         try:
             category = int(category)
         except Exception as e:
@@ -245,20 +258,6 @@ async def get_category_catalog_themes(callback_query: CallbackQuery, state: FSMC
     if catalog:
         dialog = ThemeCatalogDialog(callback_query, state, session)
         await dialog.dialog_window()
-        # await callback_query.message.answer(text=messages.MESSAGE_OUR_THEMES,
-        #                         reply_markup=nex_themes_keyboard())
-        # for theme in catalog[:5]:
-        #     theme_id = theme.id
-        #     try:    
-        #         await callback_query.message.answer_photo(photo=theme.preview)
-        #         await callback_query.message.answer_document(document=theme.file, caption=messages.CAPTION_TO_THEME_IN_CATALOG,
-        #                                                      parse_mode=ParseMode.HTML)
-        #         if str(user_id) in ADMINS:
-        #             await callback_query.message.answer(text=messages.MESSAGE_DELETE_THEME,
-        #                                             reply_markup=inline_keybords.delete_theme_ikb(theme_id))
-                    
-        #     except AiogramError as er:
-        #         logger.error(er)
     else:
         await callback_query.message.answer(text=messages.MESSAGE_NO_THEMES_IN_CATALOG)
         await state.set_state(ThemesCatalogState.device)
@@ -312,7 +311,14 @@ async def admin_delete_theme(callback_query: CallbackQuery, session: AsyncSessio
 async def go_to_main_menu(message: Message, state: FSMContext):
     user_id = message.from_user.id
     current_state = await state.get_state()
+    
     if current_state is not None:
+        data = await state.get_data()
+        message_1 = data.get('message_1')
+        
+        if message_1:
+            await message_1.delete()
+            
         await state.clear()
 
     await message.delete()
