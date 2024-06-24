@@ -3,50 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from config.messages import PREVIEW_WATER_MARK
 from core.utils import hex_to_rgba_v2
-
-
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'bg.png')) as image:
-    IMAGE_LAYER_1 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'bg_chat_color_2.png')) as image:
-    IMAGE_LAYER_2 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'message_clouds_out.png')) as image:
-    IMAGE_LAYER_3 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'message_clouds_in.png')) as image:
-    IMAGE_LAYER_4 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'prime_txt.png')) as image:
-    IMAGE_LAYER_5 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'second_txt.png')) as image:
-    IMAGE_LAYER_6 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'ios_theme_layers', 'shadow.png')) as image:
-    IMAGE_LAYER_7 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
+from .ios_theme_layers.ios_layers import get_ios_layers
 
 
 async def crop_wallpaper(wallpaper_path):
@@ -102,15 +59,7 @@ async def create_ios_preview(chat_id, photo, preview_bg, bg, primary_txt,
 
     layers = []
     wallpaper = await crop_wallpaper(photo)
-    images = [
-        IMAGE_LAYER_1,
-        IMAGE_LAYER_2,
-        IMAGE_LAYER_3,
-        IMAGE_LAYER_4,
-        IMAGE_LAYER_5,
-        IMAGE_LAYER_6,
-        IMAGE_LAYER_7,
-    ]
+    images = await get_ios_layers()
     
     colors = await hex_to_rgba_v2([
         preview_bg,

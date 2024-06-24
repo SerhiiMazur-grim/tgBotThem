@@ -3,98 +3,99 @@ from PIL import Image, ImageDraw, ImageFont
 
 from config.messages import PREVIEW_WATER_MARK
 from core.utils import hex_to_rgba_v2
+from .pc_theme_layers.pc_layers import PC_USER_ICON_LIST, get_pc_layers
 
 
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_1 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_2 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_3 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_4 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_5 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_6 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_7 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_1 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_2 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_3 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_4 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_5 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_6 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'user_icon_1.png')) as img:
+#     USER_ICON_7 = {
+#         'size': img.size,
+#         'alpha': img.split()[3]
+#     }
   
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'img_bg.png')) as image:
-    IMAGE_LAYER_1 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'chat_bg.png')) as image:
-    IMAGE_LAYER_2 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'side_bar.png')) as image:
-    IMAGE_LAYER_3 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'selected_chat.png')) as image:
-    IMAGE_LAYER_4 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'clouds_in.png')) as image:
-    IMAGE_LAYER_5 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'clouds_out.png')) as image:
-    IMAGE_LAYER_6 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'prime_txt.png')) as image:
-    IMAGE_LAYER_7 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'secondary_txt.png')) as image:
-    IMAGE_LAYER_8 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'shadows.png')) as image:
-    IMAGE_LAYER_9 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'img_bg.png')) as image:
+#     IMAGE_LAYER_1 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'chat_bg.png')) as image:
+#     IMAGE_LAYER_2 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'side_bar.png')) as image:
+#     IMAGE_LAYER_3 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'selected_chat.png')) as image:
+#     IMAGE_LAYER_4 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'clouds_in.png')) as image:
+#     IMAGE_LAYER_5 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'clouds_out.png')) as image:
+#     IMAGE_LAYER_6 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'prime_txt.png')) as image:
+#     IMAGE_LAYER_7 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'secondary_txt.png')) as image:
+#     IMAGE_LAYER_8 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
+# with Image.open(os.path.join('core', 'image', 'pc_theme_layers', 'shadows.png')) as image:
+#     IMAGE_LAYER_9 = {
+#         'img_data': list(image.getdata()),
+#         'alpha': list(image.split()[3].getdata()),
+#         'size': image.size
+#     }
 
 
 async def crop_wallpaper(wallpaper_path):
@@ -121,10 +122,7 @@ async def crop_wallpaper(wallpaper_path):
 
 async def users_icons_v2(colors):
     painted_icons = []
-    images = [
-    USER_ICON_1, USER_ICON_2, USER_ICON_3, USER_ICON_4,
-    USER_ICON_5, USER_ICON_6, USER_ICON_7,
-    ]
+    images = PC_USER_ICON_LIST
     fill_start_y = 335
     fill_end_y = 398
 
@@ -186,17 +184,7 @@ async def create_pc_preview(chat_id, photo, img_bg_color, chat_bg, clouds_in_col
 
     layers = []
     wallpaper = await crop_wallpaper(photo)
-    images = [
-        IMAGE_LAYER_1,
-        IMAGE_LAYER_2,
-        IMAGE_LAYER_3,
-        IMAGE_LAYER_4,
-        IMAGE_LAYER_5,
-        IMAGE_LAYER_6,
-        IMAGE_LAYER_7,
-        IMAGE_LAYER_8,
-        IMAGE_LAYER_9,
-    ]
+    images = await get_pc_layers()
     
     colors = await hex_to_rgba_v2([
         img_bg_color,

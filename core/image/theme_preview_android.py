@@ -3,92 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from config.messages import PREVIEW_WATER_MARK
 from core.utils import hex_to_rgba_v2
-
-
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_1.png')) as img:
-    USER_ICON_1 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_2.png')) as img:
-    USER_ICON_2 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_3.png')) as img:
-    USER_ICON_3 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_4.png')) as img:
-    USER_ICON_4 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_5.png')) as img:
-    USER_ICON_5 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_6.png')) as img:
-    USER_ICON_6 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_7.png')) as img:
-    USER_ICON_7 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'user_icon_8.png')) as img:
-    USER_ICON_8 = {
-        'size': img.size,
-        'alpha': img.split()[3]
-    }
-
-
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'bg.png')) as image:
-    IMAGE_LAYER_1 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'bg_chat_color_2.png')) as image:
-    IMAGE_LAYER_2 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'message_clouds_out.png')) as image:
-    IMAGE_LAYER_3 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'message_clouds_in.png')) as image:
-    IMAGE_LAYER_4 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'prime_txt.png')) as image:
-    IMAGE_LAYER_5 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'second_txt.png')) as image:
-    IMAGE_LAYER_6 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
-with Image.open(os.path.join('core', 'image', 'android_theme_layers', 'shadow.png')) as image:
-    IMAGE_LAYER_7 = {
-        'img_data': list(image.getdata()),
-        'alpha': list(image.split()[3].getdata()),
-        'size': image.size
-    }
+from .android_theme_layers.android_layers import ANDROID_USER_ICON_LIST, get_android_layers
 
 
 async def crop_wallpaper(wallpaper_path):
@@ -116,10 +31,7 @@ async def crop_wallpaper(wallpaper_path):
 
 async def users_icons_v2(colors):
     painted_icons = []
-    images = [
-    USER_ICON_1, USER_ICON_2, USER_ICON_3, USER_ICON_4,
-    USER_ICON_5, USER_ICON_6, USER_ICON_7, USER_ICON_8
-    ]
+    images = ANDROID_USER_ICON_LIST.copy()
     fill_start_y = 269
     fill_end_y = 343
 
@@ -181,15 +93,7 @@ async def create_android_preview(chat_id, photo, alfa, bg, primary_txt, secondar
 
     layers = []
     wallpaper = await crop_wallpaper(photo)
-    images = [
-        IMAGE_LAYER_1,
-        IMAGE_LAYER_2,
-        IMAGE_LAYER_3,
-        IMAGE_LAYER_4,
-        IMAGE_LAYER_5,
-        IMAGE_LAYER_6,
-        IMAGE_LAYER_7,
-    ]
+    images = await get_android_layers()
     
     colors = await hex_to_rgba_v2([
         preview_bg,
