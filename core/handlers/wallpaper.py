@@ -17,6 +17,7 @@ from core.keyboards.reply_keybords import user_keyboard, catalog_theme_keyboard
 from core.handlers.basic import command_start
 from core.wallpaper_slug import get_wallpaper_slug
 from core.handlers.theme_catalog_handlers import go_to_main_menu
+from database import get_or_create_user
 
 SESSIONS = ["my_account", "my_account_2", "my_account_3", "my_account_4", "my_account_5"]
 free_sessions = SESSIONS.copy()
@@ -24,7 +25,8 @@ free_sessions = SESSIONS.copy()
 logger = logging.getLogger(__name__)
 
 
-async def start_create_wallpaper(message: Message, state: FSMContext):
+async def start_create_wallpaper(message: Message, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
     await message.delete()
     my_message_1 = await message.answer(text=messages.MESSAGE_WALLP_START,
                          reply_markup=catalog_theme_keyboard())

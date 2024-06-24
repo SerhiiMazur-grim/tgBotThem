@@ -18,7 +18,7 @@ from core.keyboards.reply_keybords import nex_themes_keyboard, user_keyboard, ad
 from core.keyboards.inline_keybords import admin_add_theme_category_ikb, admin_del_theme_category_ikb
 from core.states import AddThemeState, GetThemesCatalogState, AddThemeCat, ThemesCatalogState
 from core.dialogs import ThemeCatalogDialog
-
+from database import get_or_create_user
 from database.models.theme_category import ThemeCategory, ThemeInCatalog
 
 
@@ -180,7 +180,8 @@ async def add_theme_category(callback_query: CallbackQuery, state: FSMContext, s
 #-------------------------------------------------------------------------------
 
 
-async def get_catalog_themes(message: Message, state: FSMContext):
+async def get_catalog_themes(message: Message, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
     await message.delete()
     await state.set_state(ThemesCatalogState.device)
     await message.answer(text=messages.BUTTON_THEME_CATALOG,

@@ -94,7 +94,11 @@ class PostSenderMiddleware(BaseMiddleware):
     ) -> Any:
         
         session = data['session']
-        db_sender: SendPost = data['post_data']
+        db_sender: SendPost = data.get('post_data')
+        
+        if not db_sender:
+            return handler(event, data)
+        
         send_post = db_sender.send_post
         
         if send_post:

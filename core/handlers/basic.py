@@ -15,6 +15,7 @@ from core.commands import set_chat_commands
 from core.utils import is_user_subscribed
 from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard, go_to_bot_ikb
 from core.keyboards.reply_keybords import user_keyboard, admin_keyboard
+from database import get_or_create_user
 from database.models.user import User
 
 
@@ -22,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 async def command_start(message: Message, bot: Bot, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
+    
     user_id = message.from_user.id
     chat_type = message.chat.type
     current_state = await state.get_state()

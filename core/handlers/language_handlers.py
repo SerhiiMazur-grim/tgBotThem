@@ -15,6 +15,7 @@ from sqlalchemy import and_
 from config import messages
 from config.api_keys import ADMINS
 from core import inline_keybords, reply_keybords
+from database import get_or_create_user
 from core.states import AddLanguageState, GetLanguageCatalogState, AddLanguageCat, LanguagesCatalogState
 from database.models.language_catalog import LanguageInCatalog
 from database.models.language_category import LanguageCategory
@@ -172,8 +173,8 @@ async def add_previev_and_desc_for_language(message: Message, state: FSMContext,
             await state.update_data(preview=preview_list)
         
 
-async def get_catalog_languages(message: Message, state: FSMContext):
-    user_id = message.from_user.id
+async def get_catalog_languages(message: Message, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
     await state.set_state(GetLanguageCatalogState.device)
     await message.delete()
     await message.answer(text=messages.BUTTON_LANGUAGE_CATALOG,

@@ -11,6 +11,7 @@ from sqlalchemy.future import select
 
 from config import messages
 from core.keyboards import inline_keybords
+from database import get_or_create_user
 from database.models.theme_catalog import ThemeInCatalog
 from database.models.language_catalog import LanguageInCatalog
 from core.states import RandomThemeState, RandomLanguageState
@@ -23,7 +24,8 @@ DEVICE_DICT = {
 }
 
 
-async def random_theme_command(message: Message, state: FSMContext):
+async def random_theme_command(message: Message, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
     user_full_name = message.from_user.full_name
     await state.set_state(RandomThemeState.device)
     await message.answer(text=messages.message_what_your_device(user_full_name),
@@ -64,7 +66,8 @@ async def get_random_err(callback_query: CallbackQuery):
                                 show_alert=True)
 
 
-async def random_language_command(message: Message, state: FSMContext):
+async def random_language_command(message: Message, state: FSMContext, session: AsyncSession):
+    await get_or_create_user(message, session)
     user_full_name = message.from_user.full_name
     await state.set_state(RandomLanguageState.device)
     await message.answer(text=messages.message_what_your_device(user_full_name),
