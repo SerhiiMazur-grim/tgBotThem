@@ -15,6 +15,7 @@ class Database:
             pool_size=20,
             max_overflow=30,
             pool_timeout=60,
+            pool_recycle=300,
             future=True,
             pool_pre_ping=True
         )
