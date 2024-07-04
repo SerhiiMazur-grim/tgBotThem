@@ -19,7 +19,7 @@ from core.utils import sub_checker
 from core.filters import IsAdminFilter, IsPrivateChatFilter, IsGroupChatFilter
 from core.states import AddThemeState, ThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat, \
-    RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState
+    RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState, GetImageIdState
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
     referal_statistica, users_to_txt
 from core.commands import set_commands
@@ -60,6 +60,8 @@ async def main():
     # dp.callback_query.register(wallpaper.abort_create_wallpaper, F.data=='wallp_create_abort')
     
     dp.message.register(basic.command_start, Command('start'))
+    dp.message.register(basic.get_image_id_command, Command('image_id'))
+    dp.message.register(basic.get_image, GetImageIdState.image)
     dp.message.register(basic.command_admin_kb, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_ADMIN)
     dp.message.register(basic.command_user_kb, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_BACK_TO_USER_KB)
     dp.message.register(basic.command_create_theme, IsPrivateChatFilter(), F.text == messages.BUTTON_CREATE_THEME)

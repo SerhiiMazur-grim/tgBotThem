@@ -74,3 +74,7 @@ class SetWallpaperState(StatesGroup):
 class WallpState(StatesGroup):
     message = State()
     photo = State()
+
+
+class GetImageIdState(StatesGroup):
+    image = State()

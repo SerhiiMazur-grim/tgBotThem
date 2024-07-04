@@ -15,6 +15,7 @@ from core.commands import set_chat_commands
 from core.utils import is_user_subscribed
 from core.keyboards.inline_keybords import add_bot_to_chat_inl_keyboard, go_to_bot_ikb
 from core.keyboards.reply_keybords import user_keyboard, admin_keyboard
+from core.states import GetImageIdState
 from database import get_or_create_user
 from database.models.user import User
 
@@ -52,7 +53,7 @@ async def command_start(message: Message, bot: Bot, state: FSMContext, session: 
             except Exception as e:
                 logger.error(e)
                 
-            await message.answer_photo(photo='AgACAgIAAxkBAAPmZcOjmZ-oSadgRaJXeQ02ATAwqZYAAgLaMRtJLxlKEdTyeWa_VDABAAMCAAN4AAM0BA',
+            await message.answer_photo(photo='AgACAgIAAxkBAAHt-jFmhlRRyXsAAQYd7L2h61g8GwRKjQADVNgxG6jHMUgxyDlthIwe4gEAAwIAA3gAAzUE',
                                         caption=messages.MESSAGE_ON_START_IN_GROUP,
                                         reply_markup=go_to_bot_ikb())
             # await message.answer(text=messages.MESSAGE_ON_START_IN_GROUP,
@@ -120,3 +121,18 @@ async def bot_is_blocked(error, session: AsyncSession, user_id):
 
 async def call_answer(call: CallbackQuery):
     await call.answer()
+
+
+async def get_image_id_command(message: Message, state: FSMContext):
+    await message.delete()
+    await state.set_state(GetImageIdState.image)
+    return message.answer(text='Отправьте мне изображение')
+
+
+async def get_image(message: Message, state: FSMContext):
+    if message.photo:
+        image_id = message.photo[-1].file_id
+        await state.clear()
+        return message.answer(text=image_id)
+    else:
+        return message.answer(text='Это не изображение!\nОтправьте мне изображение!')
