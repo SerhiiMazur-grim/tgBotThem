@@ -95,6 +95,7 @@ async def main():
     dp.callback_query.register(referal_statistica.detail_referal_statistica, IsAdminFilter(), F.data.startswith('ref_title_'))
     dp.message.register(base_statistic_handler.extract_users_menu, IsPrivateChatFilter(), IsAdminFilter(), F.text == messages.BUTTON_EXTRACT_USERS)
     dp.callback_query.register(users_to_txt.all_users_to_txt, IsAdminFilter(), F.data=='ext_all_users')
+    dp.callback_query.register(users_to_txt.all_users_and_groups_to_txt, IsAdminFilter(), F.data=='ext_all_users_and_groups')
     dp.callback_query.register(users_to_txt.all_active_users_to_txt, IsAdminFilter(), F.data=='ext_all_active_users')
     
     # language handlers

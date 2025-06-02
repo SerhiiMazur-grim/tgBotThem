@@ -317,6 +317,7 @@ MESSAGE_THEME_IS_DELETE_ERR = 'Ошибка удаления темы! Смот�
 BUTTON_EXTRACT_USERS = 'Выгрузить пользователей'
 MESSAGE_EXTRACT_USERS = 'Каких пользователей вигрузить в файл?'
 BUTTON_ALL_USERS = 'Всех пользователей'
+BUTTON_ALL_USERS_AND_GROUPS = 'Всех пользователей+групы'
 BUTTON_ALL_ACTIVE_USERS = 'Только активных'
 
 COMMAND_DESCRIPTION_RANDOM_THEME = '🪄 Рандомная тема'

@@ -359,6 +359,7 @@ def extract_users_ikb():
     keyboard = InlineKeyboardBuilder()
     
     keyboard.button(text=messages.BUTTON_ALL_USERS, callback_data='ext_all_users')
+    keyboard.button(text=messages.BUTTON_ALL_USERS_AND_GROUPS, callback_data='ext_all_users_and_groups')
     keyboard.button(text=messages.BUTTON_ALL_ACTIVE_USERS, callback_data='ext_all_active_users')
     
     keyboard.adjust(1)
