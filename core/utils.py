@@ -1,16 +1,20 @@
 import os
+from typing import TYPE_CHECKING
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
+from sqlalchemy import update, select
 
 from config.api_keys import CHANNEL_IDS
 from config.api_keys import ADMINS
 from config.fonts import FONTS
 from config import messages
+from config.telegram_chats import CHANNEL_IDS
 from core.keyboards.inline_keybords import subscribe_keyboard
 from database.models.user import User
+from database.models.chanel_op import ChanelOP
+
 # from core.database import start_db
 # from core.commands import set_commands
 
@@ -20,7 +24,16 @@ from database.models.user import User
     # await set_commands(bot)
 
 
+async def get_op_chanels(session):
+    result = await session.scalars(select(ChanelOP))
+    channels = result.all()
+    channels_dicts = [{'chanel_id': i.chanel_id, 'invate_url': i.invate_url} for i in channels]
+    print(channels_dicts)
+    return channels_dicts
+
+
 async def is_user_subscribed(message, bot: Bot, session: AsyncSession):
+    print('is is_user_subscribed')
 
     # Перевірка підписки користувача на кожен канал зі списку channel_ids
     checked_channels = []
@@ -28,8 +41,10 @@ async def is_user_subscribed(message, bot: Bot, session: AsyncSession):
     if str(user_id) in ADMINS:
         return True
     
-    for channel_id in CHANNEL_IDS:
-        member = await Bot.get_chat_member(self=bot, chat_id=channel_id, user_id=user_id)
+    op_list = await get_op_chanels(session)
+    
+    for channel_id in op_list:
+        member = await Bot.get_chat_member(self=bot, chat_id=channel_id.get('chanel_id'), user_id=user_id)
 
         # Перевірка, чи користувач є учасником каналу та має статус "member" або "creator"
         if member.status == 'member' or member.status == 'creator':
@@ -54,6 +69,7 @@ async def is_user_subscribed(message, bot: Bot, session: AsyncSession):
 
 
 async def sub_checker(callback_query: CallbackQuery, bot: Bot, session: AsyncSession):
+    print('is sub_checker')
     user_id = callback_query.from_user.id
     await callback_query.message.delete()
     
@@ -113,3 +129,6 @@ async def hex_to_rgba_v2(hex_colors):
             rgb_colors.append(rgba)
     
     return rgb_colors
+
+
+

@@ -78,3 +78,12 @@ class WallpState(StatesGroup):
 
 class GetImageIdState(StatesGroup):
     image = State()
+
+
+class OPKanal(StatesGroup):
+    chanel_id = State()
+    invate_url = State()
+
+
+class OPDelKanal(StatesGroup):
+    chanel_id = State()

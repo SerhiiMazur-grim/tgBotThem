@@ -1,9 +1,10 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats, \
     BotCommandScopeAllChatAdministrators, BotCommandScopeAllGroupChats, \
-    BotCommandScopeChat
+    BotCommandScopeChat, BotCommandScopeChat
 
 from config import messages
+from config.api_keys import ADMINS
 
 
 async def set_chat_commands(bot: Bot, chat_id) -> None:
@@ -23,8 +24,17 @@ async def set_chat_commands(bot: Bot, chat_id) -> None:
         BotCommand(
             command='restart_theme_bot',
             description=messages.COMMAND_DESCRIPTION_RESTART_BOT
-        )
+        ),
+        BotCommand(
+            command='set_op',
+            description='Додати ОП'
+        ),
+        BotCommand(
+            command='del_op',
+            description='Видалити ОП'
+        ),
     ]
+    
     await bot.set_my_commands(commands=commands,
                               scope=BotCommandScopeChat(chat_id=chat_id))
 
@@ -50,6 +60,7 @@ async def set_commands(bot: Bot):
         BotCommand(command='randomlanguage',
                    description=messages.COMMAND_DESCRIPTION_RANDOM_LANGUAGE)
     ]
+    
 
     await bot.set_my_commands(commands_private, BotCommandScopeAllPrivateChats())
     await bot.set_my_commands(commands_group, BotCommandScopeAllGroupChats())

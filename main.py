@@ -15,23 +15,29 @@ from core.handlers import basic, theme_handlers, language_handlers, \
     theme_catalog_handlers, fonts_handlers, posts_handlers, group_commands_handler, \
     set_wallpaper_command, wallpaper
 from core.middleware import CleanupMiddleware, PostSenderMiddleware, IsSubscribedMiddleware, check_and_delete_files
-from core.utils import sub_checker
+from core.utils import sub_checker, get_op_chanels
 from core.filters import IsAdminFilter, IsPrivateChatFilter, IsGroupChatFilter
 from core.states import AddThemeState, ThemesCatalogState, GetFontTextState, \
     AddLanguageState, GetLanguageCatalogState, AddPostState, AddThemeCat, AddLanguageCat, \
-    RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState, GetImageIdState
+    RandomThemeState, RandomLanguageState, SetWallpaperState, WallpState, GetImageIdState, \
+    OPKanal, OPDelKanal
 from statistica import base_statistic_handler, user_activity_statistica, full_statistica, \
     referal_statistica, users_to_txt
 from core.commands import set_commands
 from core.handlers.admin.restart_command import restart_bot
+from core.handlers.op_handlers import command_set_op, set_op_url, get_op_url, del_op, op_is_del
 
 logger = logging.getLogger(__name__)
 
 
 async def main():
     await check_and_delete_files()
-    logging.basicConfig(filename='theme_bot_logs.log',
-                        level=logging.WARNING,
+    # logging.basicConfig(filename='theme_bot_logs.log',
+    #                     level=logging.WARNING,
+    #                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    # logger.warning("Starting bot...")
+    
+    logging.basicConfig(level=logging.WARNING,
                         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     logger.warning("Starting bot...")
     
@@ -51,6 +57,12 @@ async def main():
     dp.message.middleware.register(IsSubscribedMiddleware(bot))
     
     dp.message.register(restart_bot, IsAdminFilter(), Command('restart_theme_bot'))
+    
+    dp.message.register(command_set_op, IsAdminFilter(), Command('set_op'))
+    dp.message.register(set_op_url, OPKanal.chanel_id)
+    dp.message.register(get_op_url, OPKanal.invate_url)
+    dp.message.register(del_op, IsAdminFilter(), Command('del_op'))
+    dp.callback_query.register(op_is_del, OPDelKanal.chanel_id)
         
     # basic handlers
     # dp.startup.register(start_bot)

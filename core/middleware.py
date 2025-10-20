@@ -16,16 +16,18 @@ from aiogram.types.input_media_video import InputMediaVideo
 from sqlalchemy import update
 from sqlalchemy.future import select
 
-from config.api_keys import CHANNEL_IDS
+# from config.telegram_chats import CHANNEL_IDS
 from config.api_keys import ADMINS
 from core.keyboards.inline_keybords import subscribe_keyboard, go_to_bot_ikb
+from core.utils import get_op_chanels
 from config import messages
 from database.models.send_post import SendPost
+from database.models.chanel_op import ChanelOP
 
 
 clean_time = None
 logger = logging.getLogger(__name__)
-
+op_ids = []
 
 class IsSubscribedMiddleware(BaseMiddleware):
     def __init__(self, bot: Bot) -> None:
@@ -41,24 +43,38 @@ class IsSubscribedMiddleware(BaseMiddleware):
         user_id = event.from_user.id
         chat_type = event.chat.type
         user_name = event.from_user.full_name
+        session = data['session']
+        global op_ids
         
         if str(user_id) in ADMINS:
             return await handler(event, data)
         
-        if event.text:
-            if event.text.startswith('/start'):
-                return await handler(event, data)
+        # if event.text:
+        #     if event.text.startswith('/start'):
+        #         return await handler(event, data)
         
         if chat_type != 'private' and event.photo:
             if event.caption!='/bg':
-                return
-                    
+                return await handler(event, data)
+                  
+        if not op_ids:
+            op_ids = await get_op_chanels(session)
+            if not op_ids:
+                op_ids = 'pass'
+            data['op_list'] = op_ids
+            print('i get op from bd')
+        else:
+            data['op_list'] = op_ids
+            
+        data['op_list'] = op_ids    
         
         checked_channels = []
-        if CHANNEL_IDS:
-            for channel_id in CHANNEL_IDS:
+        if op_ids == 'pass':
+            return  await handler(event, data)
+        if op_ids:
+            for op_channel in op_ids:
                 try:
-                    member = await self.bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+                    member = await self.bot.get_chat_member(chat_id=op_channel.get('chanel_id'), user_id=user_id)
                 except Exception as e:
                     logger.error(e)
 
@@ -66,7 +82,7 @@ class IsSubscribedMiddleware(BaseMiddleware):
                     continue
                 
                 else:
-                    checked_channels.append(channel_id)
+                    checked_channels.append(op_channel)
 
             if not checked_channels:
                 return await handler(event, data)

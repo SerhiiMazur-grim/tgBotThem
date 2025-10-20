@@ -10,7 +10,8 @@ def subscribe_keyboard(checked_channels):
     counter = 1
 
     for channel_id in checked_channels:
-        keyboard.button(text=f"{messages.MESSAGE_WITH_CHAT}{counter}", url=f"https://t.me/{channel_id[1:]}")
+        invate_url = channel_id.get('invate_url')
+        keyboard.button(text=f"{messages.MESSAGE_WITH_CHAT}{counter}", url=invate_url)
         counter += 1
     keyboard.button(text=messages.MESSAGE_CHECK_SUBSCRIBE, callback_data='sub_check')
     keyboard.adjust(2, 2, 1)
@@ -424,4 +425,15 @@ def theme_catalog_ikb(page, pages, user_id, theme_id):
         keyboard.button(text=messages.MESSAGE_DELETE_THEME, callback_data=f'del_theme_id_{theme_id}')
     
     keyboard.adjust(1, 3, 1)
+    return keyboard.as_markup()
+
+
+def choose_op_to_del(op_list):
+    keyboard = InlineKeyboardBuilder()
+    for  i in op_list:
+        keyboard.button(text=i, callback_data=i)
+    keyboard.button(text=messages.ABORT, callback_data='abort')
+
+    keyboard.adjust(1)
+
     return keyboard.as_markup()
