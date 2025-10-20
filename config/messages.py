@@ -18,7 +18,7 @@ MESSAGE_ON_START_IN_GROUP = 'Отправь в чат картинку с под
 BUTTON_GO_TO_BOT = 'Бот с темками👉'
 MESSAGE_WITH_CHAT = 'Чат: '
 MESSAGE_CHECK_SUBSCRIBE = 'Проверить подписку'
-MESSAGE_YOU_NOT_SUBSCRIBE = 'Вы не подписаны на наши чаты🧐, для пользования ботом подпишитесь на наши чаты😊:'
+MESSAGE_YOU_NOT_SUBSCRIBE = '🥰 Чтобы продолжить необходимо подписаться на каналы наших спонсоров!'
 MESSAGE_YOU_NOT_SUBSCRIBE_GROUP = ' ты не подписаны на наши чаты и бот🧐, перейди в бот и зарегистрируйся для начала😊'
 
 SUBSCRIBE_CHECKED = 'Ура, вы подписаны😊'

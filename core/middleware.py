@@ -45,7 +45,7 @@ class IsSubscribedMiddleware(BaseMiddleware):
         user_name = event.from_user.full_name
         session = data['session']
         global op_ids
-        
+        data['op_list'] = op_ids
         if str(user_id) in ADMINS:
             return await handler(event, data)
         
@@ -53,9 +53,12 @@ class IsSubscribedMiddleware(BaseMiddleware):
         #     if event.text.startswith('/start'):
         #         return await handler(event, data)
         
-        if chat_type != 'private' and event.photo:
-            if event.caption!='/bg':
-                return await handler(event, data)
+        # if chat_type != 'private' and event.photo:
+        #     if event.caption!='/bg':
+        #         return await handler(event, data)
+        
+        if chat_type != 'private':
+            return await handler(event, data)
                   
         if not op_ids:
             op_ids = await get_op_chanels(session)
@@ -91,9 +94,9 @@ class IsSubscribedMiddleware(BaseMiddleware):
                 if chat_type == 'private':
                     await event.answer(text=messages.MESSAGE_YOU_NOT_SUBSCRIBE,
                                             reply_markup=subscribe_keyboard(checked_channels))
-                else:
-                    await event.answer(text=f'{user_name}{messages.MESSAGE_YOU_NOT_SUBSCRIBE_GROUP}',
-                                    reply_markup=go_to_bot_ikb())
+                # else:
+                #     await event.answer(text=f'{user_name}{messages.MESSAGE_YOU_NOT_SUBSCRIBE_GROUP}',
+                #                     reply_markup=go_to_bot_ikb())
         else:
             return await handler(event, data)
 

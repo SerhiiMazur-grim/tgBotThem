@@ -11,7 +11,7 @@ def subscribe_keyboard(checked_channels):
 
     for channel_id in checked_channels:
         invate_url = channel_id.get('invate_url')
-        keyboard.button(text=f"{messages.MESSAGE_WITH_CHAT}{counter}", url=invate_url)
+        keyboard.button(text=f"{counter}.Подписаться", url=invate_url)
         counter += 1
     keyboard.button(text=messages.MESSAGE_CHECK_SUBSCRIBE, callback_data='sub_check')
     keyboard.adjust(2, 2, 1)
